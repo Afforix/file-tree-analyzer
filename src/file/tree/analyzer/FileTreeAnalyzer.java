@@ -15,5 +15,6 @@ public class FileTreeAnalyzer {
      */
     public static void main(String[] args) {
         System.out.println("Hello World3!");
+        System.out.println("Exclude config attempt 1");
     }
 }
