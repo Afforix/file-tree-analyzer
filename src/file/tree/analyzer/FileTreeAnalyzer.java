@@ -14,7 +14,7 @@ public class FileTreeAnalyzer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println("Hello World3!");
+        System.out.println("Hello World4!");
         System.out.println("Exclude config attempt 2");
     }
 }
