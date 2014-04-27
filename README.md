@@ -11,4 +11,5 @@ Project chat available at https://gitter.im/Afforix/file-tree-analyzer
 * Martina Vitovská (xvitovs1) - manager for analysis history
 * Filip Křepinský (suomiy) - unit testing, GUI
 * Jindřich Ryšavý (xrysavy1) - undecided
+
 (Complete overview of the tasks assigned to each contributor is available in the issues section.)
