@@ -16,7 +16,7 @@
     </Menu>
     <Menu mnemonicParsing="false" text="Tools">
       <items>
-        <MenuItem mnemonicParsing="false" text="Diff to" /><MenuItem mnemonicParsing="false" text="Diff to Actual State" />
+        <MenuItem mnemonicParsing="false" onAction="#handleMenuDiffToAction" text="Diff to" /><MenuItem mnemonicParsing="false" onAction="#handleMenuDiffToCurrentAction" text="Diff to Current State" />
       </items>
     </Menu><Menu mnemonicParsing="false" text="Help">
 <items>
@@ -57,7 +57,7 @@
 <Insets left="10.0" />
 </HBox.margin>
 </Label>
-<ComboBox maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="30.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+<ComboBox fx:id="openComboBox" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" onAction="#handleOpenComboBoxAction" prefHeight="30.0" prefWidth="200.0" promptText="Choose File ..." HBox.hgrow="ALWAYS" />
 </children>
 </HBox><HBox alignment="CENTER_LEFT" maxHeight="40.0" minHeight="0.0" minWidth="0.0" prefHeight="40.0" GridPane.valignment="TOP">
 <GridPane.margin>
@@ -70,7 +70,7 @@
 <HBox.margin>
 <Insets left="10.0" />
 </HBox.margin>
-</Label><ComboBox maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="30.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+</Label><ComboBox fx:id="diffComboBox" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" onAction="#handleDiffComboBoxAction" prefHeight="30.0" prefWidth="200.0" promptText="Choose File ..." HBox.hgrow="ALWAYS" />
 </children></HBox><ToolBar minHeight="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="431.0" GridPane.rowIndex="1" GridPane.valignment="TOP">
 <items><Label minHeight="0.0" minWidth="0.0" prefHeight="30.0" prefWidth="164.0" text="Properties">
 <font>
