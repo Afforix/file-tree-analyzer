@@ -27,11 +27,18 @@ public class FileTreeAnalyzer extends Application{
         primaryStage.setScene(scene);
         primaryStage.setTitle("File Tree Analyzer");
         primaryStage.show();        
-         
-        System.out.println("Prints contents of the given directory:");
-        DiscExplorer explorer = new DiscExplorer();
-        explorer.listFiles(".");
+        
+        //FOR TESTING ONLY
+        System.out.println("Contents of the parent directory:");
+        DiskExplorer explorer = new DiskExplorer();
+        FileInfo directory = explorer.getFileTree("..");
+        if (directory != null) {
+            directory.print();
+        } else {
+            System.err.println("Analysis failed.");
+        }
         System.out.println("DONE");                 
+        //END TESTING
     }
     
     /**
