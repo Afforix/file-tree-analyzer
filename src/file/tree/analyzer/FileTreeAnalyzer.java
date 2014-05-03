@@ -30,14 +30,15 @@ public class FileTreeAnalyzer extends Application{
         
         //FOR TESTING ONLY
         System.out.println("Contents of the parent directory:");
-        DiskExplorer explorer = new DiskExplorer();
-        FileInfo directory = explorer.getFileTree("..");
-        if (directory != null) {
+        FileInfo directory = null;
+        try {
+            directory = DiskExplorer.getFileTree("..");
             directory.print();
-        } else {
+            System.out.println("DONE");
+        } catch (IOException e) {
             System.err.println("Analysis failed.");
-        }
-        System.out.println("DONE");                 
+            e.printStackTrace();
+        }                 
         //END TESTING
     }
     

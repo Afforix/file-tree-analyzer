@@ -32,10 +32,10 @@ public class FileInfo implements Comparable<FileInfo> {
         if (file == null) throw new NullPointerException("file");
         if (attributes == null) throw new NullPointerException("attributes");
         
-        //needs special treatment with root ("/")
-        //TEST ON WINDOWS!
-        if (file.getFileName() == null) name = "/";
+        //needs special treatment with root
+        if (file.getFileName() == null) name = file.getRoot().toString();
         else name = file.getFileName().toString();
+        
         symbolicLink = attributes.isSymbolicLink();
         
         directory = attributes.isDirectory();

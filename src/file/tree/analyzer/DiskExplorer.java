@@ -10,21 +10,18 @@ import java.nio.file.Paths;
  * @author afforix
  */
 public class DiskExplorer {
+    
+    private DiskExplorer() {}
 
     /**
      * 
      * @param path root of the directory tree to analyze
      * @return root of the analyzed directory tree
      */
-    public FileInfo getFileTree(String path) {
+    public static FileInfo getFileTree(String path) throws IOException {
         FileVisitorImpl fileVisitor = new FileVisitorImpl();
         Path startPath = Paths.get(path);
-        try {
-            Files.walkFileTree(startPath, fileVisitor);
-        } catch (IOException ex) {
-            System.err.println("walkFileTree failed " + ex);
-            return null;
-        }
+        Files.walkFileTree(startPath, fileVisitor);
         return fileVisitor.getRoot();
     }
 }
