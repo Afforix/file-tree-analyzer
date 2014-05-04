@@ -29,16 +29,16 @@ public class FileTreeAnalyzer extends Application{
         primaryStage.show();        
         
         //FOR TESTING ONLY
-        System.out.println("Contents of the parent directory:");
-        FileInfo directory = null;
-        try {
-            directory = DiskExplorer.getFileTree("..");
-            directory.print();
-            System.out.println("DONE");
-        } catch (IOException e) {
-            System.err.println("Analysis failed.");
-            e.printStackTrace();
-        }                 
+//        System.out.println("Contents of the parent directory:");
+//        FileInfo directory = null;
+//        try {
+//            directory = DiskExplorer.getFileTree("..");
+//            directory.print();
+//            System.out.println("DONE");
+//        } catch (IOException e) {
+//            System.err.println("Analysis failed.");
+//            e.printStackTrace();
+//        }                 
         //END TESTING
     }
     

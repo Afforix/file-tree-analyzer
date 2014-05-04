@@ -1,71 +1,86 @@
 package file.tree.analyzer;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.util.Pair;
 
 public class Controller {
 
+// <editor-fold defaultstate="collapsed" desc="FXML variables">
     @FXML
     private Parent root;
-
     @FXML
     private ResourceBundle resources;
-
     @FXML
     private URL location;
-
     @FXML
-    private TreeView<File> treeView;
-
+    private TreeView<FileInfo> treeView;
     @FXML
-    private TableView<TestClassAttribute> tableView;
-
+    private TableView<Pair<String, String>> tableView;
     @FXML
-    private TableColumn<TestClassAttribute, String> attributeName;
-
+    private TableColumn<Pair<String, String>, String> attributeName;
     @FXML
-    private TableColumn<TestClassAttribute, String> attribute;
-
+    private TableColumn<Pair<String, String>, String> attribute;
     @FXML
     private ComboBox<String> openComboBox;
-
     @FXML
     private ComboBox<String> diffComboBox;
 
-    private ObservableList<TestClassAttribute> testData;
+    // </editor-fold>
+    
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         attributeName.setCellValueFactory(
-                new PropertyValueFactory<>("attributeName"));
-
+                new PropertyValueFactory<>("key"));
         attribute.setCellValueFactory(
-                new PropertyValueFactory<>("attribute"));
+                new PropertyValueFactory<>("value"));       
+        attribute.setCellFactory(TextFieldTableCell.forTableColumn());        
+        tableView.setPlaceholder(new Label("Properties"));
+        tableView.getSelectionModel().setCellSelectionEnabled(true);
+        
 
-        testData = FXCollections.observableArrayList(
-                new TestClassAttribute("Name", "test.txt"),
-                new TestClassAttribute("Type", "plain text document (text/plain)"),
-                new TestClassAttribute("Size", "100 bytes"),
-                new TestClassAttribute("Location", "/home")
-        );
+        treeView.getSelectionModel().selectedItemProperty()
+                .addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ObservableValue observable, Object oldValue,
+                            Object newValue) {
 
-        tableView.setItems(testData);
+                        if (newValue != null) {
+                            TreeItem<FileInfo> selectedItem = (TreeItem<FileInfo>) newValue;
+                            tableView.setItems(selectedItem.getValue().getPairedVariables());
+                        } else {
+                            tableView.setPlaceholder(new Label("Properties"));
+                        }
+                    }
+
+                });
 
         XMLFileManager xmlFileManager = new XMLFileManager(("./saved_analyses"));
         List<String> xmlFiles = xmlFileManager.findAllXMLFiles();
@@ -89,18 +104,35 @@ public class Controller {
     @FXML
     void handleNewAnalysisAction(ActionEvent event) {
 
+        root.setDisable(true);
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        File selectedDirectory = directoryChooser.showDialog(root.getScene().getWindow());
+        File selectedDirectory = directoryChooser
+                .showDialog(root.getScene().getWindow());
 
         if (selectedDirectory != null) {
+            try {
+                FileInfo directory = DiskExplorer
+                        .getFileTree(selectedDirectory.getAbsolutePath());
 
-            System.out.println(selectedDirectory.getAbsolutePath());
-
-            listFilesDemo(selectedDirectory);
+                if (directory != null) {
+                    TreeItem<FileInfo> treeRoot = new TreeItem<>(directory);
+                    addRecursively(treeRoot);
+                    treeView.setRoot(treeRoot);
+                    treeRoot.setExpanded(true);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Controller.class.getName()).
+                        log(Level.SEVERE, null, ex);
+            }
+        } else {
+            Logger.getLogger(Controller.class.getName()).
+                    log(Level.SEVERE, "Analysis failed.");
         }
-
+        
+        root.setDisable(false);
     }
 
+// <editor-fold defaultstate="collapsed" desc="Menu actions">
     @FXML
     void handleMenuDiffToAction(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
@@ -127,37 +159,15 @@ public class Controller {
     void handleQuitAction(ActionEvent event) {
         System.exit(0);
     }
+    // </editor-fold>
 
-    private void listFilesDemo(File selectedDirectory) {
-
-        TreeItem<File> r = new TreeItem<>(selectedDirectory);
-
-        for (File n : selectedDirectory.listFiles()) {
-            r.getChildren().add(new TreeItem<>(n));
-        }
-
-        r.setExpanded(true);
-        treeView.setRoot(r);
-    }
-
-    public class TestClassAttribute {
-
-        private final SimpleStringProperty attributeName;
-        private final SimpleStringProperty attribute;
-
-        public TestClassAttribute(String attributeName, String attribute) {
-
-            this.attribute = new SimpleStringProperty(attribute);
-            this.attributeName = new SimpleStringProperty(attributeName);
-        }
-
-        public String getAttributeName() {
-            return attributeName.get();
-        }
-
-        public String getAttribute() {
-            return attribute.get();
+    private void addRecursively(TreeItem<FileInfo> element) {
+        for (FileInfo f : element.getValue().getChildren()) {
+            TreeItem<FileInfo> item = new TreeItem<>(f);
+            element.getChildren().add(item);
+            if (f.isDirectory()) {
+                addRecursively(item);
+            }
         }
     }
-
 }

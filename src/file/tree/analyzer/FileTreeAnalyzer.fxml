@@ -78,14 +78,17 @@
 </font>
 </Label>
 </items>
-</ToolBar><TableView fx:id="tableView" depthTest="DISABLE" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+</ToolBar><TableView fx:id="tableView" depthTest="DISABLE" editable="true" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
   <columns>
-    <TableColumn fx:id="attributeName" prefWidth="142.0" text="Attribute name" />
-    <TableColumn fx:id="attribute" minWidth="0.0" prefWidth="287.0" text="Attribute" />
+    <TableColumn fx:id="attributeName" editable="false" prefWidth="142.0" sortable="false" />
+    <TableColumn fx:id="attribute" editable="true" minWidth="0.0" prefWidth="287.0" sortable="false" />
   </columns>
 <GridPane.margin>
 <Insets top="40.0" />
 </GridPane.margin>
+<columnResizePolicy>
+<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+</columnResizePolicy>
 </TableView><CheckBox alignment="CENTER" contentDisplay="CENTER" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Show Full Diff" GridPane.halignment="RIGHT">
 <GridPane.margin>
 <Insets right="10.0" />

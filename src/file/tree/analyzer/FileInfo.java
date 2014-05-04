@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package file.tree.analyzer;
 
 import java.nio.file.Path;
@@ -12,13 +11,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.util.Pair;
 
 /**
  *
  * @author afforix
  */
 public class FileInfo implements Comparable<FileInfo> {
-    
+
     private final String name;
     private final boolean directory;
     private final boolean symbolicLink;
@@ -27,33 +29,44 @@ public class FileInfo implements Comparable<FileInfo> {
     private final Date lastAccessTime;
     private final Date lastModifiedTime;
     private final List<FileInfo> children;
+    private final String path;
 
     public FileInfo(Path file, BasicFileAttributes attributes) {
-        if (file == null) throw new NullPointerException("file");
-        if (attributes == null) throw new NullPointerException("attributes");
-        
+        if (file == null) {
+            throw new NullPointerException("file");
+        }
+        if (attributes == null) {
+            throw new NullPointerException("attributes");
+        }
+
         //needs special treatment with root
-        if (file.getFileName() == null) name = file.getRoot().toString();
-        else name = file.getFileName().toString();
-        
+        if (file.getFileName() == null) {
+            name = file.getRoot().toString();
+        } else {
+            name = file.getFileName().toString();
+        }
+
+        path = file.toAbsolutePath().toString();
         symbolicLink = attributes.isSymbolicLink();
-        
+
         directory = attributes.isDirectory();
         if (directory) {
             children = new ArrayList<>();
             size = null;
         } else {
             children = null;
-            size = attributes.size();            
+            size = attributes.size();
         }
-        
+
         creationTime = new Date(attributes.creationTime().toMillis());
         lastAccessTime = new Date(attributes.lastAccessTime().toMillis());
         lastModifiedTime = new Date(attributes.lastModifiedTime().toMillis());
     }
-    
+
     public void addChild(FileInfo file) {
-        if (file == null) throw new NullPointerException("file");
+        if (file == null) {
+            throw new NullPointerException("file");
+        }
         if (directory) {
             children.add(file);
         } else {
@@ -63,7 +76,8 @@ public class FileInfo implements Comparable<FileInfo> {
 
     @Override
     public String toString() {
-        return "FileInfo{" + "name=" + name + ", directory=" + directory + ", symbolicLink=" + symbolicLink + ", size=" + size + ", creationTime=" + creationTime + ", lastAccessTime=" + lastAccessTime + ", lastModifiedTime=" + lastModifiedTime + '}';
+        return name;
+       // return "FileInfo{" + "name=" + name + ", directory=" + directory + ", symbolicLink=" + symbolicLink + ", size=" + size + ", creationTime=" + creationTime + ", lastAccessTime=" + lastAccessTime + ", lastModifiedTime=" + lastModifiedTime + '}';
     }
 
     public String getName() {
@@ -101,16 +115,18 @@ public class FileInfo implements Comparable<FileInfo> {
             throw new IllegalStateException("Files don't have children!");
         }
     }
-    
+
     public void print() {
         print(0);
     }
-    
+
     private void print(int level) {
         System.out.println(name);
-        if (!directory) return;
-        
-        for (FileInfo file: children) {
+        if (!directory) {
+            return;
+        }
+
+        for (FileInfo file : children) {
             for (int i = 0; i <= level; i++) {
                 System.out.print(" ");
             }
@@ -122,7 +138,7 @@ public class FileInfo implements Comparable<FileInfo> {
     public int compareTo(FileInfo o) {
         return name.compareTo(o.getName());
     }
-    
+
     public void sortChildren() {
         if (directory) {
             Collections.sort(children);
@@ -130,4 +146,31 @@ public class FileInfo implements Comparable<FileInfo> {
             throw new IllegalStateException("Files don't have children!");
         }
     }
+
+    public ObservableList<Pair<String, String>> getPairedVariables() {
+
+        ArrayList<Pair<String, String>> list  = new ArrayList<> ();
+        
+        list.add(new Pair("Name", name));
+        
+        if(!directory){
+        list.add( new Pair("Size", humanReadableByteCount(size,true) + " (" + size + " bytes)"));
+        }
+        
+        list.add( new Pair("Creation Time", creationTime.toString()));
+        list.add(new Pair("Last Access Time", lastAccessTime.toString()));
+        list.add(new Pair("Creation Time", lastModifiedTime.toString()));
+        list.add(new Pair("Symbolic Link", Boolean.toString(symbolicLink)));
+        list.add( new Pair("Path", path));   
+        
+        return FXCollections.observableArrayList(list);
+        
+    }
+    private static String humanReadableByteCount(long bytes, boolean si) {
+    int unit = si ? 1000 : 1024;
+    if (bytes < unit) return bytes + " B";
+    int exp = (int) (Math.log(bytes) / Math.log(unit));
+    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+}
 }
