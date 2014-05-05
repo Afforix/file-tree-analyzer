@@ -40,14 +40,18 @@ public class XMLFileManager {
      * Gets XML DOM and saves it.
      *
      * @param xmlDom XML DOM to be saved
+     * @return name of created file
      */
-    public void createXMLFile(Document xmlDom) {
+    public String createXMLFile(Document xmlDom) {
         try {
+            
+            File file = new File(analysesPath.toFile(),xmlDom.getDocumentElement().getAttribute("name") + "_" + getTimestamp() + ".xml");           
             javax.xml.transform.TransformerFactory.newInstance().newTransformer().
-                    transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(new File(analysesPath + "/" + getTimestamp() + ".xml")));
+                    transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(file));
+            return file.toPath().getFileName().toString();
         } catch (TransformerException ex) {
-
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "Cannot save file.", ex);
+            return null;
         }
     }
 
@@ -58,7 +62,7 @@ public class XMLFileManager {
     private String getTimestamp() {
         Date date = new Date();
         //TODO timestamp format
-        SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
         return timeStampFormat.format(date);
     }
 

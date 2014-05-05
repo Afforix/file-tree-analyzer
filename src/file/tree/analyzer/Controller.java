@@ -3,29 +3,25 @@ package file.tree.analyzer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
+import java.nio.file.Path;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
@@ -51,20 +47,31 @@ public class Controller {
     private ComboBox<String> openComboBox;
     @FXML
     private ComboBox<String> diffComboBox;
+    @FXML
+    private MenuItem menuDelete;
+    @FXML
+    private MenuItem menuClear;
+    @FXML
+    private MenuItem menuDiffTo;
+    @FXML
+    private MenuItem menuDiffToCurrent;
+    @FXML
+    private CheckBox fullDiffCheckBox;
 
     // </editor-fold>
-    
+    private XMLFileManager xmlFileManager = new XMLFileManager(("./saved_analyses"));
+    private FileInfoConverter convertor = new FileInfoConverter();
+    private boolean treeAlreadyLoaded = false;   
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         attributeName.setCellValueFactory(
                 new PropertyValueFactory<>("key"));
         attribute.setCellValueFactory(
-                new PropertyValueFactory<>("value"));       
-        attribute.setCellFactory(TextFieldTableCell.forTableColumn());        
+                new PropertyValueFactory<>("value"));
+        attribute.setCellFactory(TextFieldTableCell.forTableColumn());
         tableView.setPlaceholder(new Label("Properties"));
         tableView.getSelectionModel().setCellSelectionEnabled(true);
-        
 
         treeView.getSelectionModel().selectedItemProperty()
                 .addListener(new ChangeListener() {
@@ -82,43 +89,58 @@ public class Controller {
 
                 });
 
-        XMLFileManager xmlFileManager = new XMLFileManager(("./saved_analyses"));
-        List<String> xmlFiles = xmlFileManager.findAllXMLFiles();
-
-        openComboBox.getItems().addAll(xmlFiles);
-        diffComboBox.getItems().addAll(xmlFiles);
+        openComboBox.getItems().addAll(xmlFileManager.findAllXMLFiles());
+        diffComboBox.getItems().addAll(xmlFileManager.findAllXMLFiles());
     }
 
     @FXML
     void handleOpenComboBoxAction(ActionEvent event) {
-        ComboBox<String> source = (ComboBox<String>) event.getSource();
-        System.out.println("Open " + source.getValue());
+
+        if (!treeAlreadyLoaded) {
+
+            ComboBox<String> source = (ComboBox<String>) event.getSource();
+//             FileInfo dir  = convertor....(xmlFileManager.findXMLFile(source.getValue()));
+//             loadFile(dir);            
+            if (source.getValue() == null || source.getValue().isEmpty()) {
+                return;
+            }
+            System.out.println("Open " + source.getValue());
+        } else {
+            treeAlreadyLoaded = false;
+        }
+        if (menuClear.isDisable()) {
+            enableItems(true,false);
+        }
+
     }
 
     @FXML
     void handleDiffComboBoxAction(ActionEvent event) {
         ComboBox<String> source = (ComboBox<String>) event.getSource();
         System.out.println("Diff " + source.getValue());
+        enableItems(true,true);
     }
 
     @FXML
     void handleNewAnalysisAction(ActionEvent event) {
 
-        root.setDisable(true);
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File selectedDirectory = directoryChooser
                 .showDialog(root.getScene().getWindow());
-
+        root.setDisable(true);
         if (selectedDirectory != null) {
             try {
                 FileInfo directory = DiskExplorer
                         .getFileTree(selectedDirectory.getAbsolutePath());
-
                 if (directory != null) {
-                    TreeItem<FileInfo> treeRoot = new TreeItem<>(directory);
-                    addRecursively(treeRoot);
-                    treeView.setRoot(treeRoot);
-                    treeRoot.setExpanded(true);
+                    loadFile(directory);
+                    treeAlreadyLoaded = true;
+                    // save directory                   
+                    String file = xmlFileManager.createXMLFile(convertor.fileInfoToDom(directory));
+                    openComboBox.getItems().add(file);
+                    diffComboBox.getItems().add(file);
+                    openComboBox.getSelectionModel().select(file);
+                    enableItems(true,false);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Controller.class.getName()).
@@ -128,11 +150,27 @@ public class Controller {
             Logger.getLogger(Controller.class.getName()).
                     log(Level.SEVERE, "Analysis failed.");
         }
-        
         root.setDisable(false);
+
     }
 
 // <editor-fold defaultstate="collapsed" desc="Menu actions">
+    @FXML
+    void handleDeleteAnalysisAction(ActionEvent event) {
+        String value = openComboBox.getValue();
+        if (value != null) {
+            xmlFileManager.deleteXMLFile(value);
+            openComboBox.getItems().remove(value);
+            diffComboBox.getItems().remove(value);
+            clear();
+        }
+    }
+
+    @FXML
+    void handleClearAction(ActionEvent event) {
+        clear();
+    }
+
     @FXML
     void handleMenuDiffToAction(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
@@ -161,6 +199,13 @@ public class Controller {
     }
     // </editor-fold>
 
+    private void loadFile(FileInfo directory) {
+        TreeItem<FileInfo> treeRoot = new TreeItem<>(directory);
+        addRecursively(treeRoot);
+        treeView.setRoot(treeRoot);
+        treeRoot.setExpanded(true);
+    }
+
     private void addRecursively(TreeItem<FileInfo> element) {
         for (FileInfo f : element.getValue().getChildren()) {
             TreeItem<FileInfo> item = new TreeItem<>(f);
@@ -170,4 +215,25 @@ public class Controller {
             }
         }
     }
+
+    private void clear() {
+        openComboBox.getSelectionModel().clearSelection();
+        openComboBox.setPromptText("Choose File ...");        
+        diffComboBox.getSelectionModel().clearSelection();
+        diffComboBox.setPromptText("Choose File ...");
+        treeView.setRoot(null);
+        tableView.setItems(null);
+        tableView.getSelectionModel().clearSelection();
+        enableItems(false,false);
+    }
+
+    private void enableItems(boolean items, boolean checkbox) {
+        menuDelete.setDisable(!items);
+        menuDiffTo.setDisable(!items);
+        menuClear.setDisable(!items);
+        diffComboBox.setDisable(!items);
+        menuDiffToCurrent.setDisable(!items);
+        fullDiffCheckBox.setDisable(!checkbox);       
+    }
+
 }
