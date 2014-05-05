@@ -33,7 +33,15 @@ public class XMLFileManager {
     private final Path analysesPath;
 
     public XMLFileManager(String path) {
+
         analysesPath = Paths.get(path);
+        File dir = analysesPath.toFile();
+
+        if (!dir.exists()) {
+            dir.mkdir();
+        }else if(!dir.isDirectory()){
+            throw new IllegalArgumentException("Argument path isn't directory.");
+        }
     }
 
     /**
@@ -44,8 +52,8 @@ public class XMLFileManager {
      */
     public String createXMLFile(Document xmlDom) {
         try {
-            
-            File file = new File(analysesPath.toFile(),xmlDom.getDocumentElement().getAttribute("name") + "_" + getTimestamp() + ".xml");           
+
+            File file = new File(analysesPath.toFile(), xmlDom.getDocumentElement().getAttribute("name") + "_" + getTimestamp() + ".xml");
             javax.xml.transform.TransformerFactory.newInstance().newTransformer().
                     transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(file));
             return file.toPath().getFileName().toString();
@@ -57,6 +65,7 @@ public class XMLFileManager {
 
     /**
      * Returns string that represents current date timestamp.
+     *
      * @return string that represents timestamp
      */
     private String getTimestamp() {
@@ -68,6 +77,7 @@ public class XMLFileManager {
 
     /**
      * Deletes XML file of given name.
+     *
      * @param fileName name of the XML file to be deleted
      */
     public void deleteXMLFile(String fileName) {
@@ -91,18 +101,18 @@ public class XMLFileManager {
                 }
             }
         }
-        
-        if(xmlFile==null){
+
+        if (xmlFile == null) {
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "File not found!");
             return;
         }
 
-        try{
-           xmlFile.delete(); 
-        }catch(Exception ex){
+        try {
+            xmlFile.delete();
+        } catch (Exception ex) {
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "Cannot delete file.", ex);
         }
-        
+
     }
 
     /**
