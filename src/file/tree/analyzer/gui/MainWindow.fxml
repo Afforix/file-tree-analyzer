@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="file.tree.analyzer.Controller">
+<AnchorPane id="AnchorPane" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="file.tree.analyzer.gui.MainController">
     <children><MenuBar cache="true" prefHeight="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
   <menus>
     <Menu mnemonicParsing="false" text="File">
@@ -26,7 +26,7 @@
       </items>
     </Menu><Menu mnemonicParsing="false" text="Help">
 <items>
-<MenuItem mnemonicParsing="false" text="About" />
+<MenuItem mnemonicParsing="false" onAction="#handleAboutAction" text="About" />
 </items>
 </Menu>
   </menus>

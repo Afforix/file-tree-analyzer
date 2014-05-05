@@ -21,7 +21,7 @@ public class FileTreeAnalyzer extends Application{
     @Override
     public void start(Stage primaryStage) throws IOException {     
    //    setUserAgentStylesheet(STYLESHEET_MODENA); //STYLESHEET_CASPIAN
-        Parent root = FXMLLoader.load(getClass().getResource("FileTreeAnalyzer.fxml"));      
+        Parent root = FXMLLoader.load(getClass().getResource("gui/MainWindow.fxml"));      
         Scene scene = new Scene(root);  
        
         primaryStage.setScene(scene);

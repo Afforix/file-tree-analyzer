@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<GridPane alignment="CENTER" hgap="14.0" minHeight="0.0" minWidth="0.0" prefHeight="300.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="file.tree.analyzer.gui.AboutController">
+  <children>
+        <Label fx:id="messageLabel" alignment="CENTER" contentDisplay="CENTER" minHeight="25.0" prefHeight="25.0" prefWidth="133.0" text="File Tree Analyzer" wrapText="true" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER">
+          <font>
+            <Font name="System Bold" size="13.0" />
+          </font>
+        </Label>
+        <Label fx:id="detailsLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="6.0" layoutY="-3.0" minHeight="20.0" minWidth="0.0" prefHeight="20.0" prefWidth="75.0" text="0.1" textAlignment="LEFT" wrapText="true" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" /><TextArea editable="false" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" text="https://github.com/Afforix/file-tree-analyzer" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+            <Button fx:id="okButton" alignment="CENTER" minHeight="0.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleCloseAboutWindowAction" prefWidth="80.0" text="Close" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER" HBox.hgrow="NEVER">
+              <HBox.margin>
+                <Insets left="14.0" />
+              </HBox.margin>
+<GridPane.margin>
+<Insets right="20.0" />
+</GridPane.margin>
+            </Button>
+  </children>
+  <columnConstraints>
+    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="+Infinity" minWidth="-Infinity" />
+  </columnConstraints>
+  <padding>
+    <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
+  </padding>
+  <rowConstraints>
+<RowConstraints maxHeight="Infinity" minHeight="25.0" prefHeight="25.0" valignment="CENTER" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="Infinity" minHeight="23.0" prefHeight="23.0" valignment="CENTER" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="Infinity" valignment="CENTER" vgrow="ALWAYS" />
+<RowConstraints maxHeight="Infinity" minHeight="-Infinity" prefHeight="36.0" valignment="CENTER" vgrow="ALWAYS" />
+<RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="NEVER" />
+  </rowConstraints>
+</GridPane>
