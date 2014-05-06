@@ -77,7 +77,7 @@ public class FileInfoConverter {
             Element currentElement = doc.createElement("file");
             currentElement.setTextContent(root.getName());
             if(root.getSize() != null)
-                currentElement.setAttribute("size", root.getSize().toString() + " B");
+                currentElement.setAttribute("size", root.getSize().toString());
             parent.appendChild(currentElement);
         }
     }
