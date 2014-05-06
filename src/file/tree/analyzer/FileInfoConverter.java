@@ -5,8 +5,7 @@
  */
 package file.tree.analyzer;
 
-import java.io.File;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -14,7 +13,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -53,6 +51,8 @@ public class FileInfoConverter {
             } else {
                 Element rootElement = doc.createElement("file");
                 rootElement.setTextContent(root.getName());
+                if(root.getSize() != null)
+                    rootElement.setAttribute("size", root.getSize().toString() + " B");
                 doc.appendChild(rootElement);
             }
 
@@ -67,6 +67,7 @@ public class FileInfoConverter {
         if (root.isDirectory()) {
             Element currentElement = doc.createElement("directory");
             currentElement.setAttribute("name", root.getName());
+            //TODO size of the dirctory?
             parent.appendChild(currentElement);
             List<FileInfo> children = new ArrayList<>(root.getChildren());
             for (FileInfo child : children) {
@@ -75,6 +76,8 @@ public class FileInfoConverter {
         } else {
             Element currentElement = doc.createElement("file");
             currentElement.setTextContent(root.getName());
+            if(root.getSize() != null)
+                currentElement.setAttribute("size", root.getSize().toString() + " B");
             parent.appendChild(currentElement);
         }
     }
