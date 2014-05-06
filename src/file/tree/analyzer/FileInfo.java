@@ -30,6 +30,8 @@ public class FileInfo implements Comparable<FileInfo> {
     private final Date lastModifiedTime;
     private final List<FileInfo> children;
     private final String path;
+    private final int numberOfFiles;
+    private final int numberofDirectories;
 
     public FileInfo(Path file, BasicFileAttributes attributes) {
         if (file == null) {
@@ -61,6 +63,9 @@ public class FileInfo implements Comparable<FileInfo> {
         creationTime = new Date(attributes.creationTime().toMillis());
         lastAccessTime = new Date(attributes.lastAccessTime().toMillis());
         lastModifiedTime = new Date(attributes.lastModifiedTime().toMillis());
+        numberOfFiles = 0;
+        numberofDirectories = 0;
+
     }
 
     public void addChild(FileInfo file) {
@@ -77,7 +82,7 @@ public class FileInfo implements Comparable<FileInfo> {
     @Override
     public String toString() {
         return name;
-       // return "FileInfo{" + "name=" + name + ", directory=" + directory + ", symbolicLink=" + symbolicLink + ", size=" + size + ", creationTime=" + creationTime + ", lastAccessTime=" + lastAccessTime + ", lastModifiedTime=" + lastModifiedTime + '}';
+        // return "FileInfo{" + "name=" + name + ", directory=" + directory + ", symbolicLink=" + symbolicLink + ", size=" + size + ", creationTime=" + creationTime + ", lastAccessTime=" + lastAccessTime + ", lastModifiedTime=" + lastModifiedTime + '}';
     }
 
     public String getName() {
@@ -106,6 +111,14 @@ public class FileInfo implements Comparable<FileInfo> {
 
     public Date getLastModifiedTime() {
         return new Date(lastModifiedTime.getTime());
+    }
+
+    public int getNumberOfFiles() {
+        return numberOfFiles;
+    }
+
+    public int getNumberOfDirectories() {
+        return numberofDirectories;
     }
 
     public List<FileInfo> getChildren() {
@@ -149,28 +162,31 @@ public class FileInfo implements Comparable<FileInfo> {
 
     public ObservableList<Pair<String, String>> getPairedVariables() {
 
-        ArrayList<Pair<String, String>> list  = new ArrayList<> ();
-        
+        ArrayList<Pair<String, String>> list = new ArrayList<>();
+
         list.add(new Pair("Name", name));
-        
-        if(!directory){
-        list.add( new Pair("Size", humanReadableByteCount(size,true) + " (" + size + " bytes)"));
+
+        if (!directory) {
+            list.add(new Pair("Size", humanReadableByteCount(size, true) + " (" + size + " bytes)"));
         }
-        
-        list.add( new Pair("Creation Time", creationTime.toString()));
+
+        list.add(new Pair("Creation Time", creationTime.toString()));
         list.add(new Pair("Last Access Time", lastAccessTime.toString()));
         list.add(new Pair("Creation Time", lastModifiedTime.toString()));
         list.add(new Pair("Symbolic Link", Boolean.toString(symbolicLink)));
-        list.add( new Pair("Path", path));   
-        
+        list.add(new Pair("Path", path));
+
         return FXCollections.observableArrayList(list);
-        
+
     }
+
     private static String humanReadableByteCount(long bytes, boolean si) {
-    int unit = si ? 1000 : 1024;
-    if (bytes < unit) return bytes + " B";
-    int exp = (int) (Math.log(bytes) / Math.log(unit));
-    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
-    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
-}
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit) {
+            return bytes + " B";
+        }
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
 }

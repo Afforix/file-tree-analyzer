@@ -8,6 +8,8 @@ package file.tree.analyzer;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -30,11 +32,19 @@ import org.xml.sax.SAXException;
 public class XMLFileManager {
     //TODO logging
 
-    private final Path analysesPath;
+    private  Path analysesPath;
 
     public XMLFileManager(String path) {
 
+        System.out.println(path);
         analysesPath = Paths.get(path);
+        
+        try {
+           analysesPath = analysesPath.toRealPath();
+        } catch (IOException ex) {
+            Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         File dir = analysesPath.toFile();
 
         if (!dir.exists()) {
@@ -53,7 +63,7 @@ public class XMLFileManager {
     public String createXMLFile(Document xmlDom) {
         try {
 
-            File file = new File(analysesPath.toFile(), xmlDom.getDocumentElement().getAttribute("name") + "_" + getTimestamp() + ".xml");
+            File file = new File(analysesPath.toFile(),getTimestamp() + ".xml");
             javax.xml.transform.TransformerFactory.newInstance().newTransformer().
                     transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(file));
             return file.toPath().getFileName().toString();
@@ -71,7 +81,7 @@ public class XMLFileManager {
     private String getTimestamp() {
         Date date = new Date();
         //TODO timestamp format
-        SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+        SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd'T'hhmmss");
         return timeStampFormat.format(date);
     }
 

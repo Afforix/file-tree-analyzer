@@ -67,7 +67,6 @@ public class MainController {
 
     // </editor-fold>
     private final XMLFileManager xmlFileManager = new XMLFileManager(("./saved_analyses"));
-    private final FileInfoConverter convertor = new FileInfoConverter();
     private boolean treeAlreadyLoaded = false;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -143,7 +142,7 @@ public class MainController {
                     loadFile(directory);
                     treeAlreadyLoaded = true;
                     // save directory                   
-                    String file = xmlFileManager.createXMLFile(convertor.fileInfoToDom(directory));
+                    String file = xmlFileManager.createXMLFile(FileInfoConverter.fileInfoToDom(directory));
                     openComboBox.getItems().add(file);
                     diffComboBox.getItems().add(file);
                     openComboBox.getSelectionModel().select(file);

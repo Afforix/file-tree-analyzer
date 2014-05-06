@@ -31,7 +31,7 @@ public class FileInfoConverter {
      * @param root root of the directory tree
      * @return XML DOM
      */
-    public Document fileInfoToDom(FileInfo root) {
+    public static Document fileInfoToDom(FileInfo root) {
         Document doc = null;
 
         try {
@@ -63,7 +63,7 @@ public class FileInfoConverter {
         return doc;
     }
 
-    private void childrenToDom(Document doc, Element parent, FileInfo root) {
+    private static void childrenToDom(Document doc, Element parent, FileInfo root) {
         if (root.isDirectory()) {
             Element currentElement = doc.createElement("directory");
             currentElement.setAttribute("name", root.getName());
