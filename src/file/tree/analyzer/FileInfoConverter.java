@@ -5,7 +5,10 @@
  */
 package file.tree.analyzer;
 
-
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -13,6 +16,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -31,6 +35,7 @@ public class FileInfoConverter {
      */
     public static Document fileInfoToDom(FileInfo root) {
         Document doc = null;
+        Element rootElement = null;
 
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -41,7 +46,7 @@ public class FileInfoConverter {
 
             // root element
             if (root.isDirectory()) {
-                Element rootElement = doc.createElement("directory");
+                rootElement = doc.createElement("directory");
                 rootElement.setAttribute("name", root.getName());
                 doc.appendChild(rootElement);
                 List<FileInfo> children = new ArrayList<>(root.getChildren());
@@ -49,12 +54,19 @@ public class FileInfoConverter {
                     childrenToDom(doc, rootElement, child);
                 }
             } else {
-                Element rootElement = doc.createElement("file");
+                rootElement = doc.createElement("file");
                 rootElement.setTextContent(root.getName());
-                if(root.getSize() != null)
-                    rootElement.setAttribute("size", root.getSize().toString() + " B");
+                if (root.getSize() != null) {
+                    rootElement.setAttribute("size", root.getSize().toString());
+                }
                 doc.appendChild(rootElement);
             }
+
+            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); //TODO
+
+            rootElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
+            rootElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
+            rootElement.setAttribute("lastModifiedTime", dateFormat.format(root.getLastModifiedTime()));
 
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
@@ -64,8 +76,10 @@ public class FileInfoConverter {
     }
 
     private static void childrenToDom(Document doc, Element parent, FileInfo root) {
+        Element currentElement = null;
+
         if (root.isDirectory()) {
-            Element currentElement = doc.createElement("directory");
+            currentElement = doc.createElement("directory");
             currentElement.setAttribute("name", root.getName());
             //TODO size of the dirctory?
             parent.appendChild(currentElement);
@@ -74,11 +88,21 @@ public class FileInfoConverter {
                 childrenToDom(doc, currentElement, child);
             }
         } else {
-            Element currentElement = doc.createElement("file");
+            currentElement = doc.createElement("file");
             currentElement.setTextContent(root.getName());
-            if(root.getSize() != null)
+            if (root.getSize() != null) {
                 currentElement.setAttribute("size", root.getSize().toString());
+            }
             parent.appendChild(currentElement);
         }
+
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); //TODO
+
+        currentElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
+        currentElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
+        currentElement.setAttribute("lastModifiedTime", dateFormat.format(root.getLastModifiedTime()));
     }
+
+   
+
 }
