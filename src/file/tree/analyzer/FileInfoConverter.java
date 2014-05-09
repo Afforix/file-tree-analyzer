@@ -62,11 +62,19 @@ public class FileInfoConverter {
                 doc.appendChild(rootElement);
             }
 
+            if (root.isSymbolicLink()) {
+                rootElement.setAttribute("symbolicLink", "true");
+            } else {
+                rootElement.setAttribute("symbolicLink", "false");
+            }
+
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); //TODO
 
             rootElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
             rootElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
             rootElement.setAttribute("lastModifiedTime", dateFormat.format(root.getLastModifiedTime()));
+            rootElement.setAttribute("numberOfFiles", Integer.toString(root.getNumberOfFiles()));
+            rootElement.setAttribute("numberOfDirectories", Integer.toString(root.getNumberOfDirectories()));
 
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
@@ -81,7 +89,7 @@ public class FileInfoConverter {
         if (root.isDirectory()) {
             currentElement = doc.createElement("directory");
             currentElement.setAttribute("name", root.getName());
-            //TODO size of the dirctory?
+            //TODO size of the directory?
             parent.appendChild(currentElement);
             List<FileInfo> children = new ArrayList<>(root.getChildren());
             for (FileInfo child : children) {
@@ -96,13 +104,32 @@ public class FileInfoConverter {
             parent.appendChild(currentElement);
         }
 
+        if (root.isSymbolicLink()) {
+            currentElement.setAttribute("symbolicLink", "true");
+        } else {
+            currentElement.setAttribute("symbolicLink", "false");
+        }
+
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); //TODO
 
         currentElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
         currentElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
         currentElement.setAttribute("lastModifiedTime", dateFormat.format(root.getLastModifiedTime()));
+
+        currentElement.setAttribute("numberOfFiles", Integer.toString(root.getNumberOfFiles()));
+        currentElement.setAttribute("numberOfDirectories", Integer.toString(root.getNumberOfDirectories()));
     }
 
-   
+    /**
+     * Takes object representing XML DOM and converts it to
+     * FileInfo.
+     *
+     * @param doc XML Dom
+     * @return FileInfo
+     */
+    public static FileInfo domToFileInfo(Document doc) {
+        return null;
+    }
+
 
 }
