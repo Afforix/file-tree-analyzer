@@ -8,8 +8,10 @@ package file.tree.analyzer;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +50,8 @@ public class FileInfoConverter {
             if (root.isDirectory()) {
                 rootElement = doc.createElement("directory");
                 rootElement.setAttribute("name", root.getName());
+                rootElement.setAttribute("numberOfFiles", Integer.toString(root.getNumberOfFiles()));
+                rootElement.setAttribute("numberOfDirectories", Integer.toString(root.getNumberOfDirectories()));
                 doc.appendChild(rootElement);
                 List<FileInfo> children = new ArrayList<>(root.getChildren());
                 for (FileInfo child : children) {
@@ -73,8 +77,6 @@ public class FileInfoConverter {
             rootElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
             rootElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
             rootElement.setAttribute("lastModifiedTime", dateFormat.format(root.getLastModifiedTime()));
-            rootElement.setAttribute("numberOfFiles", Integer.toString(root.getNumberOfFiles()));
-            rootElement.setAttribute("numberOfDirectories", Integer.toString(root.getNumberOfDirectories()));
 
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
@@ -89,6 +91,8 @@ public class FileInfoConverter {
         if (root.isDirectory()) {
             currentElement = doc.createElement("directory");
             currentElement.setAttribute("name", root.getName());
+            currentElement.setAttribute("numberOfFiles", Integer.toString(root.getNumberOfFiles()));
+            currentElement.setAttribute("numberOfDirectories", Integer.toString(root.getNumberOfDirectories()));
             //TODO size of the directory?
             parent.appendChild(currentElement);
             List<FileInfo> children = new ArrayList<>(root.getChildren());
@@ -115,21 +119,65 @@ public class FileInfoConverter {
         currentElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
         currentElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
         currentElement.setAttribute("lastModifiedTime", dateFormat.format(root.getLastModifiedTime()));
-
-        currentElement.setAttribute("numberOfFiles", Integer.toString(root.getNumberOfFiles()));
-        currentElement.setAttribute("numberOfDirectories", Integer.toString(root.getNumberOfDirectories()));
     }
 
     /**
-     * Takes object representing XML DOM and converts it to
-     * FileInfo.
+     * Takes object representing XML DOM and converts it to FileInfo.
      *
      * @param doc XML Dom
      * @return FileInfo
      */
     public static FileInfo domToFileInfo(Document doc) {
-        return null;
+
+        Element rootElement = doc.getDocumentElement();
+
+        String name = "";
+        boolean isDirectory = false;
+        List<FileInfo> children = null;
+        Long size = null;
+        int numberOfFiles = 0;
+        int numberOfDirectories = 0;
+        
+        if (rootElement.getTagName().equals("directory")) {
+            name = rootElement.getAttribute("name");
+            isDirectory = true;
+            numberOfFiles = Integer.parseInt(rootElement.getAttribute("numberOfFiles"));
+            numberOfDirectories = Integer.parseInt(rootElement.getAttribute("numberOfDirectories"));
+        } else {
+            name = rootElement.getTextContent();
+            size = Long.parseLong(rootElement.getAttribute("size"));
+        }
+
+        boolean isSymbolicLink = false;
+        if (rootElement.getAttribute("isSymbolicLink").equals("true")) {
+            isSymbolicLink = true;
+        }
+
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); //TODO
+
+        Date creationTime = null;
+        Date lastAccessTime = null;
+        Date lastModifiedTime = null;
+        try {
+            creationTime = dateFormat.parse(rootElement.getAttribute("creationTime"));
+            lastAccessTime = dateFormat.parse(rootElement.getAttribute("lastAccessTime"));
+            lastModifiedTime = dateFormat.parse(rootElement.getAttribute("lastModifiedTime"));
+        } catch (ParseException ex) {
+            Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+
+        FileInfo root = new FileInfo(name, isDirectory, isSymbolicLink, size, creationTime,
+                lastAccessTime, lastModifiedTime, children, numberOfFiles, numberOfDirectories);
+
+        return root;
     }
 
+    //TODO delete, only for testing
+    public static void main(String[] args) throws IOException {
+        XMLFileManager xM = new XMLFileManager("/home/martina/Dokumenty/PB167");
+        Document doc = xM.findXMLFile("test.xml");
+        FileInfo root = domToFileInfo(doc);
+    }
 
 }

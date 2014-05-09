@@ -68,6 +68,20 @@ public class FileInfo implements Comparable<FileInfo> {
 
     }
 
+    public FileInfo(String name, boolean directory, boolean symbolicLink, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories) {
+        this.name = name;
+        this.directory = directory;
+        this.symbolicLink = symbolicLink;
+        this.size = size;
+        this.creationTime = creationTime;
+        this.lastAccessTime = lastAccessTime;
+        this.lastModifiedTime = lastModifiedTime;
+        this.children = children;
+        this.numberOfFiles = numberOfFiles;
+        this.numberofDirectories = numberofDirectories;
+        this.path = ""; //TODO
+    }
+    
     public void addChild(FileInfo file) {
         if (file == null) {
             throw new NullPointerException("file");
