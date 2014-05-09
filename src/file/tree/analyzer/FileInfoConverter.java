@@ -21,6 +21,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -72,7 +73,7 @@ public class FileInfoConverter {
                 rootElement.setAttribute("symbolicLink", "false");
             }
 
-            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); //TODO
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"); //TODO
 
             rootElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
             rootElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
@@ -114,7 +115,7 @@ public class FileInfoConverter {
             currentElement.setAttribute("symbolicLink", "false");
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); //TODO
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"); //TODO
 
         currentElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
         currentElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
@@ -128,56 +129,58 @@ public class FileInfoConverter {
      * @return FileInfo
      */
     public static FileInfo domToFileInfo(Document doc) {
-
         Element rootElement = doc.getDocumentElement();
+        FileInfo root = childrenToDom(rootElement);
 
+        return root;
+    }
+
+    private static FileInfo childrenToDom(Element parent) {
         String name = "";
         boolean isDirectory = false;
         List<FileInfo> children = null;
         Long size = null;
         int numberOfFiles = 0;
         int numberOfDirectories = 0;
-        
-        if (rootElement.getTagName().equals("directory")) {
-            name = rootElement.getAttribute("name");
+
+        if (parent.getTagName().equals("directory")) {
+            name = parent.getAttribute("name");
             isDirectory = true;
-            numberOfFiles = Integer.parseInt(rootElement.getAttribute("numberOfFiles"));
-            numberOfDirectories = Integer.parseInt(rootElement.getAttribute("numberOfDirectories"));
+            numberOfFiles = Integer.parseInt(parent.getAttribute("numberOfFiles"));
+            numberOfDirectories = Integer.parseInt(parent.getAttribute("numberOfDirectories"));
+
+            children = new ArrayList<>();
+            for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
+                Element child = (Element) parent.getChildNodes().item(i);
+                children.add(childrenToDom(child));
+            }
         } else {
-            name = rootElement.getTextContent();
-            size = Long.parseLong(rootElement.getAttribute("size"));
+            name = parent.getTextContent();
+            size = Long.parseLong(parent.getAttribute("size"));
         }
 
         boolean isSymbolicLink = false;
-        if (rootElement.getAttribute("isSymbolicLink").equals("true")) {
+        if (parent.getAttribute("isSymbolicLink").equals("true")) {
             isSymbolicLink = true;
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"); //TODO
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
         Date creationTime = null;
         Date lastAccessTime = null;
         Date lastModifiedTime = null;
         try {
-            creationTime = dateFormat.parse(rootElement.getAttribute("creationTime"));
-            lastAccessTime = dateFormat.parse(rootElement.getAttribute("lastAccessTime"));
-            lastModifiedTime = dateFormat.parse(rootElement.getAttribute("lastModifiedTime"));
+            creationTime = dateFormat.parse(parent.getAttribute("creationTime"));
+            lastAccessTime = dateFormat.parse(parent.getAttribute("lastAccessTime"));
+            lastModifiedTime = dateFormat.parse(parent.getAttribute("lastModifiedTime"));
         } catch (ParseException ex) {
             Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
-       
 
         FileInfo root = new FileInfo(name, isDirectory, isSymbolicLink, size, creationTime,
                 lastAccessTime, lastModifiedTime, children, numberOfFiles, numberOfDirectories);
 
         return root;
-    }
-
-    //TODO delete, only for testing
-    public static void main(String[] args) throws IOException {
-        XMLFileManager xM = new XMLFileManager("/home/martina/Dokumenty/PB167");
-        Document doc = xM.findXMLFile("test.xml");
-        FileInfo root = domToFileInfo(doc);
     }
 
 }
