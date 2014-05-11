@@ -32,7 +32,7 @@ public class FileVisitorImpl implements FileVisitor<Path> {
             //first directory to visit is root
             root = directory;            
         } else {
-            directoryStack.peek().addChild(directory);
+            //directoryStack.peek().addChild(directory);
         }
         directoryStack.push(directory);
         
@@ -61,7 +61,14 @@ public class FileVisitorImpl implements FileVisitor<Path> {
     @Override
     public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
         directoryStack.peek().sortChildren();
-        directoryStack.pop();
+        FileInfo directory = directoryStack.pop();
+        
+        if (!directoryStack.isEmpty()) {
+            directoryStack.peek().addChild(directory);
+        } else {
+            //now we are back in root
+            directory.sortChildren();
+        }
         
         return FileVisitResult.CONTINUE;
     }
