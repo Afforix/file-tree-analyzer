@@ -32,8 +32,8 @@ public class FileInfo implements Comparable<FileInfo> {
     private final Date lastModifiedTime;
     private final List<FileInfo> children;
     private final String path;
-    private final int numberOfFiles;
-    private final int numberofDirectories;
+    private int numberOfFiles;
+    private int numberofDirectories;
 
     /**
      * Constructor designed to use during hard disk analysis.
@@ -94,6 +94,7 @@ public class FileInfo implements Comparable<FileInfo> {
      * @param numberOfFiles number of files
      * @param numberofDirectories number of directories
      */
+    @Deprecated
     public FileInfo(String name, boolean directory, boolean symbolicLink, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories) {
         this.name = name;
         this.directory = directory;
@@ -109,6 +110,35 @@ public class FileInfo implements Comparable<FileInfo> {
     }
 
     /**
+     * Constructor designed for conversion from XML DOM.
+     *
+     * @param name name of file
+     * @param directory is directory
+     * @param symbolicLink is symbolic link
+     * @param size size
+     * @param creationTime creation time
+     * @param lastAccessTime last access time
+     * @param lastModifiedTime last modification time
+     * @param path full path
+     */
+    public FileInfo(String name, boolean directory, boolean symbolicLink, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, String path) {
+        this.name = name;
+        this.directory = directory;
+        this.symbolicLink = symbolicLink;
+        this.size = size;
+        this.creationTime = creationTime;
+        this.lastAccessTime = lastAccessTime;
+        this.lastModifiedTime = lastModifiedTime;
+        this.path = path;
+        
+        if (directory) {
+            children = new ArrayList<>();
+        } else {
+            children = null;
+        }
+    }
+
+    /**
      *
      * @param file file to be added to the children list
      */
@@ -118,6 +148,11 @@ public class FileInfo implements Comparable<FileInfo> {
         }
         if (directory) {
             children.add(file);
+            if (file.isDirectory()) {
+                numberofDirectories++;
+            } else {
+                numberOfFiles++;
+            }
         } else {
             throw new IllegalStateException("Files don't have children!");
         }
