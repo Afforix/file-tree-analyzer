@@ -8,8 +8,6 @@ package file.tree.analyzer;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -132,8 +130,6 @@ public class XMLFileManager {
      * @return list of names of XML files
      */
     public List<String> findAllXMLFiles() {
-        //TODO any subfolders?
-
         List<String> xmlFilesNames = new ArrayList<>();
 
         File analysesDirectory = analysesPath.toFile();
