@@ -281,10 +281,54 @@ public class FileInfo implements Comparable<FileInfo> {
             file.print(level + 1);
         }
     }
+    
+    /**
+     * Compares names of files like UNIX tool ls.
+     * 
+     * @param a first string to compare
+     * @param b second string to compare
+     * @return comparison of the names of two files
+     */
+    private int nameCompare(String a, String b) {
+        boolean dotA = false;
+        boolean dotB = false;
+        
+        if (a.startsWith(".") && !b.startsWith(".")) dotA = true;
+        else if (!a.startsWith(".") && b.startsWith(".")) dotB = true;
+        
+        //removing dots from the beginning of the name
+        if (dotA) {
+            a = a.substring(1);
+        }
+        if (dotB) {
+            b = b.substring(1);
+        }
+        
+        int result = a.compareToIgnoreCase(b);
+        if (result == 0) {
+            result = -a.compareTo(b);
+        }
+        
+        if (result == 0) {
+            if (dotA) return 1;
+            else if (dotB) return -1;
+            else return result;
+        } else {
+            return result;
+        }
+    }
 
+    /**
+     * Sorts directories before files and then by names.
+     * 
+     * @param o file to sompare
+     * @return 
+     */
     @Override
     public int compareTo(FileInfo o) {
-        return name.compareTo(o.getName());
+        int dirCompare = -Boolean.compare(directory, o.directory);
+        if (dirCompare != 0) return dirCompare;
+        else return nameCompare(name, o.getName());
     }
 
     /**
