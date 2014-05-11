@@ -16,6 +16,8 @@ import javafx.collections.ObservableList;
 import javafx.util.Pair;
 
 /**
+ * Entity class for storing information about file or directory. In case of
+ * directory, all children are accessible using instance of this class.
  *
  * @author afforix
  */
@@ -33,6 +35,17 @@ public class FileInfo implements Comparable<FileInfo> {
     private final int numberOfFiles;
     private final int numberofDirectories;
 
+    /**
+     * Constructor designed to use during hard disk analysis.
+     *
+     * @throws NullPointerException if parameter file or attributes is null
+     * @throws IllegalStateException if directory features are used on an object
+     * representing file. Client must always check if the object is directory
+     * using {@code isDirectory()} method when using methods for directories:
+     * {@code getChildren()} and {@code addChild()}.
+     * @param file file, which attributes are going to be stored
+     * @param attributes attributes of the files
+     */
     public FileInfo(Path file, BasicFileAttributes attributes) {
         if (file == null) {
             throw new NullPointerException("file");
@@ -41,7 +54,8 @@ public class FileInfo implements Comparable<FileInfo> {
             throw new NullPointerException("attributes");
         }
 
-        //needs special treatment with root
+        //needs special treatment with root, because root does not have  
+        //a regular file name, so it's necessary to obtain root name
         if (file.getFileName() == null) {
             name = file.getRoot().toString();
         } else {
@@ -65,9 +79,21 @@ public class FileInfo implements Comparable<FileInfo> {
         lastModifiedTime = new Date(attributes.lastModifiedTime().toMillis());
         numberOfFiles = 0;
         numberofDirectories = 0;
-
     }
 
+    /**
+     *
+     * @param name name of file or directory
+     * @param directory is directory
+     * @param symbolicLink is symbolic link
+     * @param size size of file
+     * @param creationTime creation time
+     * @param lastAccessTime last access time
+     * @param lastModifiedTime last modification time
+     * @param children list of children
+     * @param numberOfFiles number of files
+     * @param numberofDirectories number of directories
+     */
     public FileInfo(String name, boolean directory, boolean symbolicLink, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories) {
         this.name = name;
         this.directory = directory;
@@ -81,7 +107,11 @@ public class FileInfo implements Comparable<FileInfo> {
         this.numberofDirectories = numberofDirectories;
         this.path = ""; //TODO
     }
-    
+
+    /**
+     *
+     * @param file file to be added to the children list
+     */
     public void addChild(FileInfo file) {
         if (file == null) {
             throw new NullPointerException("file");
@@ -99,42 +129,86 @@ public class FileInfo implements Comparable<FileInfo> {
         // return "FileInfo{" + "name=" + name + ", directory=" + directory + ", symbolicLink=" + symbolicLink + ", size=" + size + ", creationTime=" + creationTime + ", lastAccessTime=" + lastAccessTime + ", lastModifiedTime=" + lastModifiedTime + '}';
     }
 
+    /**
+     *
+     * @return name of the file or directory
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return if the instance is file or directory
+     */
     public boolean isDirectory() {
         return directory;
     }
 
+    /**
+     *
+     * @return if the instance is symbolic link
+     */
     public boolean isSymbolicLink() {
         return symbolicLink;
     }
 
+    /**
+     * @throws IllegalStateException if the method is called on directory
+     * @return return size of the file
+     */
     public Long getSize() {
-        return size;
+        if (directory) {
+            throw new IllegalStateException("Size of folders is not calculated!");
+        } else {
+            return size;
+        }
     }
-
+    
+    /**
+     * 
+     * @return creation time
+     */
     public Date getCreationTime() {
         return new Date(creationTime.getTime());
     }
 
+    /**
+     * 
+     * @return last access time
+     */
     public Date getLastAccessTime() {
         return new Date(lastAccessTime.getTime());
     }
 
+    /**
+     * 
+     * @return last modification time
+     */
     public Date getLastModifiedTime() {
         return new Date(lastModifiedTime.getTime());
     }
 
+    /**
+     * 
+     * @return number of files in the directory
+     */
     public int getNumberOfFiles() {
         return numberOfFiles;
     }
 
+    /**
+     * 
+     * @return number of subdirectories in the folder
+     */
     public int getNumberOfDirectories() {
         return numberofDirectories;
     }
 
+    /**
+     * @throws IllegalStateException if called on a file
+     * @return list of children of the directory
+     */
     public List<FileInfo> getChildren() {
         if (directory) {
             return Collections.unmodifiableList(children);
@@ -143,10 +217,19 @@ public class FileInfo implements Comparable<FileInfo> {
         }
     }
 
+    /**
+     * Prints whole directory tree.
+     * Mainly for testing purposes, can be removed in the final release.
+     */
     public void print() {
         print(0);
     }
 
+    /**
+     * Recursively prints whole directory tree.
+     * 
+     * @param level indentation level
+     */
     private void print(int level) {
         System.out.println(name);
         if (!directory) {
@@ -166,6 +249,12 @@ public class FileInfo implements Comparable<FileInfo> {
         return name.compareTo(o.getName());
     }
 
+    /**
+     * Sorts children of the directory for purposes of the tree visualization 
+     * and diff.
+     * 
+     * @throws IllegalStateException if called on a file
+     */
     public void sortChildren() {
         if (directory) {
             Collections.sort(children);
