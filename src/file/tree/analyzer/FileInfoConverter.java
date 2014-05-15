@@ -130,12 +130,12 @@ public class FileInfoConverter {
      */
     public static FileInfo domToFileInfo(Document doc) {
         Element rootElement = doc.getDocumentElement();
-        FileInfo root = childrenToDom(rootElement);
+        FileInfo root = childrenToFileInfo(rootElement);
 
         return root;
     }
 
-    private static FileInfo childrenToDom(Element parent) {
+    private static FileInfo childrenToFileInfo(Element parent) {
         String name = "";
         boolean isDirectory = false;
         List<FileInfo> children = null;
@@ -152,7 +152,7 @@ public class FileInfoConverter {
             children = new ArrayList<>();
             for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
                 Element child = (Element) parent.getChildNodes().item(i);
-                children.add(childrenToDom(child));
+                children.add(childrenToFileInfo(child));
             }
         } else {
             name = parent.getTextContent();
@@ -182,5 +182,5 @@ public class FileInfoConverter {
 
         return root;
     }
-
+    
 }

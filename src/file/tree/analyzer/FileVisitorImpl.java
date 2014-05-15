@@ -9,27 +9,33 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * Class provides methods used by Files.walkFileTree().
- * Structure of the traversed directory tree is stored 
- * and can be obtained by method getRoot().
+ * Class provides methods used by {@code Files.walkFileTree()} and 
+ * provides result of the disk analysis throughout method {@code getRoot()}.
+ * This is just a utility class, most of the methods are implementation of 
+ * the FileVisitor interface and should not be used on its own. Please use 
+ * class which is designed to use this class correctly, for example 
+ * DiskExplorer class.
  * 
  * @author afforix
  */
 public class FileVisitorImpl implements FileVisitor<Path> {
     
-    //on top of the stack is currently processed directory
+    /** On top of the stack is currently processed directory */
     Deque<FileInfo> directoryStack = new ArrayDeque<>();
+    /** Root of the directory tree to return */
     FileInfo root;
     
     @Override
     public FileVisitResult preVisitDirectory(Path dirPath, BasicFileAttributes attrs) throws IOException {
         FileInfo directory = new FileInfo(dirPath, attrs);
         if (directoryStack.isEmpty()) {
+            //first directory to visit is root
             root = directory;            
         } else {
-            directoryStack.peek().addChild(directory);
+            //directoryStack.peek().addChild(directory);
         }
         directoryStack.push(directory);
+        
         return FileVisitResult.CONTINUE;
     }
 
@@ -46,22 +52,30 @@ public class FileVisitorImpl implements FileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-        System.err.println("File failed: " + file);
+        System.err.println("File failed: " + file);//testing output
         if (root == null) throw new IOException("Obtaining file tree failed.", exc);
+        
         return FileVisitResult.CONTINUE;
     }
 
     @Override
     public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
         directoryStack.peek().sortChildren();
-        directoryStack.pop();
+        FileInfo directory = directoryStack.pop();
+        
+        if (!directoryStack.isEmpty()) {
+            directoryStack.peek().addChild(directory);
+        } else {
+            //now we are back in root
+            directory.sortChildren();
+        }
+        
         return FileVisitResult.CONTINUE;
     }
     
     /**
      * 
-     * @return root of analyzed directory, null if no
-     *          analysis has been done yet
+     * @return root of analyzed directory, null if no analysis has been done yet
      */
     public FileInfo getRoot() {
         return root;
