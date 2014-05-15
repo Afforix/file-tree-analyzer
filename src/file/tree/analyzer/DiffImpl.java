@@ -9,13 +9,13 @@ package file.tree.analyzer;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
-import java.util.List;
+
 
 /**
  *
  * @author jindra
  */
-public class Diff extends FileInfo {
+public class DiffImpl extends FileInfo {
 
     private ItemState state;
     private final String newName="";
@@ -26,10 +26,14 @@ public class Diff extends FileInfo {
     private final Date newLastAccessTime=null;
     private final Date newLastModifiedTime=null;
     
-    public Diff(Path file, BasicFileAttributes attributes) {
+    public DiffImpl(Path file, BasicFileAttributes attributes) {
         super(file, attributes);
+    
+        
         
     }
+    
+    
      public ItemState getState() {
         return state;
     }
