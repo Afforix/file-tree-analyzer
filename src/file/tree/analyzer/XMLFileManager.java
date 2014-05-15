@@ -162,7 +162,20 @@ public class XMLFileManager {
      * @param fileName name of the xml file
      * @return XML DOM loaded from XML file
      */
-    public Document findXMLFile(String fileName) {
+    public Document findXMLFile(String fileName) {        
+        Document xmlDoc = this.findXMLFile(fileName, false);
+        return xmlDoc;
+    }
+    
+    /**
+     * Returns XML DOM loaded from XML file.
+     * added by Jindra because deferred DOM was causing troubles in Differ 
+     * 
+     * @param fileName name of the xml file
+     * @param turnOffDefferedDom true to disable deffered version of DOM 
+     * @return XML DOM loaded from XML file
+     */
+     public Document findXMLFile(String fileName, Boolean turnOffDefferedDom) {
         Document xmlDoc = null;
 
         try {
@@ -188,6 +201,12 @@ public class XMLFileManager {
             }
 
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            
+            if(turnOffDefferedDom)
+            {
+                dbFactory.setFeature("http://apache.org/xml/features/dom/defer-node-expansion", false);
+            }
+                        
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             xmlDoc = dBuilder.parse(xmlFile);
         } catch (IOException | ParserConfigurationException | SAXException ex) {

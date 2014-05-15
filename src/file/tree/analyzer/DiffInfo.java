@@ -15,7 +15,7 @@ import java.util.Date;
  *
  * @author jindra
  */
-public class DiffImpl extends FileInfo {
+public class DiffInfo extends FileInfo {
 
     private ItemState state;
     private final String newName="";
@@ -26,7 +26,7 @@ public class DiffImpl extends FileInfo {
     private final Date newLastAccessTime=null;
     private final Date newLastModifiedTime=null;
     
-    public DiffImpl(Path file, BasicFileAttributes attributes) {
+    public DiffInfo(Path file, BasicFileAttributes attributes) {
         super(file, attributes);
     
         
