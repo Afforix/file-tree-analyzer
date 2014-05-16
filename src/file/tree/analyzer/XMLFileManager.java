@@ -33,16 +33,8 @@ public class XMLFileManager {
     private  Path analysesPath;
 
     public XMLFileManager(String path) {
-
-        System.out.println(path);
-        analysesPath = Paths.get(path);
         
-        try {
-           analysesPath = analysesPath.toRealPath();
-        } catch (IOException ex) {
-            Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        analysesPath = Paths.get(path);        
         File dir = analysesPath.toFile();
 
         if (!dir.exists()) {
@@ -50,6 +42,14 @@ public class XMLFileManager {
         }else if(!dir.isDirectory()){
             throw new IllegalArgumentException("Argument path isn't directory.");
         }
+        
+        try {
+           analysesPath = analysesPath.toRealPath();
+        } catch (IOException ex) {
+            Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
     }
 
     /**
