@@ -178,6 +178,14 @@ public class FileInfo implements Comparable<FileInfo> {
     public String getName() {
         return name;
     }
+    
+    /**
+     *
+     * @return path to the file or directory
+     */
+    public String getPath() {
+        return path;
+    }
 
     /**
      *

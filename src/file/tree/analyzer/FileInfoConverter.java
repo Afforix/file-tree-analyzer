@@ -38,7 +38,6 @@ public class FileInfoConverter {
      */
     public static Document fileInfoToDom(FileInfo root) {
         Document doc = null;
-        Element rootElement = null;
 
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -47,37 +46,7 @@ public class FileInfoConverter {
             doc = docBuilder.newDocument();
             doc.setXmlVersion("1.0");
 
-            // root element
-            if (root.isDirectory()) {
-                rootElement = doc.createElement("directory");
-                rootElement.setAttribute("name", root.getName());
-                rootElement.setAttribute("numberOfFiles", Integer.toString(root.getNumberOfFiles()));
-                rootElement.setAttribute("numberOfDirectories", Integer.toString(root.getNumberOfDirectories()));
-                doc.appendChild(rootElement);
-                List<FileInfo> children = new ArrayList<>(root.getChildren());
-                for (FileInfo child : children) {
-                    childrenToDom(doc, rootElement, child);
-                }
-            } else {
-                rootElement = doc.createElement("file");
-                rootElement.setTextContent(root.getName());
-                if (root.getSize() != null) {
-                    rootElement.setAttribute("size", root.getSize().toString());
-                }
-                doc.appendChild(rootElement);
-            }
-
-            if (root.isSymbolicLink()) {
-                rootElement.setAttribute("symbolicLink", "true");
-            } else {
-                rootElement.setAttribute("symbolicLink", "false");
-            }
-
-            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"); //TODO
-
-            rootElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
-            rootElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
-            rootElement.setAttribute("lastModifiedTime", dateFormat.format(root.getLastModifiedTime()));
+            childrenToDom(doc, doc, root);
 
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
@@ -86,40 +55,45 @@ public class FileInfoConverter {
         return doc;
     }
 
-    private static void childrenToDom(Document doc, Element parent, FileInfo root) {
+    private static void childrenToDom(Document doc, Node parent, FileInfo fileInfo) {
+ 
         Element currentElement = null;
 
-        if (root.isDirectory()) {
+        if (fileInfo.isDirectory()) {
             currentElement = doc.createElement("directory");
-            currentElement.setAttribute("name", root.getName());
-            currentElement.setAttribute("numberOfFiles", Integer.toString(root.getNumberOfFiles()));
-            currentElement.setAttribute("numberOfDirectories", Integer.toString(root.getNumberOfDirectories()));
-            //TODO size of the directory?
+            currentElement.setAttribute("name", fileInfo.getName());
+            currentElement.setAttribute("numberOfFiles", Integer.toString(fileInfo.getNumberOfFiles()));
+            currentElement.setAttribute("numberOfDirectories", Integer.toString(fileInfo.getNumberOfDirectories()));
+            //TODO size of folders?
             parent.appendChild(currentElement);
-            List<FileInfo> children = new ArrayList<>(root.getChildren());
+            List<FileInfo> children = new ArrayList<>(fileInfo.getChildren());
             for (FileInfo child : children) {
                 childrenToDom(doc, currentElement, child);
             }
         } else {
             currentElement = doc.createElement("file");
-            currentElement.setTextContent(root.getName());
-            if (root.getSize() != null) {
-                currentElement.setAttribute("size", root.getSize().toString());
+            currentElement.setTextContent(fileInfo.getName());
+            if (fileInfo.getSize() != null) {
+                currentElement.setAttribute("size", fileInfo.getSize().toString());
             }
             parent.appendChild(currentElement);
         }
 
-        if (root.isSymbolicLink()) {
+        if (fileInfo.isSymbolicLink()) {
             currentElement.setAttribute("symbolicLink", "true");
         } else {
             currentElement.setAttribute("symbolicLink", "false");
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"); //TODO
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-        currentElement.setAttribute("creationTime", dateFormat.format(root.getCreationTime()));
-        currentElement.setAttribute("lastAccessTime", dateFormat.format(root.getLastAccessTime()));
-        currentElement.setAttribute("lastModifiedTime", dateFormat.format(root.getLastModifiedTime()));
+        currentElement.setAttribute("creationTime", dateFormat.format(fileInfo.getCreationTime()));
+        currentElement.setAttribute("lastAccessTime", dateFormat.format(fileInfo.getLastAccessTime()));
+        currentElement.setAttribute("lastModifiedTime", dateFormat.format(fileInfo.getLastModifiedTime()));
+        
+        if(doc.getDocumentElement().equals(currentElement)) {
+            currentElement.setAttribute("path", fileInfo.getPath());
+        }
     }
 
     /**
@@ -136,6 +110,8 @@ public class FileInfoConverter {
     }
 
     private static FileInfo childrenToFileInfo(Element parent) {
+        //TODO path
+        
         String name = "";
         boolean isDirectory = false;
         List<FileInfo> children = null;
@@ -182,5 +158,5 @@ public class FileInfoConverter {
 
         return root;
     }
-    
+
 }
