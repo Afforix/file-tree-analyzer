@@ -4,7 +4,9 @@ import file.tree.analyzer.DiskExplorer;
 import file.tree.analyzer.FileInfo;
 import file.tree.analyzer.FileInfoConverter;
 import file.tree.analyzer.XMLFileManager;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -12,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,11 +30,15 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import javax.swing.ImageIcon;
+import javax.swing.filechooser.FileSystemView;
 
 public class MainController {
 
@@ -102,15 +109,16 @@ public class MainController {
     @FXML
     void handleOpenComboBoxAction(ActionEvent event) {
 
-        if (!treeAlreadyLoaded) {
-
+        if (!treeAlreadyLoaded) { // to prevent double loading when creating new analysis
             ComboBox<String> source = (ComboBox<String>) event.getSource();
-//             FileInfo dir  = convertor....(xmlFileManager.findXMLFile(source.getValue()));
-//             loadFile(dir);            
             if (source.getValue() == null || source.getValue().isEmpty()) {
+                clear();
                 return;
             }
-            System.out.println("Open " + source.getValue());
+            FileInfo dir = FileInfoConverter.domToFileInfo(xmlFileManager.findXMLFile(source.getValue()));
+            loadFile(dir);
+            tableView.setItems(null);
+            tableView.getSelectionModel().clearSelection();
         } else {
             treeAlreadyLoaded = false;
         }
@@ -124,7 +132,7 @@ public class MainController {
     void handleDiffComboBoxAction(ActionEvent event) {
         ComboBox<String> source = (ComboBox<String>) event.getSource();
         System.out.println("Diff " + source.getValue());
-        enableItems(true, true);
+        clear();
     }
 
     @FXML
@@ -208,7 +216,7 @@ public class MainController {
             Parent parent = FXMLLoader.load(getClass().getResource("AboutWindow.fxml"));
             stage.setScene(new Scene(parent));
             stage.setTitle("About");
-            stage.show();            
+            stage.show();
         } catch (IOException ex) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -230,6 +238,14 @@ public class MainController {
     private void addRecursively(TreeItem<FileInfo> element) {
         for (FileInfo f : element.getValue().getChildren()) {
             TreeItem<FileInfo> item = new TreeItem<>(f);
+            try {
+                ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView().getSystemIcon(f.toFile());
+                java.awt.Image image = icon.getImage();
+                Image img = SwingFXUtils.toFXImage(toBufferedImage(image), null);
+                item.setGraphic(new ImageView(img));
+            } catch (Exception e) {
+            }
+            
             element.getChildren().add(item);
             if (f.isDirectory()) {
                 addRecursively(item);
@@ -255,6 +271,23 @@ public class MainController {
         diffComboBox.setDisable(!items);
         menuDiffToCurrent.setDisable(!items);
         fullDiffCheckBox.setDisable(!checkbox);
+    }
+
+    /**
+     * Converts a given Image into a BufferedImage
+     *
+     * @param img The Image to be converted
+     * @return The converted BufferedImage
+     */
+    private static BufferedImage toBufferedImage(java.awt.Image img) {
+        if (img instanceof BufferedImage) {
+            return (BufferedImage) img;
+        }
+        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D bGr = bimage.createGraphics();
+        bGr.drawImage(img, 0, 0, null);
+        bGr.dispose();
+        return bimage;
     }
 
 }

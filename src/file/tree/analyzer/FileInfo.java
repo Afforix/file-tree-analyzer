@@ -5,6 +5,7 @@
  */
 package file.tree.analyzer;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -165,6 +166,9 @@ public class FileInfo implements Comparable<FileInfo> {
     public String toString() {
         return name;// + " files: " + numberOfFiles + " directories: " + numberofDirectories;
         // return "FileInfo{" + "name=" + name + ", directory=" + directory + ", symbolicLink=" + symbolicLink + ", size=" + size + ", creationTime=" + creationTime + ", lastAccessTime=" + lastAccessTime + ", lastModifiedTime=" + lastModifiedTime + '}';
+    }
+    public File toFile() {        
+        return new File(path);
     }
 
     /**
@@ -353,13 +357,16 @@ public class FileInfo implements Comparable<FileInfo> {
 
         if (!directory) {
             list.add(new Pair("Size", humanReadableByteCount(size, true) + " (" + size + " bytes)"));
+        }else{
+            list.add(new Pair("Number of Files", String.valueOf(numberOfFiles)));
+            list.add(new Pair("Number of Directories",String.valueOf(numberofDirectories)));
         }
-
+        
         list.add(new Pair("Creation Time", creationTime.toString()));
         list.add(new Pair("Last Access Time", lastAccessTime.toString()));
         list.add(new Pair("Creation Time", lastModifiedTime.toString()));
         list.add(new Pair("Symbolic Link", Boolean.toString(symbolicLink)));
-        list.add(new Pair("Path", path));
+        list.add(new Pair("Path", path));        
 
         return FXCollections.observableArrayList(list);
 
