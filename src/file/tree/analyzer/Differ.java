@@ -29,9 +29,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * Class for finding differences between two XML docs, storing them and
- * converting to FileInfo Note: XMLUnit library
- * (http://sourceforge.net/projects/xmlunit/) is needed In this project should
- * be library stored in ./build/xmlunit-1.5.jar
+ * converting to FileInfo 
  *
  * @author jindra
  */

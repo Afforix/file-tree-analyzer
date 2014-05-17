@@ -1,21 +1,23 @@
 package file.tree.analyzer.gui;
 
-import file.tree.analyzer.DiskExplorer;
 import file.tree.analyzer.FileInfo;
 import file.tree.analyzer.FileInfoConverter;
 import file.tree.analyzer.XMLFileManager;
-import java.awt.image.BufferedImage;
+import file.tree.analyzer.utils.Utils;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -36,6 +38,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
@@ -102,8 +105,11 @@ public class MainController {
 
                 });
 
-        openComboBox.getItems().addAll(xmlFileManager.findAllXMLFiles());
-        diffComboBox.getItems().addAll(xmlFileManager.findAllXMLFiles());
+        openComboBox.getItems().addAll(Utils.FilenameToDisplayString(
+                xmlFileManager.findAllXMLFiles(), xmlFileManager));
+
+        diffComboBox.getItems().addAll(Utils.FilenameToDisplayString(
+                xmlFileManager.findAllXMLFiles(), xmlFileManager));
     }
 
     @FXML
@@ -115,7 +121,8 @@ public class MainController {
                 clear();
                 return;
             }
-            FileInfo dir = FileInfoConverter.domToFileInfo(xmlFileManager.findXMLFile(source.getValue()));
+            String fileName = Utils.DisplayStringToFilename(source.getValue());
+            FileInfo dir = FileInfoConverter.domToFileInfo(xmlFileManager.findXMLFile(fileName));
             loadFile(dir);
             tableView.setItems(null);
             tableView.getSelectionModel().clearSelection();
@@ -136,36 +143,74 @@ public class MainController {
     }
 
     @FXML
-    void handleNewAnalysisAction(ActionEvent event) {
-
+    void handleNewAnalysisAction(ActionEvent event) throws IOException {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File selectedDirectory = directoryChooser
                 .showDialog(root.getScene().getWindow());
-        root.setDisable(true);
+        
         if (selectedDirectory != null) {
-            try {
-                FileInfo directory = DiskExplorer
-                        .getFileTree(selectedDirectory.getAbsolutePath());
-                if (directory != null) {
-                    loadFile(directory);
-                    treeAlreadyLoaded = true;
-                    // save directory                   
-                    String file = xmlFileManager.createXMLFile(FileInfoConverter.fileInfoToDom(directory));
-                    openComboBox.getItems().add(file);
-                    diffComboBox.getItems().add(file);
-                    openComboBox.getSelectionModel().select(file);
-                    enableItems(true, false);
+            Stage subStage = InitializeWindow("DialogWindow.fxml", "Status");
+            subStage.setResizable(false);
+            subStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent event) {             
+                    event.consume();
                 }
-            } catch (IOException ex) {
-                Logger.getLogger(MainController.class.getName()).
-                        log(Level.SEVERE, null, ex);
-            }
+            });
+            subStage.show();
+            Task<FileInfo> task = new DiskExplorerTask (selectedDirectory);
+
+            
+
+            task.stateProperty().addListener(new ChangeListener<Worker.State>() {
+                @Override
+                public void changed(ObservableValue<? extends Worker.State> source,
+                        Worker.State oldState, Worker.State newState) {
+                    
+                    if (newState.equals(Worker.State.SUCCEEDED)) {
+                        FileInfo dir = task.getValue();
+                        if (dir != null) {
+                            loadFile(dir);
+                            treeAlreadyLoaded = true;
+                            // save directory                   
+                            String file = xmlFileManager
+                                    .createXMLFile(FileInfoConverter.fileInfoToDom(dir));
+                            String displayString = Utils
+                                    .FilenameToDisplayString(file, xmlFileManager);
+                            openComboBox.getItems().add(displayString);
+                            diffComboBox.getItems().add(displayString);
+                            openComboBox.getSelectionModel().select(displayString);
+                            enableItems(true, false);
+                            subStage.close();
+                        }
+                    } else if (newState.equals(Worker.State.FAILED)) {
+                        System.out.println("Analysis failed");
+                    } else if (newState.equals(Worker.State.CANCELLED)) {
+                        System.out.println("Analysis was canceled");
+                    }
+                }
+            });
+            
+            Thread thread = new Thread(task);
+            ThreadSingleton.getInstance().setDiskExplorerThread(thread);
+            thread.start();
+            
+            
         } else {
             Logger.getLogger(MainController.class.getName()).
-                    log(Level.SEVERE, "Analysis failed.");
+                    log(Level.SEVERE, "No selected directory!");
         }
-        root.setDisable(false);
 
+    }
+
+    private Stage InitializeWindow(String resource, String title) throws IOException {
+        Stage stage = new Stage();
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(root.getScene().getWindow());
+        Parent parent = FXMLLoader.load(getClass().getResource(resource));
+        stage.setScene(new Scene(parent));
+        stage.setTitle(title);
+        return stage;
     }
 
 // <editor-fold defaultstate="collapsed" desc="Menu actions">
@@ -173,7 +218,7 @@ public class MainController {
     void handleDeleteAnalysisAction(ActionEvent event) {
         String value = openComboBox.getValue();
         if (value != null) {
-            xmlFileManager.deleteXMLFile(value);
+            xmlFileManager.deleteXMLFile(Utils.DisplayStringToFilename(value));
             openComboBox.getItems().remove(value);
             diffComboBox.getItems().remove(value);
             clear();
@@ -210,12 +255,7 @@ public class MainController {
     @FXML
     void handleAboutAction(ActionEvent event) {
         try {
-            Stage stage = new Stage();
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(root.getScene().getWindow());
-            Parent parent = FXMLLoader.load(getClass().getResource("AboutWindow.fxml"));
-            stage.setScene(new Scene(parent));
-            stage.setTitle("About");
+            Stage stage = InitializeWindow("AboutWindow.fxml", "About");
             stage.show();
         } catch (IOException ex) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
@@ -224,6 +264,7 @@ public class MainController {
 
     @FXML
     void handleQuitAction(ActionEvent event) {
+        Platform.exit();
         System.exit(0);
     }
     // </editor-fold>
@@ -241,11 +282,11 @@ public class MainController {
             try {
                 ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView().getSystemIcon(f.toFile());
                 java.awt.Image image = icon.getImage();
-                Image img = SwingFXUtils.toFXImage(toBufferedImage(image), null);
+                Image img = SwingFXUtils.toFXImage(Utils.toBufferedImage(image), null);
                 item.setGraphic(new ImageView(img));
             } catch (Exception e) {
             }
-            
+
             element.getChildren().add(item);
             if (f.isDirectory()) {
                 addRecursively(item);
@@ -271,23 +312,6 @@ public class MainController {
         diffComboBox.setDisable(!items);
         menuDiffToCurrent.setDisable(!items);
         fullDiffCheckBox.setDisable(!checkbox);
-    }
-
-    /**
-     * Converts a given Image into a BufferedImage
-     *
-     * @param img The Image to be converted
-     * @return The converted BufferedImage
-     */
-    private static BufferedImage toBufferedImage(java.awt.Image img) {
-        if (img instanceof BufferedImage) {
-            return (BufferedImage) img;
-        }
-        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        java.awt.Graphics2D bGr = bimage.createGraphics();
-        bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-        return bimage;
     }
 
 }
