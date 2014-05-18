@@ -7,6 +7,8 @@ import file.tree.analyzer.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,6 +44,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.filechooser.FileView;
 
 public class MainController {
 
@@ -78,6 +81,8 @@ public class MainController {
     // </editor-fold>
     private final XMLFileManager xmlFileManager = new XMLFileManager(("./saved_analyses"));
     private boolean treeAlreadyLoaded = false;
+    private File genericFile;
+    private File genericDirectory;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -110,6 +115,12 @@ public class MainController {
 
         diffComboBox.getItems().addAll(Utils.FilenameToDisplayString(
                 xmlFileManager.findAllXMLFiles(), xmlFileManager));
+        try {
+            genericFile = Files.createTempFile(null, "").toFile();
+            genericDirectory = Files.createTempDirectory(null).toFile();
+        } catch (IOException ex) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
@@ -147,26 +158,24 @@ public class MainController {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File selectedDirectory = directoryChooser
                 .showDialog(root.getScene().getWindow());
-        
+
         if (selectedDirectory != null) {
             Stage subStage = InitializeWindow("DialogWindow.fxml", "Status");
             subStage.setResizable(false);
             subStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
-                public void handle(WindowEvent event) {             
+                public void handle(WindowEvent event) {
                     event.consume();
                 }
             });
             subStage.show();
-            Task<FileInfo> task = new DiskExplorerTask (selectedDirectory);
-
-            
+            Task<FileInfo> task = new DiskExplorerTask(selectedDirectory);
 
             task.stateProperty().addListener(new ChangeListener<Worker.State>() {
                 @Override
                 public void changed(ObservableValue<? extends Worker.State> source,
                         Worker.State oldState, Worker.State newState) {
-                    
+
                     if (newState.equals(Worker.State.SUCCEEDED)) {
                         FileInfo dir = task.getValue();
                         if (dir != null) {
@@ -190,12 +199,11 @@ public class MainController {
                     }
                 }
             });
-            
+
             Thread thread = new Thread(task);
             ThreadSingleton.getInstance().setDiskExplorerThread(thread);
             thread.start();
-            
-            
+
         } else {
             Logger.getLogger(MainController.class.getName()).
                     log(Level.SEVERE, "No selected directory!");
@@ -277,18 +285,35 @@ public class MainController {
     }
 
     private void addRecursively(TreeItem<FileInfo> element) {
-        for (FileInfo f : element.getValue().getChildren()) {
-            TreeItem<FileInfo> item = new TreeItem<>(f);
-            try {
-                ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView().getSystemIcon(f.toFile());
-                java.awt.Image image = icon.getImage();
-                Image img = SwingFXUtils.toFXImage(Utils.toBufferedImage(image), null);
-                item.setGraphic(new ImageView(img));
-            } catch (Exception e) {
+        FileInfo elementVal = element.getValue();
+        try { // try to set icon
+            File iconFile;
+
+            if (elementVal.toFile().exists()) {
+                iconFile = elementVal.toFile();
+            } else if (elementVal.isDirectory()) {
+                iconFile = genericDirectory;
+            } else {
+                iconFile = genericFile;
             }
 
-            element.getChildren().add(item);
-            if (f.isDirectory()) {
+            ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView()
+                    .getSystemIcon(iconFile);
+
+            if (icon != null) {
+                java.awt.Image image = icon.getImage();
+                Image img = SwingFXUtils.toFXImage(Utils.toBufferedImage(image), null);
+                element.setGraphic(new ImageView(img));
+            } else {
+
+            }
+        } catch (Exception e) {
+        }
+
+        if (elementVal.isDirectory()) {
+            for (FileInfo f : elementVal.getChildren()) {
+                TreeItem<FileInfo> item = new TreeItem<>(f);
+                element.getChildren().add(item);
                 addRecursively(item);
             }
         }
