@@ -7,8 +7,6 @@ import file.tree.analyzer.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,7 +15,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -34,17 +31,12 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
-import javax.swing.ImageIcon;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.filechooser.FileView;
 
 public class MainController {
 
@@ -81,9 +73,6 @@ public class MainController {
     // </editor-fold>
     private final XMLFileManager xmlFileManager = new XMLFileManager(("./saved_analyses"));
     private boolean treeAlreadyLoaded = false;
-    private File genericFile;
-    private File genericDirectory;
-
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         attributeName.setCellValueFactory(
@@ -114,13 +103,7 @@ public class MainController {
                 xmlFileManager.findAllXMLFiles(), xmlFileManager));
 
         diffComboBox.getItems().addAll(Utils.FilenameToDisplayString(
-                xmlFileManager.findAllXMLFiles(), xmlFileManager));
-        try {
-            genericFile = Files.createTempFile(null, "").toFile();
-            genericDirectory = Files.createTempDirectory(null).toFile();
-        } catch (IOException ex) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+                xmlFileManager.findAllXMLFiles(), xmlFileManager));     
     }
 
     @FXML
@@ -277,48 +260,12 @@ public class MainController {
     }
     // </editor-fold>
 
-    private void loadFile(FileInfo directory) {
-        TreeItem<FileInfo> treeRoot = new TreeItem<>(directory);
-        addRecursively(treeRoot);
+    private void loadFile(FileInfo directory) {      
+        FileInfoTreeItem treeRoot = new FileInfoTreeItem(directory);       
         treeView.setRoot(treeRoot);
-        treeRoot.setExpanded(true);
+        treeRoot.setExpanded(true);        
     }
-
-    private void addRecursively(TreeItem<FileInfo> element) {
-        FileInfo elementVal = element.getValue();
-        try { // try to set icon
-            File iconFile;
-
-            if (elementVal.toFile().exists()) {
-                iconFile = elementVal.toFile();
-            } else if (elementVal.isDirectory()) {
-                iconFile = genericDirectory;
-            } else {
-                iconFile = genericFile;
-            }
-
-            ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView()
-                    .getSystemIcon(iconFile);
-
-            if (icon != null) {
-                java.awt.Image image = icon.getImage();
-                Image img = SwingFXUtils.toFXImage(Utils.toBufferedImage(image), null);
-                element.setGraphic(new ImageView(img));
-            } else {
-
-            }
-        } catch (Exception e) {
-        }
-
-        if (elementVal.isDirectory()) {
-            for (FileInfo f : elementVal.getChildren()) {
-                TreeItem<FileInfo> item = new TreeItem<>(f);
-                element.getChildren().add(item);
-                addRecursively(item);
-            }
-        }
-    }
-
+    
     private void clear() {
         openComboBox.getSelectionModel().clearSelection();
         openComboBox.setPromptText("Choose File ...");
