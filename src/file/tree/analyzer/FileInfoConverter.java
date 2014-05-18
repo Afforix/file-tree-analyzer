@@ -104,14 +104,12 @@ public class FileInfoConverter {
      */
     public static FileInfo domToFileInfo(Document doc) {
         Element rootElement = doc.getDocumentElement();
-        FileInfo root = childrenToFileInfo(rootElement);
+        FileInfo root = childrenToFileInfo(rootElement, "");
 
         return root;
     }
 
-    private static FileInfo childrenToFileInfo(Element parent) {
-        //TODO path
-        
+    private static FileInfo childrenToFileInfo(Element parent, String path) {        
         String name = "";
         boolean isDirectory = false;
         List<FileInfo> children = null;
@@ -119,20 +117,27 @@ public class FileInfoConverter {
         int numberOfFiles = 0;
         int numberOfDirectories = 0;
 
-        if (parent.getTagName().equals("directory")) {
+                if (parent.getTagName().equals("directory")) {
             name = parent.getAttribute("name");
             isDirectory = true;
             numberOfFiles = Integer.parseInt(parent.getAttribute("numberOfFiles"));
             numberOfDirectories = Integer.parseInt(parent.getAttribute("numberOfDirectories"));
 
+            if (parent.hasAttribute("path")) {
+                path = parent.getAttribute("path");
+            } else {
+                path += "/" + name;
+            }
+
             children = new ArrayList<>();
             for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
                 Element child = (Element) parent.getChildNodes().item(i);
-                children.add(childrenToFileInfo(child));
+                children.add(childrenToFileInfo(child, path));
             }
         } else {
             name = parent.getTextContent();
             size = Long.parseLong(parent.getAttribute("size"));
+            path += "/" + name;
         }
 
         boolean isSymbolicLink = false;
@@ -153,7 +158,7 @@ public class FileInfoConverter {
             Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        FileInfo root = new FileInfo(name, isDirectory, isSymbolicLink, size, creationTime,
+        FileInfo root = new FileInfo(name, path, isDirectory, isSymbolicLink, size, creationTime,
                 lastAccessTime, lastModifiedTime, children, numberOfFiles, numberOfDirectories);
 
         return root;

@@ -85,6 +85,7 @@ public class FileInfo implements Comparable<FileInfo> {
     /**
      *
      * @param name name of file or directory
+     * @param path path
      * @param directory is directory
      * @param symbolicLink is symbolic link
      * @param size size of file
@@ -95,7 +96,7 @@ public class FileInfo implements Comparable<FileInfo> {
      * @param numberOfFiles number of files
      * @param numberofDirectories number of directories
      */
-    public FileInfo(String name, boolean directory, boolean symbolicLink, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories) {
+    public FileInfo(String name, String path, boolean directory, boolean symbolicLink, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories) {
         this.name = name;
         this.directory = directory;
         this.symbolicLink = symbolicLink;
@@ -106,7 +107,7 @@ public class FileInfo implements Comparable<FileInfo> {
         this.children = children;
         this.numberOfFiles = numberOfFiles;
         this.numberofDirectories = numberofDirectories;
-        this.path = ""; //TODO
+        this.path = path;
     }
 
 //    /**
