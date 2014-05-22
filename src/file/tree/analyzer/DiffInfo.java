@@ -8,7 +8,11 @@ package file.tree.analyzer;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import static javafx.scene.input.KeyCode.T;
 
 
 /**
@@ -18,36 +22,49 @@ import java.util.Date;
 public class DiffInfo extends FileInfo {
 
     private ItemState state;
-    private final String newName="";
-    private final boolean newDirectory=false;
-    private final boolean newSymbolicLink=false;
-    private final Long newSize=null;
-    private final Date newCreationTime=null;
-    private final Date newLastAccessTime=null;
-    private final Date newLastModifiedTime=null;
+    //commented because newDirectory says the same as FileInfo.directory + state="created"
+    //private final boolean newDirectory; 
+    //same as newDirectory
+    //private final boolean newSymbolicLink;
+    private final Long newSize;
+    private final Date newCreationTime;
+    private final Date newLastAccessTime;
+    private final Date newLastModifiedTime;
     
     public DiffInfo(Path file, BasicFileAttributes attributes) {
         super(file, attributes);
+        //this.newDirectory = false;
+        //this.newSymbolicLink = false;
+        this.newSize = null;
+        this.newCreationTime = null;
+        this.newLastAccessTime = null;
+        this.newLastModifiedTime = null;
+    }
     
-        
-        
+    public DiffInfo(String name, String path, boolean directory, boolean symbolicLink, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
+        ItemState state, /*boolean newDirectory, boolean newSymbolicLink,*/ Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
+        super(name, path, directory, symbolicLink, size, creationTime, lastAccessTime, lastModifiedTime, children, numberOfFiles, numberofDirectories);
+        this.state = state;
+        //this.newDirectory = newDirectory;
+        //this.newSymbolicLink = newSymbolicLink;
+        this.newSize = newSize;
+        this.newCreationTime = newCreationTime;
+        this.newLastAccessTime = newLastAccessTime;
+        this.newLastModifiedTime = newLastModifiedTime;
     }
     
     
-     public ItemState getState() {
+    public ItemState getState() {
         return state;
     }
-    public String getNewName() {
-        return newName;
-    }
-
-    public boolean isNewDirectory() {
+    
+    /* boolean isNewDirectory() {
         return newDirectory;
     }
 
     public boolean isNewSymbolicLink() {
         return newSymbolicLink;
-    }
+    }*/
 
     public Long getNewSize() {
         return newSize;
@@ -64,4 +81,29 @@ public class DiffInfo extends FileInfo {
     public Date getNewLastModifiedTime() {
         return new Date(newLastModifiedTime.getTime());
     }
+    
+    /*
+    public List<DiffInfo> getChildrenInDiff() {
+        if (this.isDirectory()) {
+            return (List<DiffInfo>)children);
+            //return (List<DiffInfo>) Collections.unmodifiableList((List<? extends T>) children);
+        } else {
+            throw new IllegalStateException("Files don't have children!");
+        }
+    }
+    */
+        /*
+        if (this.isDirectory()) {
+            List<FileInfo> fileInfo = this.getChildren();
+            List<DiffInfo> diffInfo;
+            for(Item i: diffInfo)
+            //diffInfo.addAll(fileInfo);
+            fileInfo.addAll(diffInfo);
+            return Collections.unmodifiableList();
+        } else {
+            throw new IllegalStateException("Files don't have children!");
+        }
+                */
+    
+    
 }

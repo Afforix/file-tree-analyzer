@@ -43,10 +43,40 @@ public class Differ {
     /*
     public static void main(String[] args) {
         Differ differ = new Differ();
+        DiffInfo diffInfo;
         try {
-            differ.diffXMLs("./saved_analyses", "2014-05-15T222222.xml", "2014-05-15T111111.xml");
+            diffInfo = differ.diffXMLs("./saved_analyses", "2014-05-15T222222.xml", "2014-05-15T111111.xml");
+            printIt(diffInfo, 0);
         } catch (IOException e) {
             System.out.println("error in main");
+        }
+    }
+    
+    //print DiffInfo for testing only
+    private static void printIt(DiffInfo parent, int level) {
+        System.out.println("name:" + parent.getName() + 
+                " directory:" + parent.isDirectory() + 
+                " symlink:" + parent.isSymbolicLink() + 
+                //" size:" + parent.getSize() + 
+                " creationTime:" + parent.getCreationTime() + 
+                " lastAccessTime:" + parent.getLastAccessTime() + 
+                " lastModifiedTime:" + parent.getLastModifiedTime() + 
+                " numberOfFiles:" + parent.getNumberOfFiles() + 
+                " numberOfDirectories:"  + parent.getNumberOfDirectories() + 
+                " path:" + parent.getPath() + 
+                " ||| newSize:" + parent.getNewSize() + 
+                " newCreationTime:" + parent.getNewCreationTime() +  
+                " newLastAccessTime:" + parent.getNewLastAccessTime() + 
+                " newLastModifiedTime:" + parent.getNewLastModifiedTime());
+        
+        if(parent.isDirectory()){
+            List<FileInfo> children = parent.getChildren();
+            for (FileInfo file : children) {
+                for (int i = 0; i <= level; i++) {
+                    System.out.print(" ");
+                }
+                printIt((DiffInfo) file, level + 1);
+            }
         }
     }
     */
@@ -59,8 +89,9 @@ public class Differ {
      * @param controlName name of NEWER XML file
      * @param testName name of OLDER XML file
      * @throws IOException
+     * @return DiffInfo (which is extended FileInfo)
      */
-    public void diffXMLs(String cwd, String controlName, String testName) throws IOException {
+    public DiffInfo diffXMLs(String cwd, String controlName, String testName) throws IOException {
 
         XMLFileManager fileManager = new XMLFileManager(cwd);
 
@@ -115,7 +146,7 @@ public class Differ {
                        elementToChange.setAttribute("itemState", "created");                       
                    }*/
                     
-                    elementToChange.setAttribute("new-" + attr, newValue);
+                    elementToChange.setAttribute("new" + attr.substring(0, 1).toUpperCase() + attr.substring(1), newValue);
                     
                     if(!xpathToAttr.equals(modifiedElement))
                     {
@@ -132,8 +163,6 @@ public class Differ {
         }
 
         fileManager.createXMLFile(testDoc); // Write to XML - not necessary
+        return FileInfoConverter.domToDiffInfo(testDoc);
     }
-    
-    
-    //TODO: convert DOM to extended FileInfo
 }
