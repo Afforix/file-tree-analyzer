@@ -48,6 +48,9 @@ public class FileInfoConverter {
 
             childrenToDom(doc, doc, root);
 
+            doc.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
+                    "xsi:noNamespaceSchemaLocation", "../analysesXmlSchema.xsd");
+
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -56,12 +59,11 @@ public class FileInfoConverter {
     }
 
     private static void childrenToDom(Document doc, Node parent, FileInfo fileInfo) {
- 
+
         Element currentElement = null;
 
         if (fileInfo.isDirectory()) {
             currentElement = doc.createElement("directory");
-            currentElement.setAttribute("name", fileInfo.getName());
             currentElement.setAttribute("numberOfFiles", Integer.toString(fileInfo.getNumberOfFiles()));
             currentElement.setAttribute("numberOfDirectories", Integer.toString(fileInfo.getNumberOfDirectories()));
             //TODO size of folders?
@@ -72,12 +74,13 @@ public class FileInfoConverter {
             }
         } else {
             currentElement = doc.createElement("file");
-            currentElement.setTextContent(fileInfo.getName());
             if (fileInfo.getSize() != null) {
                 currentElement.setAttribute("size", fileInfo.getSize().toString());
             }
             parent.appendChild(currentElement);
         }
+
+        currentElement.setAttribute("name", fileInfo.getName());
 
         if (fileInfo.isSymbolicLink()) {
             currentElement.setAttribute("symbolicLink", "true");
@@ -85,13 +88,13 @@ public class FileInfoConverter {
             currentElement.setAttribute("symbolicLink", "false");
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 
         currentElement.setAttribute("creationTime", dateFormat.format(fileInfo.getCreationTime()));
         currentElement.setAttribute("lastAccessTime", dateFormat.format(fileInfo.getLastAccessTime()));
         currentElement.setAttribute("lastModifiedTime", dateFormat.format(fileInfo.getLastModifiedTime()));
-        
-        if(doc.getDocumentElement().equals(currentElement)) {
+
+        if (doc.getDocumentElement().equals(currentElement)) {
             currentElement.setAttribute("path", fileInfo.getPath());
         }
     }
@@ -108,7 +111,7 @@ public class FileInfoConverter {
 
         return root;
     }
-    
+
     private static FileInfo childrenToFileInfo(Element parent, String path) {
         String name = "";
         boolean isDirectory = false;
@@ -117,25 +120,25 @@ public class FileInfoConverter {
         int numberOfFiles = 0;
         int numberOfDirectories = 0;
 
+        name = parent.getAttribute("name");
+
         if (parent.getTagName().equals("directory")) {
-            name = parent.getAttribute("name");
             isDirectory = true;
             numberOfFiles = Integer.parseInt(parent.getAttribute("numberOfFiles"));
             numberOfDirectories = Integer.parseInt(parent.getAttribute("numberOfDirectories"));
-            
-        if (parent.hasAttribute("path")) {
-            path = parent.getAttribute("path");
-        } else {
-            path += "/" + name;
-        }
 
-        children = new ArrayList<>();
-        for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
-            Element child = (Element) parent.getChildNodes().item(i);
-            children.add(childrenToFileInfo(child, path));
-        }
+            if (parent.hasAttribute("path")) {
+                path = parent.getAttribute("path");
+            } else {
+                path += "/" + name;
+            }
+
+            children = new ArrayList<>();
+            for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
+                Element child = (Element) parent.getChildNodes().item(i);
+                children.add(childrenToFileInfo(child, path));
+            }
         } else {
-            name = parent.getTextContent();
             size = Long.parseLong(parent.getAttribute("size"));
             path += "/" + name;
         }
@@ -145,7 +148,7 @@ public class FileInfoConverter {
             isSymbolicLink = true;
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 
         Date creationTime = null;
         Date lastAccessTime = null;
@@ -160,7 +163,7 @@ public class FileInfoConverter {
 
         FileInfo root = new FileInfo(name, path, isDirectory, isSymbolicLink, size, creationTime,
                 lastAccessTime, lastModifiedTime, children, numberOfFiles, numberOfDirectories);
-        
+
         return root;
     }
 
@@ -173,10 +176,10 @@ public class FileInfoConverter {
     public static DiffInfo domToDiffInfo(Document doc) {
         Element rootElement = doc.getDocumentElement();
         DiffInfo root = childrenToDiffInfo(rootElement, "");
-        
+
         return root;
     }
-    
+
     private static DiffInfo childrenToDiffInfo(Element parent, String path) {
         String name = "";
         boolean isDirectory = false;
@@ -212,7 +215,7 @@ public class FileInfoConverter {
             size = Long.parseLong(parent.getAttribute("size"));
             path += "/" + name;
             newString = parent.getAttribute("newSize");
-            if(!("".equals(newString))){
+            if (!("".equals(newString))) {
                 newSize = Long.parseLong(newString);
             }
         }
@@ -234,51 +237,50 @@ public class FileInfoConverter {
         } catch (ParseException ex) {
             Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         Date newCreationTime = setDate(parent, "newCreationTime", dateFormat);
         Date newLastAccessTime = setDate(parent, "newLastAccessTime", dateFormat);
         Date newLastModifiedTime = setDate(parent, "newLastModifiedTime", dateFormat);
-        
+
         //todo: try if new*Time can be null and not throw exception
-        if(newCreationTime == null){
+        if (newCreationTime == null) {
             newCreationTime = creationTime;
         }
-        if(newLastAccessTime == null){
+        if (newLastAccessTime == null) {
             newLastAccessTime = lastAccessTime;
         }
-        if(newLastModifiedTime == null){
+        if (newLastModifiedTime == null) {
             newLastModifiedTime = lastModifiedTime;
         }
-        
-        
+
         newString = parent.getAttribute("state");
         if (!("".equals(newString))) {
             state = ItemState.valueOf(parent.getAttribute("state"));
-        } else{
+        } else {
             state = ItemState.created; //maybe choose other option
         }
 
         DiffInfo root = new DiffInfo(name, path, isDirectory, isSymbolicLink, size, creationTime,
-            lastAccessTime, lastModifiedTime, children, numberOfFiles, numberOfDirectories,
-            state, newSize, newCreationTime, newLastAccessTime, newLastModifiedTime);
+                lastAccessTime, lastModifiedTime, children, numberOfFiles, numberOfDirectories,
+                state, newSize, newCreationTime, newLastAccessTime, newLastModifiedTime);
 
         return root;
     }
-    
+
     /**
-     * 
+     *
      * @param parent element whose attribute should be tested
      * @param attributeName attribute must have format DateFormat
      * @param dateFormat how should output look
      * @return date
      */
-    public static Date setDate(Element parent, String attributeName, DateFormat dateFormat){
+    public static Date setDate(Element parent, String attributeName, DateFormat dateFormat) {
         Date date = null;
         String string = parent.getAttribute(attributeName);
-        if(!("".equals(string))){
-            try{
+        if (!("".equals(string))) {
+            try {
                 date = dateFormat.parse(string);
-            } catch(ParseException ex) {
+            } catch (ParseException ex) {
                 Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

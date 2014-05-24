@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+    
+    <xs:element name="directory" type="rootDirectoryType"/>
+        
+    <xs:complexType name="directoryType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="directory" type="directoryType"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="file" type="fileType"></xs:element>
+        </xs:sequence>
+        <xs:attributeGroup ref="commonAttributes"/>
+        <xs:attribute name="numberOfFiles" type="xs:nonNegativeInteger"></xs:attribute> 
+        <xs:attribute name="numberOfDirectories" type="xs:nonNegativeInteger"></xs:attribute>        
+    </xs:complexType>
+    
+    <xs:complexType name="fileType">
+        <xs:attributeGroup ref="commonAttributes"/> 
+        <xs:attribute name="size" type="xs:nonNegativeInteger"></xs:attribute>     
+    </xs:complexType>
+    
+    <xs:complexType name="rootDirectoryType">
+        <xs:complexContent>
+            <xs:extension base="directoryType">
+                <xs:attribute name="path" type="nonEmptyString"></xs:attribute> 
+            </xs:extension>
+        </xs:complexContent>       
+    </xs:complexType>
+    
+    <xs:attributeGroup name="commonAttributes">
+        <xs:attribute name="name" type="nonEmptyString"></xs:attribute> 
+        <xs:attribute name="creationTime" type="xs:dateTime"></xs:attribute> 
+        <xs:attribute name="lastAccessTime" type="xs:dateTime"></xs:attribute> 
+        <xs:attribute name="lastModifiedTime" type="xs:dateTime"></xs:attribute> 
+        <xs:attribute name="symbolicLink" type="xs:boolean"></xs:attribute> 
+    </xs:attributeGroup>
+    
+    <xs:simpleType name="nonEmptyString">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
