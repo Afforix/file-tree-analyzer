@@ -45,7 +45,7 @@ public class Differ {
         Differ differ = new Differ();
         DiffInfo diffInfo;
         try {
-            diffInfo = differ.diffXMLs("./saved_analyses", "2014-05-15T222222.xml", "2014-05-15T111111.xml");
+            diffInfo = differ.diffXMLs("./saved_analyses", "2014-05-24T222222.xml", "2014-05-24T111111.xml");
             printIt(diffInfo, 0);
         } catch (IOException e) {
             System.out.println("error in main");
