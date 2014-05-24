@@ -7,6 +7,7 @@
 package file.tree.analyzer.utils;
 
 import file.tree.analyzer.XMLFileManager;
+import file.tree.analyzer.gui.ComboBoxItem;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -23,28 +24,21 @@ import org.w3c.dom.Document;
  */
 public class Utils {
     
-    public static List<String> FilenameToDisplayString(List<String> list,XMLFileManager xmlFileManager){
-        List<String> out = new ArrayList<>();
+    public static List<ComboBoxItem> FilenameToComboBoxItem(List<String> list,XMLFileManager xmlFileManager){
+        List<ComboBoxItem> out = new ArrayList<>();
         
         for(String s : list){
-            out.add(FilenameToDisplayString(s,xmlFileManager));
-        }       
+            out.add(FilenameToComboBoxItem(s,xmlFileManager));
+        }     
         
         return out;
     }
     
-    public static String FilenameToDisplayString(String file,XMLFileManager xmlFileManager){
+    public static ComboBoxItem FilenameToComboBoxItem(String file,XMLFileManager xmlFileManager){
         Document doc = xmlFileManager.findXMLFile(file);
         String path = doc.getDocumentElement().getAttribute("path");
-        if(path.contains(" ")){
-            throw new IllegalArgumentException("attribute path contains space");
-        }
-        return path + " " + file;
-    }
-    
-    public static String DisplayStringToFilename(String string){
-        String[] arr = string.split(" ", 2);
-        return arr[1];
+        
+        return new ComboBoxItem(path, file);
     }
     
     public static Image FileToImg(File file) {

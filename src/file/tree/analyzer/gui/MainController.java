@@ -25,17 +25,20 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 import javafx.util.Pair;
 
 public class MainController {
@@ -56,9 +59,9 @@ public class MainController {
     @FXML
     private TableColumn<Pair<String, String>, String> attribute;
     @FXML
-    private ComboBox<String> openComboBox;
+    private ComboBox<ComboBoxItem> openComboBox;
     @FXML
-    private ComboBox<String> diffComboBox;
+    private ComboBox<ComboBoxItem> diffComboBox;
     @FXML
     private MenuItem menuDelete;
     @FXML
@@ -99,10 +102,10 @@ public class MainController {
 
                 });
 
-        openComboBox.getItems().addAll(Utils.FilenameToDisplayString(
+        openComboBox.getItems().addAll(Utils.FilenameToComboBoxItem(
                 xmlFileManager.findAllXMLFiles(), xmlFileManager));
 
-        diffComboBox.getItems().addAll(Utils.FilenameToDisplayString(
+        diffComboBox.getItems().addAll(Utils.FilenameToComboBoxItem(
                 xmlFileManager.findAllXMLFiles(), xmlFileManager));     
     }
 
@@ -110,12 +113,12 @@ public class MainController {
     void handleOpenComboBoxAction(ActionEvent event) {
 
         if (!treeAlreadyLoaded) { // to prevent double loading when creating new analysis
-            ComboBox<String> source = (ComboBox<String>) event.getSource();
-            if (source.getValue() == null || source.getValue().isEmpty()) {
+            ComboBox<ComboBoxItem> source = (ComboBox<ComboBoxItem>) event.getSource();
+            if (source.getValue() == null) {
                 clear();
                 return;
             }
-            String fileName = Utils.DisplayStringToFilename(source.getValue());
+            String fileName = source.getValue().getFile();
             FileInfo dir = FileInfoConverter.domToFileInfo(xmlFileManager.findXMLFile(fileName));
             loadFile(dir);
             tableView.setItems(null);
@@ -131,8 +134,8 @@ public class MainController {
 
     @FXML
     void handleDiffComboBoxAction(ActionEvent event) {
-        ComboBox<String> source = (ComboBox<String>) event.getSource();
-        System.out.println("Diff " + source.getValue());
+        ComboBox<ComboBoxItem> source = (ComboBox<ComboBoxItem>) event.getSource();
+        System.out.println("Diff " + source.getValue().getFile());
         clear();
     }
 
@@ -167,8 +170,8 @@ public class MainController {
                             // save directory                   
                             String file = xmlFileManager
                                     .createXMLFile(FileInfoConverter.fileInfoToDom(dir));
-                            String displayString = Utils
-                                    .FilenameToDisplayString(file, xmlFileManager);
+                            ComboBoxItem displayString = Utils
+                                    .FilenameToComboBoxItem(file, xmlFileManager);
                             openComboBox.getItems().add(displayString);
                             diffComboBox.getItems().add(displayString);
                             openComboBox.getSelectionModel().select(displayString);
@@ -207,9 +210,9 @@ public class MainController {
 // <editor-fold defaultstate="collapsed" desc="Menu actions">
     @FXML
     void handleDeleteAnalysisAction(ActionEvent event) {
-        String value = openComboBox.getValue();
+        ComboBoxItem value = openComboBox.getValue();
         if (value != null) {
-            xmlFileManager.deleteXMLFile(Utils.DisplayStringToFilename(value));
+            xmlFileManager.deleteXMLFile(value.getFile());
             openComboBox.getItems().remove(value);
             diffComboBox.getItems().remove(value);
             clear();

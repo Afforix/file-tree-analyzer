@@ -5,10 +5,6 @@
  */
 package file.tree.analyzer.gui;
 
-import file.tree.analyzer.FileInfo;
-import javafx.concurrent.Task;
-import static javafx.scene.input.KeyCode.T;
-
 /**
  *
  * @author ansy

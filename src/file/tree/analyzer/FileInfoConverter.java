@@ -215,7 +215,7 @@ public class FileInfoConverter {
             size = Long.parseLong(parent.getAttribute("size"));
             path += "/" + name;
             newString = parent.getAttribute("newSize");
-            if (!("".equals(newString))) {
+            if (!newString.isEmpty()) {
                 newSize = Long.parseLong(newString);
             }
         }
@@ -254,7 +254,7 @@ public class FileInfoConverter {
         }
 
         newString = parent.getAttribute("state");
-        if (!("".equals(newString))) {
+        if (!newString.isEmpty()) {
             state = ItemState.valueOf(parent.getAttribute("state"));
         } else {
             state = ItemState.created; //maybe choose other option
@@ -277,7 +277,7 @@ public class FileInfoConverter {
     public static Date setDate(Element parent, String attributeName, DateFormat dateFormat) {
         Date date = null;
         String string = parent.getAttribute(attributeName);
-        if (!("".equals(string))) {
+        if (!string.isEmpty()) {
             try {
                 date = dateFormat.parse(string);
             } catch (ParseException ex) {
