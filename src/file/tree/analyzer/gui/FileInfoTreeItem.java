@@ -70,7 +70,7 @@ class FileInfoTreeItem extends TreeItem<FileInfo> {
 
             if (elementVal.isDirectory()) {
                 img = genericDirectoryImg;
-            } else if (elementVal.toFile().exists()) {                
+            } else if (elementVal.toFile().exists() && !elementVal.isSymbolicLink()) {                
                 img = Utils.FileToImg(elementVal.toFile());
             } else {
                 img = genericFileImg;
