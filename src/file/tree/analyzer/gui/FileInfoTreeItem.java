@@ -63,14 +63,14 @@ class FileInfoTreeItem extends TreeItem<FileInfo> {
     @SuppressWarnings("unchecked")  
     private void loadChildren() {
         hasLoadedChildren = true;
-        FileInfo elementVal = super.getValue();        
+        FileInfo elementVal = super.getValue();
 
         try { // try to set icon           
             Image img;
 
             if (elementVal.isDirectory()) {
                 img = genericDirectoryImg;
-            } else if (elementVal.toFile().exists() && !elementVal.isSymbolicLink()) {                
+            } else if (elementVal.toFile().exists()) {                
                 img = Utils.FileToImg(elementVal.toFile());
             } else {
                 img = genericFileImg;
