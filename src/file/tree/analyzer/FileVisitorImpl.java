@@ -52,8 +52,10 @@ public class FileVisitorImpl implements FileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-        System.err.println("File failed: " + file);//testing output
-        if (root == null) throw new IOException("Obtaining file tree failed.", exc);
+        FileInfo failed = new FileInfo(file, exc);
+        
+        if (root == null) root = failed;
+        else directoryStack.peek().addChild(failed);
         
         return FileVisitResult.CONTINUE;
     }
