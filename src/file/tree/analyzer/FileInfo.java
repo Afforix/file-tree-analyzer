@@ -139,6 +139,14 @@ public class FileInfo implements Comparable<FileInfo> {
         return exception == null;
     }
 
+    /**
+     * 
+     * @return exception of inaccessible file, or null if the file is accessible
+     */
+    public IOException getException() {
+        return exception;
+    }
+
 //    /**
 //     * Constructor designed for conversion from XML DOM.
 //     *
