@@ -130,7 +130,11 @@ public class FileInfo implements Comparable<FileInfo> {
         this.path = file.toAbsolutePath().toString();
         this.exception = exc;
     }
-    
+     
+    /**
+     * 
+     * @return true if the file/folder is accessible
+     */
     public boolean isAccessible() {
         return exception == null;
     }
