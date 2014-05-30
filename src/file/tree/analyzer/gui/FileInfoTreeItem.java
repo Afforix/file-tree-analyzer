@@ -64,24 +64,26 @@ class FileInfoTreeItem extends TreeItem<FileInfo> {
     private void loadChildren() {
         hasLoadedChildren = true;
         FileInfo elementVal = super.getValue();
-
+         Image img = null;
         try { // try to set icon           
-            Image img;
+           
 
             if (elementVal.isDirectory()) {
                 img = genericDirectoryImg;
             } else if (elementVal.toFile().exists() && !elementVal.isSymbolicLink()) {                
                 img = Utils.FileToImg(elementVal.toFile());
-            } else {
-                img = genericFileImg;
-            }
-
+            } 
             super.setGraphic(new ImageView(img));
 
-        } catch (Exception e) {
+        } catch (Exception e) {           
+        }
+        
+        if(img == null){
+            img = genericFileImg;
+             super.setGraphic(new ImageView(img));
         }
 
-        if (elementVal.isDirectory()) {
+        if (elementVal.isDirectory() && elementVal.isAccessible()) {
             for (FileInfo f : elementVal.getChildren()) {
                 FileInfoTreeItem item = new FileInfoTreeItem(f);
                 super.getChildren().add(item);

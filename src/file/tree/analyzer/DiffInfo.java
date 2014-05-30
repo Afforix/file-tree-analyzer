@@ -41,9 +41,9 @@ public class DiffInfo extends FileInfo {
         this.newLastModifiedTime = null;
     }
     
-    public DiffInfo(String name, String path, boolean directory, boolean symbolicLink, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
+    public DiffInfo(String name, String path, boolean directory, boolean symbolicLink,boolean accessibility, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
         ItemState state, /*boolean newDirectory, boolean newSymbolicLink,*/ Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
-        super(name, path, directory, symbolicLink, size, creationTime, lastAccessTime, lastModifiedTime, children, numberOfFiles, numberofDirectories);
+        super(name, path, directory, symbolicLink, accessibility, size, creationTime, lastAccessTime, lastModifiedTime, children, numberOfFiles, numberofDirectories);
         this.state = state;
         //this.newDirectory = newDirectory;
         //this.newSymbolicLink = newSymbolicLink;
