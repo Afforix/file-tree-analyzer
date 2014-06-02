@@ -8,11 +8,9 @@ package file.tree.analyzer;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import static javafx.scene.input.KeyCode.T;
 
 
 /**
@@ -21,11 +19,13 @@ import static javafx.scene.input.KeyCode.T;
  */
 public class DiffInfo extends FileInfo {
 
-    private ItemState state;
+    private final ItemState state;
     //commented because newDirectory says the same as FileInfo.directory + state="created"
     //private final boolean newDirectory; 
     //same as newDirectory
     //private final boolean newSymbolicLink;
+    private final List<DiffInfo> diffChildren;
+    //private final boolean newAccesibility;    //TODO !!! - implement, change FileInfoConverter and Differ
     private final Long newSize;
     private final Date newCreationTime;
     private final Date newLastAccessTime;
@@ -33,20 +33,19 @@ public class DiffInfo extends FileInfo {
     
     public DiffInfo(Path file, BasicFileAttributes attributes) {
         super(file, attributes);
-        //this.newDirectory = false;
-        //this.newSymbolicLink = false;
+        this.state = null;
+        this.diffChildren = null;
         this.newSize = null;
         this.newCreationTime = null;
         this.newLastAccessTime = null;
         this.newLastModifiedTime = null;
     }
     
-    public DiffInfo(String name, String path, boolean directory, boolean symbolicLink,boolean accessibility, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
-        ItemState state, /*boolean newDirectory, boolean newSymbolicLink,*/ Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
+    public DiffInfo(String name, String path, boolean directory, boolean symbolicLink, boolean accessibility, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
+        ItemState state, List<DiffInfo> diffChildren, Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
         super(name, path, directory, symbolicLink, accessibility, size, creationTime, lastAccessTime, lastModifiedTime, children, numberOfFiles, numberofDirectories);
         this.state = state;
-        //this.newDirectory = newDirectory;
-        //this.newSymbolicLink = newSymbolicLink;
+        this.diffChildren = diffChildren;
         this.newSize = newSize;
         this.newCreationTime = newCreationTime;
         this.newLastAccessTime = newLastAccessTime;
@@ -58,13 +57,21 @@ public class DiffInfo extends FileInfo {
         return state;
     }
     
-    /* boolean isNewDirectory() {
-        return newDirectory;
+    /*
+    public List<DiffInfo> getDiffChildren() {
+        return diffChildren;
     }
-
-    public boolean isNewSymbolicLink() {
-        return newSymbolicLink;
-    }*/
+    */
+    
+    public List<DiffInfo> getDiffChildren() {
+        if (!isAccessible()) throw new IllegalStateException("file is not accessible: " + getPath());
+        
+        if (isDirectory()) {
+            return Collections.unmodifiableList(diffChildren);
+        } else {
+            throw new IllegalStateException("Files don't have children! " + getPath());
+        }
+    }
 
     public Long getNewSize() {
         return newSize;
@@ -81,6 +88,8 @@ public class DiffInfo extends FileInfo {
     public Date getNewLastModifiedTime() {
         return new Date(newLastModifiedTime.getTime());
     }
+    
+    
     
     /*
     public List<DiffInfo> getChildrenInDiff() {

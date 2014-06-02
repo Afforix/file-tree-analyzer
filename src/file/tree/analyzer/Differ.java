@@ -45,6 +45,7 @@ public class Differ {
         Differ differ = new Differ();
         DiffInfo diffInfo;
         try {
+            System.out.println("wombat");
             diffInfo = differ.diffXMLs("./saved_analyses", "2014-05-24T222222.xml", "2014-05-24T111111.xml");
             printIt(diffInfo, 0);
         } catch (IOException e) {
@@ -57,6 +58,7 @@ public class Differ {
         System.out.println("name:" + parent.getName() + 
                 " directory:" + parent.isDirectory() + 
                 " symlink:" + parent.isSymbolicLink() + 
+                " accesible: " + parent.isAccessible() +
                 //" size:" + parent.getSize() + 
                 " creationTime:" + parent.getCreationTime() + 
                 " lastAccessTime:" + parent.getLastAccessTime() + 
@@ -70,8 +72,8 @@ public class Differ {
                 " newLastModifiedTime:" + parent.getNewLastModifiedTime());
         
         if(parent.isDirectory()){
-            List<FileInfo> children = parent.getChildren();
-            for (FileInfo file : children) {
+            List<DiffInfo> children = parent.getDiffChildren();
+            for (DiffInfo file : children) {
                 for (int i = 0; i <= level; i++) {
                     System.out.print(" ");
                 }
@@ -79,7 +81,8 @@ public class Differ {
             }
         }
     }
-    */
+     */
+    
 
     /**
      * Finds differences between two two XML docs, stores differences in third
@@ -97,11 +100,14 @@ public class Differ {
 
         controlDoc = fileManager.findXMLFile(controlName, true);
         olderDoc = fileManager.findXMLFile(testName, true);
-        testDoc = (Document) olderDoc.cloneNode(true); // for modifying attrs, we don't want to edit source XML currentStateDoc    
+        testDoc = (Document) olderDoc.cloneNode(true); // for modifying attrs, we don't want to edit source XML olderDoc
+        System.out.println("controlDoc: " + olderDoc.getBaseURI() + " name: " + olderDoc.getLocalName());
+        System.out.println("olderDoc: " + olderDoc.getDocumentURI() + " name: " + olderDoc.getLocalName());
+        System.out.println("testDoc: " + testDoc.getDocumentURI() + " name: " + testDoc.getLocalName());
 
         Diff diff = new Diff(controlDoc, testDoc);
-        ElementNameAndTextQualifier elementNameandTextQualifier = new ElementNameAndTextQualifier();
-        diff.overrideElementQualifier(elementNameandTextQualifier);
+        ElementNameQualifier elementNameQualifier = new ElementNameQualifier();
+        diff.overrideElementQualifier(elementNameQualifier);
         DetailedDiff detailedDiff = new DetailedDiff(diff);
 
         List allDifferences = detailedDiff.getAllDifferences();
@@ -120,7 +126,6 @@ public class Differ {
             String description = difference.getDescription();
             String whatChanged = description.substring(0, description.indexOf(" "));
             
-
             if (whatChanged.equals("attribute")) {
                 // Get what has changed
                 String xpathToAttr = controlNodeDetail.getXpathLocation();
@@ -163,6 +168,7 @@ public class Differ {
         }
 
         fileManager.createXMLFile(testDoc); // Write to XML - not necessary
-        return FileInfoConverter.domToDiffInfo(testDoc);
+        System.out.println("testDoc: " + testDoc.getDocumentURI());
+        return FileInfoConverter.domToDiffInfo2(testDoc);
     }
 }
