@@ -52,7 +52,7 @@ public class FileVisitorImpl implements FileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-        FileInfo failed = new FileInfo(file, exc);
+        FileInfo failed = new FileInfo(file);
         
         if (root == null) root = failed;
         else directoryStack.peek().addChild(failed);
