@@ -5,8 +5,6 @@
  */
 package file.tree.analyzer;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,7 +16,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -59,7 +56,6 @@ public class FileInfoConverter {
     }
 
     private static void childrenToDom(Document doc, Node parent, FileInfo fileInfo) {
-
         Element currentElement;
 
         if (fileInfo.isDirectory()) {
@@ -71,37 +67,27 @@ public class FileInfoConverter {
                     childrenToDom(doc, currentElement, child);
                 }
             }
-            //TODO size of folders?
-//            parent.appendChild(currentElement);
         } else {
             currentElement = doc.createElement("file");
             if (fileInfo.isAccessible()) {
                 currentElement.setAttribute("size", fileInfo.getSize().toString());
             }
-//            parent.appendChild(currentElement);
         }
 
         parent.appendChild(currentElement);
         currentElement.setAttribute("name", fileInfo.getName());
 
-//        if (fileInfo.isSymbolicLink()) {
-//            currentElement.setAttribute("symbolicLink", "true");
-//        } else {
-//            currentElement.setAttribute("symbolicLink", "false");
-//        }
-
         if (fileInfo.isAccessible()) {
-//            currentElement.setAttribute("accessible", "true");
+            currentElement.setAttribute("accessible", "true");
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
             currentElement.setAttribute("creationTime", dateFormat.format(fileInfo.getCreationTime()));
             currentElement.setAttribute("lastAccessTime", dateFormat.format(fileInfo.getLastAccessTime()));
             currentElement.setAttribute("lastModifiedTime", dateFormat.format(fileInfo.getLastModifiedTime()));
-            
+
             currentElement.setAttribute("symbolicLink", Boolean.toString(fileInfo.isSymbolicLink()));
         } else {
             currentElement.setAttribute("accessible", "false");
         }
-        //end
 
         //it works thanks to the == :-)
         if (doc.getDocumentElement() == currentElement) {
@@ -112,7 +98,7 @@ public class FileInfoConverter {
     /**
      * Takes object representing XML DOM and converts it to FileInfo.
      *
-     * @param doc XML Dom
+     * @param doc XML DOM
      * @return FileInfo
      */
     public static FileInfo domToFileInfo(Document doc) {
@@ -122,63 +108,45 @@ public class FileInfoConverter {
         return root;
     }
 
-    private static FileInfo childrenToFileInfo(Element parent, String path) {
-        String name = "";
-        boolean isDirectory = false;
-        List<FileInfo> children = null;
-        Long size = null;
-        int numberOfFiles = 0;
-        int numberOfDirectories = 0;
+    private static FileInfo childrenToFileInfo(Element element, String path) {
+        FileInfo item = new FileInfo();
 
-        //added to enable program run - not safe, untested
-        boolean isAccessible = parent.getAttribute("Accessibility").equals("true");
-        //end
+        item.setName(element.getAttribute("name"));
+        item.setAccessibility(Boolean.parseBoolean(element.getAttribute("accessible")));
+        item.setDirectory(element.getTagName().equals("directory"));
+        item.setPath(element.hasAttribute("path") ? element.getAttribute("path") : path + "/" + item.getName());
 
-        name = parent.getAttribute("name");
+        if (!item.isAccessible()) {
+            return item;//we are done here
+        }
 
-        if (parent.getTagName().equals("directory")) {
-            isDirectory = true;
-            numberOfFiles = Integer.parseInt(parent.getAttribute("numberOfFiles"));
-            numberOfDirectories = Integer.parseInt(parent.getAttribute("numberOfDirectories"));
+        if (item.isDirectory()) {
+            item.setNumberOfFiles(Integer.parseInt(element.getAttribute("numberOfFiles")));
+            item.setNumberofDirectories(Integer.parseInt(element.getAttribute("numberOfDirectories")));
 
-            if (parent.hasAttribute("path")) {
-                path = parent.getAttribute("path");
-            } else {
-                path += "/" + name;
-            }
-
-            children = new ArrayList<>();
-            for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
-                Element child = (Element) parent.getChildNodes().item(i);
-                children.add(childrenToFileInfo(child, path));
+            for (int i = 0; i < element.getChildNodes().getLength(); i++) {
+                Node node = element.getChildNodes().item(i);
+                if (node.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+                item.addChild(childrenToFileInfo((Element) node, item.getPath()));
             }
         } else {
-            size = Long.parseLong(parent.getAttribute("size"));
-            path += "/" + name;
+            item.setSize(Long.parseLong(element.getAttribute("size")));
         }
 
-        boolean isSymbolicLink = false;
-        if (parent.getAttribute("isSymbolicLink").equals("true")) {
-            isSymbolicLink = true;
-        }
-
+        item.setSymbolicLink(Boolean.parseBoolean(element.getAttribute("isSymbolicLink")));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 
-        Date creationTime = null;
-        Date lastAccessTime = null;
-        Date lastModifiedTime = null;
         try {
-            creationTime = dateFormat.parse(parent.getAttribute("creationTime"));
-            lastAccessTime = dateFormat.parse(parent.getAttribute("lastAccessTime"));
-            lastModifiedTime = dateFormat.parse(parent.getAttribute("lastModifiedTime"));
+            item.setCreationTime(dateFormat.parse(element.getAttribute("creationTime")));
+            item.setLastAccessTime(dateFormat.parse(element.getAttribute("lastAccessTime")));
+            item.setLastModifiedTime(dateFormat.parse(element.getAttribute("lastModifiedTime")));
         } catch (ParseException ex) {
             Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        FileInfo root = new FileInfo(name, path, isDirectory, isSymbolicLink, isAccessible, size, creationTime,
-                lastAccessTime, lastModifiedTime, children, numberOfFiles, numberOfDirectories);
-
-        return root;
+        return item;
     }
 
     /**
