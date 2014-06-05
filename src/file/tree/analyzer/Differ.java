@@ -18,9 +18,14 @@ import javax.xml.xpath.XPathFactory;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
 import org.custommonkey.xmlunit.ElementNameQualifier;
 import org.custommonkey.xmlunit.NodeDetail;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.custommonkey.xmlunit.exceptions.ConfigurationException;
+import org.custommonkey.xmlunit.exceptions.XMLUnitException;
+import org.custommonkey.xmlunit.exceptions.XMLUnitRuntimeException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -40,7 +45,7 @@ public class Differ {
     private Document testDoc; //testDoc is copy of olderDoc, will be modified and used for FileInfo transformation
 
     //main is for testing purpose only
-    /*
+    
     public static void main(String[] args) {
         Differ differ = new Differ();
         DiffInfo diffInfo;
@@ -81,9 +86,6 @@ public class Differ {
             }
         }
     }
-     */
-    
-
     /**
      * Finds differences between two two XML docs, stores differences in third
      * DOM
@@ -94,32 +96,50 @@ public class Differ {
      * @throws IOException
      * @return DiffInfo (which is extended FileInfo)
      */
-    public DiffInfo diffXMLs(String cwd, String controlName, String testName) throws IOException {
-
+    public DiffInfo diffXMLs(String cwd, String controlName, String testName) throws IOException, IllegalArgumentException, ConfigurationException {
+        try {
+            XMLUnit.setCompareUnmatched(false); //TODO - deal with deleted / created items (they are unmatched) 
+            XMLUnit.setIgnoreComments(true); 
+            XMLUnit.setIgnoreAttributeOrder(true);
+            /*if(XMLUnit.getCompareUnmatched() || !XMLUnit.getIgnoreComments() || !XMLUnit.getIgnoreAttributeOrder()){
+                throw new IllegalStateException(); //TODO : is this correct solution???
+            }*/
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "XMLUnit configuration failed.", ex);
+        }
+        
         XMLFileManager fileManager = new XMLFileManager(cwd);
 
-        controlDoc = fileManager.findXMLFile(controlName, true);
-        olderDoc = fileManager.findXMLFile(testName, true);
-        testDoc = (Document) olderDoc.cloneNode(true); // for modifying attrs, we don't want to edit source XML olderDoc
-        System.out.println("controlDoc: " + olderDoc.getBaseURI() + " name: " + olderDoc.getLocalName());
-        System.out.println("olderDoc: " + olderDoc.getDocumentURI() + " name: " + olderDoc.getLocalName());
-        System.out.println("testDoc: " + testDoc.getDocumentURI() + " name: " + testDoc.getLocalName());
+        try {
+            controlDoc = fileManager.findXMLFile(controlName, true);
+            olderDoc = fileManager.findXMLFile(testName, true);
+            testDoc = (Document) olderDoc.cloneNode(true); // for modifying attrs, we don't want to edit source XML olderDoc
+            System.out.println("controlDoc: " + olderDoc.getBaseURI() + " name: " + olderDoc.getLocalName());
+            System.out.println("olderDoc: " + olderDoc.getDocumentURI() + " name: " + olderDoc.getLocalName());
+            System.out.println("testDoc: " + testDoc.getDocumentURI() + " name: " + testDoc.getLocalName());
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "Differ: input document not found.", ex);
+        }
 
         Diff diff = new Diff(controlDoc, testDoc);
-        ElementNameQualifier elementNameQualifier = new ElementNameQualifier();
-        diff.overrideElementQualifier(elementNameQualifier);
-        DetailedDiff detailedDiff = new DetailedDiff(diff);
+        //name of element + attribute "name" is ID
+        String attributeUsedAsID = "name"; 
+        ElementNameAndAttributeQualifier elementNameAndAttributeQualifier = new ElementNameAndAttributeQualifier(attributeUsedAsID); 
+        diff.overrideElementQualifier(elementNameAndAttributeQualifier);
 
+        DetailedDiff detailedDiff = new DetailedDiff(diff);
+        detailedDiff.overrideElementQualifier(elementNameAndAttributeQualifier);
         List allDifferences = detailedDiff.getAllDifferences();
         ListIterator listIterator = allDifferences.listIterator();
-
+          
         Difference difference; //one item from allDifferences List
         Element elementToChange;
-
+        
         Boolean modified = false;
         String modifiedElement = null; //path to modified element
         while (listIterator.hasNext()) {
             difference = (Difference) listIterator.next();
+            //System.out.println(difference);
             NodeDetail controlNodeDetail = difference.getControlNodeDetail();
             NodeDetail testNodeDetail = difference.getTestNodeDetail();
             
@@ -131,8 +151,8 @@ public class Differ {
                 String xpathToAttr = controlNodeDetail.getXpathLocation();
                 String xpathToElem = xpathToAttr.substring(0, xpathToAttr.indexOf("@") - 1); // /document[1]/@attr                
                 String attr = xpathToAttr.substring(xpathToAttr.indexOf('@') + 1); // attr is after @ in xpath
-                String newValue = testNodeDetail.getValue();
-                String oldValue = controlNodeDetail.getValue();
+                String newValue = controlNodeDetail.getValue();
+                String oldValue = testNodeDetail.getValue();
 
                 XPath testXPath = XPathFactory.newInstance().newXPath();
                 XPath controlXPath = XPathFactory.newInstance().newXPath();
@@ -152,6 +172,7 @@ public class Differ {
                    }*/
                     
                     elementToChange.setAttribute("new" + attr.substring(0, 1).toUpperCase() + attr.substring(1), newValue);
+                    System.out.println("new" + attr.substring(0, 1).toUpperCase() + attr.substring(1) + " <- " + newValue);
                     
                     if(!xpathToAttr.equals(modifiedElement))
                     {
