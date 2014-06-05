@@ -18,6 +18,7 @@ import javax.xml.xpath.XPathFactory;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.DifferenceConstants;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
 import org.custommonkey.xmlunit.ElementNameQualifier;
@@ -45,7 +46,7 @@ public class Differ {
     private Document testDoc; //testDoc is copy of olderDoc, will be modified and used for FileInfo transformation
 
     //main is for testing purpose only
-    
+    /*
     public static void main(String[] args) {
         Differ differ = new Differ();
         DiffInfo diffInfo;
@@ -62,19 +63,20 @@ public class Differ {
     private static void printIt(DiffInfo parent, int level) {
         System.out.println("name:" + parent.getName() + 
                 " directory:" + parent.isDirectory() + 
-                " symlink:" + parent.isSymbolicLink() + 
-                " accesible: " + parent.isAccessible() +
+                //" symlink:" + parent.isSymbolicLink() + 
+                //" accesible: " + parent.isAccessible() +
                 //" size:" + parent.getSize() + 
-                " creationTime:" + parent.getCreationTime() + 
-                " lastAccessTime:" + parent.getLastAccessTime() + 
-                " lastModifiedTime:" + parent.getLastModifiedTime() + 
-                " numberOfFiles:" + parent.getNumberOfFiles() + 
-                " numberOfDirectories:"  + parent.getNumberOfDirectories() + 
-                " path:" + parent.getPath() + 
+                //" creationTime:" + parent.getCreationTime() + 
+                //" lastAccessTime:" + parent.getLastAccessTime() + 
+                //" lastModifiedTime:" + parent.getLastModifiedTime() + 
+                //" numberOfFiles:" + parent.getNumberOfFiles() + 
+                //" numberOfDirectories:"  + parent.getNumberOfDirectories() + 
+                //" path:" + parent.getPath() + 
                 " ||| newSize:" + parent.getNewSize() + 
                 " newCreationTime:" + parent.getNewCreationTime() +  
                 " newLastAccessTime:" + parent.getNewLastAccessTime() + 
-                " newLastModifiedTime:" + parent.getNewLastModifiedTime());
+                " newLastModifiedTime:" + parent.getNewLastModifiedTime() +
+                " state: " + parent.getState());
         
         if(parent.isDirectory()){
             List<DiffInfo> children = parent.getDiffChildren();
@@ -86,6 +88,8 @@ public class Differ {
             }
         }
     }
+    */
+
     /**
      * Finds differences between two two XML docs, stores differences in third
      * DOM
@@ -101,9 +105,7 @@ public class Differ {
             XMLUnit.setCompareUnmatched(false); //TODO - deal with deleted / created items (they are unmatched) 
             XMLUnit.setIgnoreComments(true); 
             XMLUnit.setIgnoreAttributeOrder(true);
-            /*if(XMLUnit.getCompareUnmatched() || !XMLUnit.getIgnoreComments() || !XMLUnit.getIgnoreAttributeOrder()){
-                throw new IllegalStateException(); //TODO : is this correct solution???
-            }*/
+            //XMLUnit.setIgnoreWhitespace(true); //causes bug - why?
         } catch (ConfigurationException ex) {
             Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "XMLUnit configuration failed.", ex);
         }
@@ -133,35 +135,47 @@ public class Differ {
         ListIterator listIterator = allDifferences.listIterator();
           
         Difference difference; //one item from allDifferences List
-        Element elementToChange;
-        
-        Boolean modified = false;
+        Element elementToChange;        
         String modifiedElement = null; //path to modified element
+        String description = null;
+        NodeDetail controlNodeDetail = null;
+        NodeDetail testNodeDetail = null;
+        boolean attributeChange = false;
+        boolean createdOrDeleted = false;
+        
         while (listIterator.hasNext()) {
             difference = (Difference) listIterator.next();
             //System.out.println(difference);
-            NodeDetail controlNodeDetail = difference.getControlNodeDetail();
-            NodeDetail testNodeDetail = difference.getTestNodeDetail();
-            
-            String description = difference.getDescription();
+            description = difference.getDescription();
+            System.out.println(description);
             String whatChanged = description.substring(0, description.indexOf(" "));
+            controlNodeDetail = difference.getControlNodeDetail();
+            testNodeDetail = difference.getTestNodeDetail();
             
-            if (whatChanged.equals("attribute")) {
+            //TODO: XPATHNODETRACKER
+            attributeChange = whatChanged.equals("attribute");
+            createdOrDeleted = (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
+                    && (difference.getTestNodeDetail().getValue().equals("file") || difference.getTestNodeDetail().getValue().equals("directory") || difference.getTestNodeDetail().getValue().equals("null"))
+                    && (difference.getControlNodeDetail().getValue().equals("file") || difference.getControlNodeDetail().getValue().equals("directory") || difference.getControlNodeDetail().getValue().equals("null")));
+
+            if (attributeChange || createdOrDeleted) {
+                if(createdOrDeleted) {
+                    System.out.println("CREATED OR DELETED: " + difference);
+                    System.out.println(":: EXPECTED " + difference.getTestNodeDetail().getValue() + " FOUND " + difference.getControlNodeDetail().getValue());
+                }
+                
                 // Get what has changed
                 String xpathToAttr = controlNodeDetail.getXpathLocation();
-                String xpathToElem = xpathToAttr.substring(0, xpathToAttr.indexOf("@") - 1); // /document[1]/@attr                
-                String attr = xpathToAttr.substring(xpathToAttr.indexOf('@') + 1); // attr is after @ in xpath
                 String newValue = controlNodeDetail.getValue();
                 String oldValue = testNodeDetail.getValue();
-
+                
                 XPath testXPath = XPathFactory.newInstance().newXPath();
                 XPath controlXPath = XPathFactory.newInstance().newXPath();
                 try {
                     //TODO: find out how to cast Node to Element, then avoid next line
                     //and create elementToChange using testNodeDetail.getNode()
                     //like Element elementToChange = (Element) testNodeDetail.getNode();
-                    NodeList testNodes = (NodeList) testXPath.evaluate(xpathToElem, testDoc.getDocumentElement(), XPathConstants.NODESET);
-                    elementToChange = (Element) testNodes.item(0);
+                     //NodeList ControlNodes = (NodeList) controlXPath.evaluate(xpathToControlElem, null)
 
                     //TODO: possible node states: unmodified,modified,created,deleted
                    
@@ -170,15 +184,34 @@ public class Differ {
                    if(controlNodes.getLength() == 0){
                        elementToChange.setAttribute("itemState", "created");                       
                    }*/
-                    
-                    elementToChange.setAttribute("new" + attr.substring(0, 1).toUpperCase() + attr.substring(1), newValue);
-                    System.out.println("new" + attr.substring(0, 1).toUpperCase() + attr.substring(1) + " <- " + newValue);
-                    
-                    if(!xpathToAttr.equals(modifiedElement))
-                    {
-                        modifiedElement = xpathToAttr;
-                        elementToChange.setAttribute("itemState", "modified");
-                        //System.out.println("ITEMSTATE CHANGED");
+                    if(attributeChange) {
+                        String xpathToElem = xpathToAttr.substring(0, xpathToAttr.indexOf("@") - 1); // /document[1]/@attr                
+                        String attr = xpathToAttr.substring(xpathToAttr.indexOf('@') + 1); // attr is after @ in xpath
+                        NodeList testNodes = (NodeList) testXPath.evaluate(xpathToElem, testDoc.getDocumentElement(), XPathConstants.NODESET);
+                        elementToChange = (Element) testNodes.item(0);
+                        elementToChange.setAttribute("new" + attr.substring(0, 1).toUpperCase() + attr.substring(1), newValue);
+                        System.out.println("new" + attr.substring(0, 1).toUpperCase() + attr.substring(1) + " <- " + newValue);
+
+                        if (!xpathToAttr.equals(modifiedElement)) {
+                            modifiedElement = xpathToAttr;
+                            elementToChange.setAttribute("state", "modified");
+                            //System.out.println("ITEMSTATE CHANGED");
+                        }
+                    } else if (createdOrDeleted) {
+                        if (difference.getTestNodeDetail().getValue().equals("null")) { //testNode is null so controlNode was created
+                            
+                        } else if (difference.getControlNodeDetail().getValue().equals("null")) { //testNode was deleted
+                            //NodeList testNode = (NodeList) testXPath.evaluate(testNodeDetail.getXpathLocation(), testDoc.getDocumentElement(), XPathConstants.NODESET);
+                            //elementToChange = (Element) testNode.item(0);
+                            //System.out.println("XXX " + difference.getTestNodeDetail().getNode());
+                            String xpathToElement = difference.getTestNodeDetail().getXpathLocation();
+                            NodeList testNodes = (NodeList) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODESET);
+                            //elementToChange = (Element) difference.getTestNodeDetail().getNode();
+                            elementToChange = (Element) testNodes.item(0);
+                            elementToChange.setAttribute("state", "deleted");
+                            System.out.println("YYY " + elementToChange.getAttribute("name") + " " + elementToChange.getAttribute("state"));
+
+                        }
                     }
                 } catch (XPathExpressionException ex) {
                     Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, null, ex); //some monster

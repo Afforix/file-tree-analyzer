@@ -442,6 +442,7 @@ public class FileInfoConverter {
                 newLastModifiedTime = setDate(parent, lastModifiedTime, "newLastModifiedTime", dateFormat);
 
                 newString = parent.getAttribute("state");
+                System.out.println("STATE: " + newString);
                 if (!newString.isEmpty()) {
                     state = ItemState.valueOf(parent.getAttribute("state"));
                 } else {
