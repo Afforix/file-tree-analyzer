@@ -46,7 +46,7 @@ public class Differ {
     private Document testDoc; //testDoc is copy of olderDoc, will be modified and used for FileInfo transformation
 
     //main is for testing purpose only
-    /*
+    
     public static void main(String[] args) {
         Differ differ = new Differ();
         DiffInfo diffInfo;
@@ -88,7 +88,7 @@ public class Differ {
             }
         }
     }
-    */
+    
 
     /**
      * Finds differences between two two XML docs, stores differences in third
@@ -199,6 +199,41 @@ public class Differ {
                         }
                     } else if (createdOrDeleted) {
                         if (difference.getTestNodeDetail().getValue().equals("null")) { //testNode is null so controlNode was created
+                            //copy from controlDoc to testDoc
+                            String xpathToElement = difference.getControlNodeDetail().getXpathLocation();
+                            NodeList controlNodes = (NodeList) controlXPath.evaluate(xpathToElement, controlDoc.getDocumentElement(), XPathConstants.NODESET);
+                            //Element el = (Element) controlNodes.item(0);
+                            Node nodeToCopy = difference.getControlNodeDetail().getNode();
+                            //Node copiedNode = nodeToCopy.cloneNode(false);
+                            Node copiedNode = testDoc.importNode(nodeToCopy, false);
+                            String xpathToParent = xpathToAttr.substring(0, xpathToElement.lastIndexOf("/"));
+                            
+                            Node testNodes = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
+                            testNodes.appendChild(copiedNode);
+                            
+                            testNodes = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
+                            elementToChange = (Element) testNodes;
+                            elementToChange.setAttribute("state", "created");
+
+                            //elementToChange = (Element) testNodes.item(0);
+                            //elementToChange.appendChild(copyNode);
+                            /*
+                            NodeList testNodes = (NodeList) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODESET);
+                            elementToChange = (Element) testNodes.item(0);
+                            elementToChange.setAttribute("state", "created");
+                            */
+                            //Node parent = copyNode.getParentNode();
+                            //NodeList testNodes = (NodeList) testXPath.evaluate(xpathToTest, testDoc.getDocumentElement(), XPathConstants.NODESET);
+                            
+                            //Node nn = testDoc.importNode(difference.getControlNodeDetail().getNode(), false);
+                            
+                            //System.out.println("NODE: " + xpathToElement+" "+nn.getAttributes().item(0) + nn.getParentNode());
+                            //testDoc.(nodeToChange.)
+                            //NodeList testNodes = (NodeList) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODESET);
+                            //elementToChange = (Element) nodeToChange;
+                            //elementToChange.getParentNode().appendChild(copyNode);
+                            //System.out.println("X X X: " + xpathToAttr + " || " + elementToChange + " " );
+
                             
                         } else if (difference.getControlNodeDetail().getValue().equals("null")) { //testNode was deleted
                             //NodeList testNode = (NodeList) testXPath.evaluate(testNodeDetail.getXpathLocation(), testDoc.getDocumentElement(), XPathConstants.NODESET);
@@ -210,7 +245,6 @@ public class Differ {
                             elementToChange = (Element) testNodes.item(0);
                             elementToChange.setAttribute("state", "deleted");
                             System.out.println("YYY " + elementToChange.getAttribute("name") + " " + elementToChange.getAttribute("state"));
-
                         }
                     }
                 } catch (XPathExpressionException ex) {

@@ -409,11 +409,12 @@ public class FileInfoConverter {
                 newLastModifiedTime = setDate(parent, lastModifiedTime, "newLastModifiedTime", dateFormat);
 
                 newString = parent.getAttribute("state");
-                System.out.println("STATE: " + newString);
+                //System.out.println("STATE: " + newString);
                 if (!newString.isEmpty()) {
-                    state = ItemState.valueOf(parent.getAttribute("state"));
+                    state = ItemState.valueOf(parent.getAttribute("state").toUpperCase());
+                    //state = ItemState.valueOf(parent.getAttribute("state"));
                 } else {
-                    state = ItemState.CREATED; //maybe choose other option
+                    state = ItemState.UNMODIFIED; //maybe choose other option
                 }
             }
         }
