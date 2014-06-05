@@ -40,6 +40,7 @@ and open the template in the editor.
         <xs:attribute name="lastAccessTime" type="xs:dateTime"></xs:attribute> 
         <xs:attribute name="lastModifiedTime" type="xs:dateTime"></xs:attribute> 
         <xs:attribute name="symbolicLink" type="xs:boolean"></xs:attribute> 
+        <xs:attribute name="accessible" type="xs:boolean" default="true"/>
     </xs:attributeGroup>
     
     <xs:simpleType name="nonEmptyString">
