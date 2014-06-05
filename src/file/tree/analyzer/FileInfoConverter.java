@@ -249,7 +249,7 @@ public class FileInfoConverter {
         if (!newString.isEmpty()) {
             state = ItemState.valueOf(parent.getAttribute("state"));
         } else {
-            state = ItemState.created; //maybe choose other option
+            state = ItemState.CREATED; //maybe choose other option
         }
         //end
 
@@ -412,7 +412,7 @@ public class FileInfoConverter {
                 if (!newString.isEmpty()) {
                     state = ItemState.valueOf(parent.getAttribute("state"));
                 } else {
-                    state = ItemState.created; //maybe choose other option
+                    state = ItemState.CREATED; //maybe choose other option
                 }
             }
         }

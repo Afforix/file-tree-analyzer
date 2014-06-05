@@ -11,5 +11,5 @@ package file.tree.analyzer;
  * @author jindra
  */
 public enum ItemState {
-    unmodified,modified,created,deleted
+    UNMODIFIED, MODIFIED, CREATED, DELETED
 }
