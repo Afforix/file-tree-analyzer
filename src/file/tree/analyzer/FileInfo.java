@@ -116,11 +116,8 @@ public class FileInfo implements Comparable<FileInfo> {
         if (file == null) {
             throw new NullPointerException("file");
         }
-
         resolvePath(file);
         directory = Files.isDirectory(file);
-//        this.exception = exc;
-
         accessibility = false;
     }
 
@@ -160,7 +157,7 @@ public class FileInfo implements Comparable<FileInfo> {
 
         addChild(child);
 
-        if (child.isAccessible() && child.isDirectory()) {
+        if (child.isDirectory()) {
             //don't forget +1 for the new directory
             numberofDirectories += child.getNumberOfDirectories() + 1;
             numberOfFiles += child.getNumberOfFiles();
@@ -386,10 +383,10 @@ public class FileInfo implements Comparable<FileInfo> {
      */
     @Override
     public int compareTo(FileInfo o) {
-        int accessCompare = -Boolean.compare(this.isAccessible(), o.isAccessible());
-        if (accessCompare != 0) {
-            return accessCompare;
-        }
+//        int accessCompare = -Boolean.compare(this.isAccessible(), o.isAccessible());
+//        if (accessCompare != 0) {
+//            return accessCompare;
+//        }
 
         int dirCompare = -Boolean.compare(directory, o.directory);
         if (dirCompare != 0) {
