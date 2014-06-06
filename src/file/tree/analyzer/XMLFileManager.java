@@ -19,7 +19,10 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -62,8 +65,13 @@ public class XMLFileManager {
         try {
 
             File file = new File(analysesPath.toFile(),getTimestamp() + ".xml");
-            javax.xml.transform.TransformerFactory.newInstance().newTransformer().
-                    transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(file));
+            Transformer t = TransformerFactory.newInstance().newTransformer();
+            
+            //set indent
+            t.setOutputProperty(OutputKeys.INDENT, "yes");
+            t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            
+            t.transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(file));
             return file.toPath().getFileName().toString();
         } catch (TransformerException ex) {
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "Cannot save file.", ex);
