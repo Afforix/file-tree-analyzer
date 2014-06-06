@@ -1,5 +1,7 @@
 package file.tree.analyzer.gui;
 
+import file.tree.analyzer.DiffInfo;
+import file.tree.analyzer.Differ;
 import file.tree.analyzer.FileInfo;
 import file.tree.analyzer.FileInfoConverter;
 import file.tree.analyzer.XMLFileManager;
@@ -106,7 +108,7 @@ public class MainController {
                 xmlFileManager.findAllXMLFiles(), xmlFileManager));
 
         diffComboBox.getItems().addAll(Utils.FilenameToComboBoxItem(
-                xmlFileManager.findAllXMLFiles(), xmlFileManager));     
+                xmlFileManager.findAllXMLFiles(), xmlFileManager));
     }
 
     @FXML
@@ -133,10 +135,17 @@ public class MainController {
     }
 
     @FXML
-    void handleDiffComboBoxAction(ActionEvent event) {
+    void handleDiffComboBoxAction(ActionEvent event) throws IOException {
         ComboBox<ComboBoxItem> source = (ComboBox<ComboBoxItem>) event.getSource();
-        System.out.println("Diff " + source.getValue().getFile());
-        clear();
+        System.out.println("Diff " + source.getValue().getFile() + " " + openComboBox.getValue().getFile());
+
+        Differ differ = new Differ();
+
+        DiffInfo info = differ.diffXMLs("./saved_analyses", 
+                openComboBox.getValue().getFile(), source.getValue().getFile());
+        loadFile(info);
+
+        // clear();
     }
 
     @FXML
@@ -263,12 +272,12 @@ public class MainController {
     }
     // </editor-fold>
 
-    private void loadFile(FileInfo directory) {      
-        FileInfoTreeItem treeRoot = new FileInfoTreeItem(directory);       
+    private void loadFile(FileInfo directory) {
+        FileInfoTreeItem treeRoot = new FileInfoTreeItem(directory);
         treeView.setRoot(treeRoot);
-        treeRoot.setExpanded(true);        
+        treeRoot.setExpanded(true);
     }
-    
+
     private void clear() {
         openComboBox.getSelectionModel().clearSelection();
         openComboBox.setPromptText("Choose File ...");

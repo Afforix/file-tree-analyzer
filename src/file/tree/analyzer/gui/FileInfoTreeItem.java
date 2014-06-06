@@ -5,6 +5,7 @@
  */
 package file.tree.analyzer.gui;
 
+import file.tree.analyzer.DiffInfo;
 import file.tree.analyzer.FileInfo;
 import file.tree.analyzer.utils.Utils;
 import java.io.File;
@@ -28,7 +29,7 @@ class FileInfoTreeItem extends TreeItem<FileInfo> {
     private static Image genericDirectoryImg;
 
     static {
-        try {            
+        try {
             File genericFile = Files.createTempFile(null, "").toFile();
             File genericDirectory = Files.createTempDirectory(null).toFile();
             genericFileImg = Utils.FileToImg(genericFile);
@@ -59,38 +60,44 @@ class FileInfoTreeItem extends TreeItem<FileInfo> {
         }
         return super.getChildren().isEmpty();
     }
-    
-    @SuppressWarnings("unchecked")  
+
+    @SuppressWarnings("unchecked")
     private void loadChildren() {
         hasLoadedChildren = true;
         FileInfo elementVal = super.getValue();
-         Image img = null;
+        Image img = null;
         try { // try to set icon           
-           
 
             if (elementVal.isDirectory()) {
                 img = genericDirectoryImg;
-            } else if (elementVal.toFile().exists() && !elementVal.isSymbolicLink()) {                
+            } else if (elementVal.toFile().exists() && !elementVal.isSymbolicLink()) {
                 img = Utils.FileToImg(elementVal.toFile());
-            } 
+            }
             super.setGraphic(new ImageView(img));
 
-        } catch (Exception e) {           
+        } catch (Exception e) {
         }
-        
-        if(img == null){
+
+        if (img == null) {
             img = genericFileImg;
-             super.setGraphic(new ImageView(img));
+            super.setGraphic(new ImageView(img));
         }
 
         if (elementVal.isDirectory() && elementVal.isAccessible()) {
-            for (FileInfo f : elementVal.getChildren()) {
-                FileInfoTreeItem item = new FileInfoTreeItem(f);
-                super.getChildren().add(item);
+            if (elementVal instanceof DiffInfo) {
+                DiffInfo info = (DiffInfo)elementVal;
+               for (DiffInfo f : info.getDiffChildren()) {
+                    FileInfoTreeItem item = new FileInfoTreeItem(f);
+                    super.getChildren().add(item);
+                }      
+            } else {
+                for (FileInfo f : elementVal.getChildren()) {
+                    FileInfoTreeItem item = new FileInfoTreeItem(f);
+                    super.getChildren().add(item);
+                }                
             }
+
         }
     }
-
-    
 
 }
