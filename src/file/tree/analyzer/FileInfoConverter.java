@@ -101,6 +101,8 @@ public class FileInfoConverter {
      * @return FileInfo
      */
     public static FileInfo domToFileInfo(Document doc) {
+        if(doc == null) throw new NullPointerException("doc is null");
+        
         Element rootElement = doc.getDocumentElement();
         FileInfo root = childrenToFileInfo(rootElement, "");
 
@@ -270,7 +272,7 @@ public class FileInfoConverter {
      * @param dateFormat how should output look like
      * @return date
      */
-    public static Date setDate(Element parent, Date oldAttribute, String newAttributeName, DateFormat dateFormat) {
+    private static Date setDate(Element parent, Date oldAttribute, String newAttributeName, DateFormat dateFormat) {
         Date date = null;
         String newAttribute = parent.getAttribute(newAttributeName);
 
