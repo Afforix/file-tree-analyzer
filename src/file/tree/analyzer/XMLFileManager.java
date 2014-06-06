@@ -72,6 +72,7 @@ public class XMLFileManager {
             t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             
             t.transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(file));
+            Logger.getLogger(XMLFileManager.class.getName()).log(Level.INFO, "File {0} created.", file.toPath().getFileName().toString());
             return file.toPath().getFileName().toString();
         } catch (TransformerException ex) {
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "Cannot save file.", ex);
@@ -86,7 +87,6 @@ public class XMLFileManager {
      */
     private String getTimestamp() {
         Date date = new Date();
-        //TODO timestamp format
         SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd'T'hhmmss");
         return timeStampFormat.format(date);
     }
@@ -124,7 +124,9 @@ public class XMLFileManager {
         }
 
         try {
+            String name = xmlFile.toPath().getFileName().toString();
             xmlFile.delete();
+            Logger.getLogger(XMLFileManager.class.getName()).log(Level.INFO, "File {0} deleted.", name);
         } catch (Exception ex) {
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "Cannot delete file.", ex);
         }
@@ -156,7 +158,9 @@ public class XMLFileManager {
                 xmlFilesNames.add(f.getName());
             }
         }
-
+        
+        Logger.getLogger(XMLFileManager.class.getName()).log(Level.INFO, "{0} analyses found.", xmlFiles.length);
+        
         return xmlFilesNames;
     }
 
@@ -205,6 +209,7 @@ public class XMLFileManager {
             }
 
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            //dbFactory.setValidating(true); TODO validating xml files
             
             if(turnOffDefferedDom)
             {

@@ -39,7 +39,6 @@ public class FileInfoConverter {
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
             doc = docBuilder.newDocument();
             doc.setXmlVersion("1.0");
 

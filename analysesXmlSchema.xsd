@@ -23,24 +23,24 @@ and open the template in the editor.
     
     <xs:complexType name="fileType">
         <xs:attributeGroup ref="commonAttributes"/> 
-        <xs:attribute name="size" type="xs:nonNegativeInteger"></xs:attribute>     
+        <xs:attribute name="size" type="xs:nonNegativeInteger" use="required"></xs:attribute>     
     </xs:complexType>
     
     <xs:complexType name="rootDirectoryType">
         <xs:complexContent>
             <xs:extension base="directoryType">
-                <xs:attribute name="path" type="nonEmptyString"></xs:attribute> 
+                <xs:attribute name="path" type="nonEmptyString" use="required"></xs:attribute> 
             </xs:extension>
         </xs:complexContent>       
     </xs:complexType>
     
     <xs:attributeGroup name="commonAttributes">
-        <xs:attribute name="name" type="nonEmptyString"></xs:attribute> 
+        <xs:attribute name="name" type="nonEmptyString" use="required"></xs:attribute> 
         <xs:attribute name="creationTime" type="xs:dateTime"></xs:attribute> 
         <xs:attribute name="lastAccessTime" type="xs:dateTime"></xs:attribute> 
         <xs:attribute name="lastModifiedTime" type="xs:dateTime"></xs:attribute> 
         <xs:attribute name="symbolicLink" type="xs:boolean"></xs:attribute> 
-        <xs:attribute name="accessible" type="xs:boolean" default="true"/>
+        <xs:attribute name="accessible" type="xs:boolean" use="required"/>
     </xs:attributeGroup>
     
     <xs:simpleType name="nonEmptyString">
