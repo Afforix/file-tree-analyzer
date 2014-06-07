@@ -34,6 +34,8 @@ public class FileInfoConverter {
      * @return XML DOM
      */
     public static Document fileInfoToDom(FileInfo root) {
+        if(root == null) throw new IllegalArgumentException("root is null");
+        
         Document doc = null;
 
         try {
@@ -101,7 +103,7 @@ public class FileInfoConverter {
      * @return FileInfo
      */
     public static FileInfo domToFileInfo(Document doc) {
-        if(doc == null) throw new NullPointerException("doc is null");
+        if(doc == null) throw new IllegalArgumentException("doc is null");
         
         Element rootElement = doc.getDocumentElement();
         FileInfo root = childrenToFileInfo(rootElement, "");

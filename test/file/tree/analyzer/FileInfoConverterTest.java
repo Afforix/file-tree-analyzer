@@ -27,6 +27,14 @@ import org.w3c.dom.Element;
  */
 public class FileInfoConverterTest {
 
+    @Before
+    public void setUp() throws Exception {
+    }
+
+    @After
+    public void tearDown() throws Exception {
+    }
+
     /**
      * Test of fileInfoToDom method, of class FileInfoConverter.
      */
@@ -39,17 +47,66 @@ public class FileInfoConverterTest {
         
         Document result = FileInfoConverter.fileInfoToDom(root);
         
-        assertEquals(expResult.getDocumentElement().getNodeName(), result.getDocumentElement().getNodeName());
-        assertEquals(expResult.getDocumentElement().getAttribute("name"), result.getDocumentElement().getAttribute("name"));
-        assertEquals(expResult.getDocumentElement().getAttribute("symbolicLink"), result.getDocumentElement().getAttribute("symbolicLink"));
-        assertEquals(expResult.getDocumentElement().getAttribute("accessible"), result.getDocumentElement().getAttribute("accessible"));
-        assertEquals(expResult.getDocumentElement().getAttribute("path"), result.getDocumentElement().getAttribute("path"));
-        assertEquals(expResult.getDocumentElement().getAttribute("numberOfFiles"), result.getDocumentElement().getAttribute("numberOfFiles"));
-        assertEquals(expResult.getDocumentElement().getAttribute("numberOfDirectories"), result.getDocumentElement().getAttribute("numberOfDirectories"));
-        assertEquals(expResult.getDocumentElement().getAttribute("creationTime"), result.getDocumentElement().getAttribute("creationTime"));
-        assertEquals(expResult.getDocumentElement().getAttribute("lastAccesTime"), result.getDocumentElement().getAttribute("lasAccessTime"));
-        assertEquals(expResult.getDocumentElement().getAttribute("lastModifiedTime"), result.getDocumentElement().getAttribute("lastModifiedTime"));
+        Element expRoot = expResult.getDocumentElement();
+        Element resultRoot = result.getDocumentElement();
         
+        assertEquals(expRoot.getNodeName(), resultRoot.getNodeName());
+        assertEquals(expRoot.getAttribute("name"), resultRoot.getAttribute("name"));
+        assertEquals(expRoot.getAttribute("symbolicLink"), resultRoot.getAttribute("symbolicLink"));
+        assertEquals(expRoot.getAttribute("accessible"), resultRoot.getAttribute("accessible"));
+        assertEquals(expRoot.getAttribute("path"), resultRoot.getAttribute("path"));
+        assertEquals(expRoot.getAttribute("numberOfFiles"), resultRoot.getAttribute("numberOfFiles"));
+        assertEquals(expRoot.getAttribute("numberOfDirectories"), resultRoot.getAttribute("numberOfDirectories"));
+        assertEquals(expRoot.getAttribute("creationTime"), resultRoot.getAttribute("creationTime"));
+        assertEquals(expRoot.getAttribute("lastAccesTime"), resultRoot.getAttribute("lasAccessTime"));
+        assertEquals(expRoot.getAttribute("lastModifiedTime"), resultRoot.getAttribute("lastModifiedTime"));
+        
+    }
+    
+    /**
+     * Test of fileInfoToDom method with illegal argument.
+     */
+    @Test
+    public void testNullFileInfoToDom() {
+        System.out.println("fileInfoToDom with illegal argument test");
+        
+        try {
+            Document result = FileInfoConverter.fileInfoToDom(null);
+            fail("didn't throw IllegalArgumentException for invalid input");
+        } catch(IllegalArgumentException ex) {
+            
+        }       
+    }
+    
+    
+    /**
+     * Test of domToFileInfo method, of class FileInfoConverter.
+     */
+    @Test
+    public void testDomToFileInfo() {
+        System.out.println("domToFileInfo");
+        Document doc = null;
+        FileInfo expResult = null;
+        FileInfo result = FileInfoConverter.domToFileInfo(doc);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+    
+    
+    /**
+     * Test of domToFileInfo method with illegal argument.
+     */
+    @Test
+    public void testNullDomToFileInfo() {
+        System.out.println("domToFileInfo with illegal argument test");
+        
+        try {
+            FileInfo result = FileInfoConverter.domToFileInfo(null);
+            fail("didn't throw IllegalArgumentException for invalid input");
+        } catch(IllegalArgumentException ex) {
+            
+        }
     }
     
     private FileInfo createTestFileInfo() {
@@ -128,60 +185,5 @@ public class FileInfoConverterTest {
         return doc;
     }
 
-    /**
-     * Test of domToFileInfo method, of class FileInfoConverter.
-     */
-    @Test
-    public void testDomToFileInfo() {
-        System.out.println("domToFileInfo");
-        Document doc = null;
-        FileInfo expResult = null;
-        FileInfo result = FileInfoConverter.domToFileInfo(doc);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of domToDiffInfo method, of class FileInfoConverter.
-     */
-    @Test
-    public void testDomToDiffInfo() {
-        System.out.println("domToDiffInfo");
-        Document doc = null;
-        DiffInfo expResult = null;
-        DiffInfo result = FileInfoConverter.domToDiffInfo(doc);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of domToFileInfo2 method, of class FileInfoConverter.
-     */
-    @Test
-    public void testDomToFileInfo2() {
-        System.out.println("domToFileInfo2");
-        Document doc = null;
-        FileInfo expResult = null;
-        FileInfo result = FileInfoConverter.domToFileInfo2(doc);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of domToDiffInfo2 method, of class FileInfoConverter.
-     */
-    @Test
-    public void testDomToDiffInfo2() {
-        System.out.println("domToDiffInfo2");
-        Document doc = null;
-        DiffInfo expResult = null;
-        DiffInfo result = FileInfoConverter.domToDiffInfo2(doc);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
     
 }
