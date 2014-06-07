@@ -6,6 +6,7 @@
 package file.tree.analyzer;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,15 +51,15 @@ public class FileInfoConverterTest {
 
         File f = new File(root, "file1.txt");
         f.delete();
-        
+
         File d = new File(root, "dir1");
-        
+
         File f2 = new File(d, "file2.txt");
         f2.delete();
-        
+
         File f3 = new File(d, "file3.txt");
         f3.delete();
-        
+
         d.delete();
 
         root.delete();
@@ -70,26 +71,40 @@ public class FileInfoConverterTest {
     @Test
     public void testFileInfoToDom() {
         System.out.println("fileInfoToDom test");
-        FileInfo root = createTestFileInfo();
-
-        Document expResult = createTestDocument();
-
-        Document result = FileInfoConverter.fileInfoToDom(root);
-
-        Element expRoot = expResult.getDocumentElement();
-        Element resultRoot = result.getDocumentElement();
-
-        assertEquals(expRoot.getNodeName(), resultRoot.getNodeName());
-        assertEquals(expRoot.getAttribute("name"), resultRoot.getAttribute("name"));
-        assertEquals(expRoot.getAttribute("symbolicLink"), resultRoot.getAttribute("symbolicLink"));
-        assertEquals(expRoot.getAttribute("accessible"), resultRoot.getAttribute("accessible"));
-        assertEquals(expRoot.getAttribute("path"), resultRoot.getAttribute("path"));
-        assertEquals(expRoot.getAttribute("numberOfFiles"), resultRoot.getAttribute("numberOfFiles"));
-        assertEquals(expRoot.getAttribute("numberOfDirectories"), resultRoot.getAttribute("numberOfDirectories"));
-        assertEquals(expRoot.getAttribute("creationTime"), resultRoot.getAttribute("creationTime"));
-        assertEquals(expRoot.getAttribute("lastAccesTime"), resultRoot.getAttribute("lasAccessTime"));
-        assertEquals(expRoot.getAttribute("lastModifiedTime"), resultRoot.getAttribute("lastModifiedTime"));
-
+        try {
+            FileInfo root = DiskExplorer.getFileTree("./testDir");
+            
+            Document result = FileInfoConverter.fileInfoToDom(root);
+            
+            //DateFormat for time attributes tests
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+            
+            //test root element
+            Element resultRoot = result.getDocumentElement();
+            
+            assertEquals("directory", resultRoot.getTagName()); //root is directory
+            assertTrue(resultRoot.hasAttribute("path")); //root has attribute path
+            assertEquals(2, resultRoot.getChildNodes().getLength()); 
+            assertEquals(root.getName(), resultRoot.getAttribute("name"));
+                       
+            assertEquals(root.getCreationTime(), dateFormat.parse(resultRoot.getAttribute("creationTime")));
+            
+            //test first directory
+            Element firstDirResult = (Element)resultRoot.getFirstChild();
+            FileInfo firstDir = root.getChildren().get(0);
+            
+            assertEquals("directory", firstDirResult.getTagName()); 
+            assertFalse(firstDirResult.hasAttribute("path")); //only root has attribute path
+            assertEquals(2, firstDirResult.getChildNodes().getLength()); 
+            assertEquals(firstDir.getName(), firstDirResult.getAttribute("name"));
+                       
+            assertEquals(firstDir.getLastModifiedTime(), dateFormat.parse(firstDirResult.getAttribute("lastModifiedTime")));
+            
+        } catch (IOException ex) {
+            fail("couldn't create FileInfo");
+        } catch (ParseException ex) {
+            fail("couldn't parse date");
+        }
     }
 
     /**
@@ -134,82 +149,6 @@ public class FileInfoConverterTest {
         } catch (IllegalArgumentException ex) {
 
         }
-    }
-
-    private FileInfo createTestFileInfo() {
-        FileInfo root = new FileInfo();
-        FileInfo child = new FileInfo();
-        try {
-            root.setPath("/home/testFolder");
-            root.setAccessibility(true);
-            root.setDirectory(true);
-            root.setSymbolicLink(false);
-            root.setName("testFolder");
-            root.setNumberOfFiles(1);
-            root.setNumberofDirectories(0);
-
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
-            root.setCreationTime(dateFormat.parse("2013-04-05T10:55:46"));
-            root.setLastAccessTime(dateFormat.parse("2013-04-05T10:55:51"));
-            root.setLastModifiedTime(dateFormat.parse("2013-04-05T10:55:46"));
-
-            child.setPath("/home/testFolder/testFile.txt");
-            child.setAccessibility(true);
-            child.setName("testFile.txt");
-            child.setSize(919l);
-            child.setSymbolicLink(false);
-            child.setDirectory(false);
-            child.setCreationTime(dateFormat.parse("2014-06-05T10:55:46"));
-            child.setLastAccessTime(dateFormat.parse("2014-06-05T10:55:51"));
-            child.setLastModifiedTime(dateFormat.parse("2014-06-05T10:55:46"));
-
-            return root;
-        } catch (ParseException ex) {
-            //TODO
-        }
-
-        return root;
-    }
-
-    private Document createTestDocument() {
-        Document doc = null;
-        try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-            // create Document
-            doc = docBuilder.newDocument();
-            doc.setXmlVersion("1.0");
-
-            //root directory
-            Element rootElement = doc.createElement("directory");
-            rootElement.setAttribute("name", "testFolder");
-            rootElement.setAttribute("accessible", "true");
-            rootElement.setAttribute("path", "/home/testFolder");
-            rootElement.setAttribute("symbolicLink", "false");
-            rootElement.setAttribute("numberOfFiles", "1");
-            rootElement.setAttribute("numberOfDirectories", "0");
-            rootElement.setAttribute("creationTime", "2013-04-05T10:55:46");
-            rootElement.setAttribute("lastAccessTime", "2013-04-05T10:55:51");
-            rootElement.setAttribute("lastModifiedTime", "2013-04-05T10:55:46");
-            doc.appendChild(rootElement);
-
-            //file element
-            Element fileElement = doc.createElement("file");
-            fileElement.setAttribute("name", "testFile.txt");
-            fileElement.setAttribute("accessible", "true");
-            fileElement.setAttribute("size", "919");
-            fileElement.setAttribute("symbolicLink", "false");
-            fileElement.setAttribute("creationTime", "2014-06-05T10:55:46");
-            fileElement.setAttribute("lastAccessTime", "2014-06-05T10:55:51");
-            fileElement.setAttribute("lastModifiedTime", "2014-06-05T10:55:46");
-            rootElement.appendChild(fileElement);
-
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(FileInfoConverterTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return doc;
     }
 
 }
