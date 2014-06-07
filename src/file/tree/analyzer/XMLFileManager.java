@@ -31,7 +31,6 @@ import org.xml.sax.SAXException;
  * @author martina
  */
 public class XMLFileManager {
-    //TODO logging
 
     private  Path analysesPath;
 
@@ -50,9 +49,7 @@ public class XMLFileManager {
            analysesPath = analysesPath.toRealPath();
         } catch (IOException ex) {
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
+        }       
     }
 
     /**
@@ -62,6 +59,8 @@ public class XMLFileManager {
      * @return name of created file
      */
     public String createXMLFile(Document xmlDom) {
+        if(xmlDom==null) throw new IllegalArgumentException("xmlDom is null");
+        
         try {
 
             File file = new File(analysesPath.toFile(),getTimestamp() + ".xml");
@@ -97,6 +96,8 @@ public class XMLFileManager {
      * @param fileName name of the XML file to be deleted
      */
     public void deleteXMLFile(String fileName) {
+        if(fileName == null) throw new IllegalArgumentException("fileName is null");
+        
         File analysesDirectory = analysesPath.toFile();
         File xmlFile = null;
 
@@ -170,7 +171,9 @@ public class XMLFileManager {
      * @param fileName name of the xml file
      * @return XML DOM loaded from XML file
      */
-    public Document findXMLFile(String fileName) {        
+    public Document findXMLFile(String fileName) { 
+        if(fileName == null) throw new IllegalArgumentException("fileName is null");
+        
         Document xmlDoc = this.findXMLFile(fileName, false);
         return xmlDoc;
     }
