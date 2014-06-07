@@ -31,15 +31,16 @@ public class XMLFileManagerTest {
     @Before
     public void setUp() throws Exception {
         File testDir = new File(".", "testDir");
-        if (testDir.mkdir()) {
-            File f1 = new File(testDir, "file1.xml");
-            File f2 = new File(testDir, "file2.xml");
-            File f3 = new File(testDir, "file3.xml");
+        testDir.mkdir();
 
-            f1.createNewFile();
-            f2.createNewFile();
-            f3.createNewFile();
-        }
+        File f1 = new File(testDir, "file1.xml");
+        File f2 = new File(testDir, "file2.xml");
+        File f3 = new File(testDir, "file3.xml");
+
+        f1.createNewFile();
+        f2.createNewFile();
+        f3.createNewFile();
+
     }
 
     @After
@@ -67,29 +68,29 @@ public class XMLFileManagerTest {
     public void testCreateXMLFile() {
         System.out.println("createXMLFile test");
         Document dom = null;
-        
+
         try {
             dom = FileInfoConverter.fileInfoToDom(DiskExplorer.getFileTree("./testDir"));
         } catch (IOException ex) {
             fail("could not create FileInfo");
         }
-        
+
         String fileName = manager.createXMLFile(dom);
-        
+
         File file = new File("./testDir", fileName);
         assertTrue(file.exists());
-        
-        if(file.exists()) {
+
+        if (file.exists()) {
             file.delete();
         }
     }
 
     /**
-     * Test of createXMLFile method with illegal attribute.
+     * Test of createXMLFile method with illegal argument.
      */
     @Test
     public void testCreateNullXMLFile() {
-        System.out.println("createXMLFile with illegal attribute test");
+        System.out.println("createXMLFile with illegal argument test");
 
         try {
             manager.createXMLFile(null);
@@ -101,21 +102,35 @@ public class XMLFileManagerTest {
     }
 
     /**
-     * Test of createXMLFile method, of class XMLFileManager.
+     * Test of deleteXMLFile method, of class XMLFileManager.
      */
     @Test
     public void testDeleteXMLFile() {
-        System.out.println("deleteXMLFile");
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("deleteXMLFile test");
+
+        manager.deleteXMLFile("file1.xml");
+
+        File file1 = new File("./testDir", "file1.xml");
+        File file2 = new File("./testDir", "file2.xml");
+        File file3 = new File("./testDir", "file3.xml");
+
+        assertFalse(file1.exists());
+        assertTrue(file2.exists());
+        assertTrue(file3.exists());
+
+        manager.deleteXMLFile("file3.xml");
+
+        assertFalse(file1.exists());
+        assertTrue(file2.exists());
+        assertFalse(file3.exists());
     }
 
     /**
-     * Test of deleteXMLFile method with illegal attribute.
+     * Test of deleteXMLFile method with illegal argument.
      */
     @Test
     public void testDeleteNullXMLFile() {
-        System.out.println("deleteXMLFile with illegal attribute");
+        System.out.println("deleteXMLFile with illegal argument");
 
         try {
             manager.deleteXMLFile(null);
@@ -131,13 +146,14 @@ public class XMLFileManagerTest {
      */
     @Test
     public void testFindAllXMLFiles() {
-        System.out.println("findAllXMLFiles");
-        XMLFileManager instance = null;
-        List<String> expResult = null;
-        List<String> result = instance.findAllXMLFiles();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("findAllXMLFiles test");
+        
+        List<String> result = manager.findAllXMLFiles();
+        
+        assertEquals(3, result.size());
+        assertTrue(result.contains("file1.xml"));
+        assertTrue(result.contains("file2.xml"));
+        assertTrue(result.contains("file3.xml"));
     }
 
     /**
@@ -145,7 +161,7 @@ public class XMLFileManagerTest {
      */
     @Test
     public void testFindXMLFile_String() {
-        System.out.println("findXMLFile");
+        System.out.println("findXMLFile test");
         String fileName = "";
         XMLFileManager instance = null;
         Document expResult = null;
@@ -154,21 +170,20 @@ public class XMLFileManagerTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-
+    
     /**
-     * Test of findXMLFile method, of class XMLFileManager.
+     * Test of findXMLFile method with illegal argument.
      */
     @Test
-    public void testFindXMLFile_String_Boolean() {
-        System.out.println("findXMLFile");
-        String fileName = "";
-        Boolean turnOffDefferedDom = null;
-        XMLFileManager instance = null;
-        Document expResult = null;
-        Document result = instance.findXMLFile(fileName, turnOffDefferedDom);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testFindXMLFile_NullString() {
+        System.out.println("findXMLFile with illegal argument test");
+        
+        try {
+            manager.findXMLFile(null);
+            fail("didn't throw IllegalArgumentException for invalid input");
+        } catch (IllegalArgumentException ex) {
+
+        }
     }
 
 }
