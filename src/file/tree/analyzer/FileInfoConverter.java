@@ -138,7 +138,7 @@ public class FileInfoConverter {
             item.setSize(Long.parseLong(element.getAttribute("size")));
         }
 
-        item.setSymbolicLink(Boolean.parseBoolean(element.getAttribute("isSymbolicLink")));
+        item.setSymbolicLink(Boolean.parseBoolean(element.getAttribute("symbolicLink")));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 
         try {
@@ -227,7 +227,7 @@ public class FileInfoConverter {
         //System.out.println("PATH:" + path);
 
         boolean isSymbolicLink = false;
-        if (parent.getAttribute("isSymbolicLink").equals("true")) {
+        if (parent.getAttribute("symbolicLink").equals("true")) {
             isSymbolicLink = true;
         }
 
@@ -372,7 +372,7 @@ public class FileInfoConverter {
         isAccessible = parent.getAttribute("accessibility").equals("true");
         
         isDirectory = parent.getTagName().equals("directory");
-        isSymbolicLink = parent.getAttribute("isSymbolicLink").equals("true");
+        isSymbolicLink = parent.getAttribute("symbolicLink").equals("true");
         
         //if isAccessible: get size/(numberOfFiles, numberOfDirectories), creatT, lastAccT, lastModT, 
         //if isAccessible && !isDiffInfo get also fileInfoChildren 
