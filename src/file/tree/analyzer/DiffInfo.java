@@ -25,7 +25,7 @@ public class DiffInfo extends FileInfo {
     //same as newDirectory
     //private final boolean newSymbolicLink;
     private final List<DiffInfo> diffChildren;
-    //private final boolean newAccesibility;    //TODO !!! - implement, change FileInfoConverter and Differ
+    private final boolean newAccesibility;
     private final Long newSize;
     private final Date newCreationTime;
     private final Date newLastAccessTime;
@@ -35,6 +35,7 @@ public class DiffInfo extends FileInfo {
         super(file, attributes);
         this.state = null;
         this.diffChildren = null;
+        this.newAccesibility = false;
         this.newSize = null;
         this.newCreationTime = null;
         this.newLastAccessTime = null;
@@ -42,9 +43,10 @@ public class DiffInfo extends FileInfo {
     }
     
     public DiffInfo(String name, String path, boolean directory, boolean symbolicLink, boolean accessibility, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
-        ItemState state, List<DiffInfo> diffChildren, Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
+        ItemState state, List<DiffInfo> diffChildren, boolean newAccessibility, Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
         super(name, path, directory, symbolicLink, accessibility, size, creationTime, lastAccessTime, lastModifiedTime, children, numberOfFiles, numberofDirectories);
         this.state = state;
+        this.newAccesibility = newAccessibility;
         this.diffChildren = diffChildren;
         this.newSize = newSize;
         this.newCreationTime = newCreationTime;
@@ -55,6 +57,10 @@ public class DiffInfo extends FileInfo {
     
     public ItemState getState() {
         return state;
+    }
+    
+    public boolean isNewlyAccessible() { //or how should it be named
+        return newAccesibility;
     }
     
     /*
