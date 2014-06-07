@@ -10,11 +10,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -85,6 +80,8 @@ public class FileInfoConverterTest {
             assertEquals("directory", resultRoot.getTagName()); //root is directory
             assertTrue(resultRoot.hasAttribute("path")); //root has attribute path
             assertEquals(2, resultRoot.getChildNodes().getLength()); 
+            assertEquals("3", resultRoot.getAttribute("numberOfFiles"));
+            assertEquals("1", resultRoot.getAttribute("numberOfDirectories"));
             assertEquals(root.getName(), resultRoot.getAttribute("name"));
                        
             assertEquals(root.getCreationTime(), dateFormat.parse(resultRoot.getAttribute("creationTime")));
@@ -96,9 +93,26 @@ public class FileInfoConverterTest {
             assertEquals("directory", firstDirResult.getTagName()); 
             assertFalse(firstDirResult.hasAttribute("path")); //only root has attribute path
             assertEquals(2, firstDirResult.getChildNodes().getLength()); 
+            assertEquals("2", firstDirResult.getAttribute("numberOfFiles")); 
+            assertEquals("0", firstDirResult.getAttribute("numberOfDirectories"));
             assertEquals(firstDir.getName(), firstDirResult.getAttribute("name"));
+            assertFalse(firstDirResult.hasAttribute("size")); //only file have attribute size
                        
             assertEquals(firstDir.getLastModifiedTime(), dateFormat.parse(firstDirResult.getAttribute("lastModifiedTime")));
+            
+            //test file2.txt          
+            Element file2Result = (Element)firstDirResult.getLastChild();
+            FileInfo file2 = firstDir.getChildren().get(1);
+            
+            assertEquals("file", file2Result.getTagName()); 
+            assertFalse(file2Result.hasAttribute("path")); //only root has attribute path
+            assertFalse(file2Result.hasAttribute("numberOfFiles")); //only directorie have attribute numberOfFiles
+            assertFalse(file2Result.hasAttribute("numberOfDirectories")); //only directories have attribute numberOfDirectories
+            assertEquals(0, file2Result.getChildNodes().getLength()); 
+            assertEquals(file2.getName(), file2Result.getAttribute("name"));
+            assertTrue(file2Result.hasAttribute("size"));
+                       
+            assertEquals(file2.getLastAccessTime(), dateFormat.parse(file2Result.getAttribute("lastAccessTime")));
             
         } catch (IOException ex) {
             fail("couldn't create FileInfo");
