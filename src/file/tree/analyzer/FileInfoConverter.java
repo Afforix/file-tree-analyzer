@@ -369,7 +369,7 @@ public class FileInfoConverter {
             path += "/" + name;
         }
         
-        isAccessible = parent.getAttribute("accessibility").equals("true");
+        isAccessible = parent.getAttribute("accessible").equals("true");
         
         isDirectory = parent.getTagName().equals("directory");
         isSymbolicLink = parent.getAttribute("symbolicLink").equals("true");
@@ -411,9 +411,9 @@ public class FileInfoConverter {
                 state = ItemState.UNMODIFIED; //maybe choose other option
             }
 
-            newString = parent.getAttribute("newAccessibility");
+            newString = parent.getAttribute("newAccessible");
             if (!newString.isEmpty()) {
-                isNewlyAccessible = parent.getAttribute("newAccessibility").equals("true");
+                isNewlyAccessible = parent.getAttribute("newAccessible").equals("true");
                 if (!isNewlyAccessible) {
                     isChangedFromAccessibleToUnaccessible = true;
                 }

@@ -62,18 +62,18 @@ public class DiffInfo extends FileInfo {
     public boolean isNewlyAccessible() { //or how should it be named
         return newAccesibility;
     }
-    
-    /*
-    public List<DiffInfo> getDiffChildren() {
-        return diffChildren;
-    }
-    */
-    
-    public List<DiffInfo> getDiffChildren() {
-        if (!isAccessible()) throw new IllegalStateException("file is not accessible: " + getPath());
         
+    public List<DiffInfo> getDiffChildren() {
+        if (!isAccessible() && !isNewlyAccessible()) {
+            throw new IllegalStateException("file is not accessible: " + getPath());
+        }
+
         if (isDirectory()) {
-            return Collections.unmodifiableList(diffChildren);
+            if (diffChildren == null) {
+                return Collections.emptyList();
+            } else {
+                return Collections.unmodifiableList(diffChildren);
+            }
         } else {
             throw new IllegalStateException("Files don't have children! " + getPath());
         }

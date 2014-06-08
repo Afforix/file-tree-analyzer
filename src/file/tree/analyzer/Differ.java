@@ -52,7 +52,7 @@ public class Differ {
         DiffInfo diffInfo;
         try {
             System.out.println("wombat");
-            diffInfo = differ.diffXMLs("./saved_analyses", "2014-05-24T222222.xml", "2014-05-24T111111.xml");
+            diffInfo = differ.diffXMLs("./saved_analyses", "2014-05-24T111111.xml", "2014-05-24T222222.xml");
             printIt(diffInfo, 0);
         } catch (IOException e) {
             System.out.println("error in main");
@@ -64,7 +64,7 @@ public class Differ {
         System.out.println("name:" + parent.getName() + 
                 " directory:" + parent.isDirectory() + 
                 //" symlink:" + parent.isSymbolicLink() + 
-                //" accesible: " + parent.isAccessible() +
+                " accesible: " + parent.isAccessible() + 
                 //" size:" + parent.getSize() + 
                 //" creationTime:" + parent.getCreationTime() + 
                 //" lastAccessTime:" + parent.getLastAccessTime() + 
@@ -72,13 +72,14 @@ public class Differ {
                 //" numberOfFiles:" + parent.getNumberOfFiles() + 
                 //" numberOfDirectories:"  + parent.getNumberOfDirectories() + 
                 //" path:" + parent.getPath() + 
-                " ||| newSize:" + parent.getNewSize() + 
-                " newCreationTime:" + parent.getNewCreationTime() +  
-                " newLastAccessTime:" + parent.getNewLastAccessTime() + 
-                " newLastModifiedTime:" + parent.getNewLastModifiedTime() +
-                " state: " + parent.getState());
+                //" ||| newSize:" + parent.getNewSize() + 
+                //" newCreationTime:" + parent.getNewCreationTime() +  
+                //" newLastAccessTime:" + parent.getNewLastAccessTime() + 
+                //" newLastModifiedTime:" + parent.getNewLastModifiedTime() +
+                //" state: " + parent.getState());
+                "");
         
-        if(parent.isDirectory()){
+        if(parent.isDirectory() && (parent.isNewlyAccessible() || parent.isAccessible())){
             List<DiffInfo> children = parent.getDiffChildren();
             for (DiffInfo file : children) {
                 for (int i = 0; i <= level; i++) {
@@ -104,7 +105,7 @@ public class Differ {
         //try {
             XMLUnit.setCompareUnmatched(false); //TODO - deal with deleted / created items (they are unmatched) 
             //XMLUnit.setIgnoreComments(true); 
-            //XMLUnit.setIgnoreAttributeOrder(true);
+            XMLUnit.setIgnoreAttributeOrder(true);
             //XMLUnit.setIgnoreWhitespace(true); //causes bug - why?
         //} catch (ConfigurationException ex) {
         //    Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "XMLUnit configuration failed.", ex);
@@ -138,6 +139,7 @@ public class Differ {
         NodeDetail testNodeDetail = null;
         boolean attributeChange = false;
         boolean createdOrDeleted = false;
+        boolean attributeAdded = false;
         
         XPath testXPath = XPathFactory.newInstance().newXPath();
         XPath controlXPath = XPathFactory.newInstance().newXPath();
@@ -159,21 +161,24 @@ public class Differ {
             createdOrDeleted = (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
                     && (testString.equals("file") || testString.equals("directory") || testString.equals("null"))
                     && (controlString.equals("file") || controlString.equals("directory") || controlString.equals("null")));
-
-            if (attributeChange || createdOrDeleted) {
+            attributeAdded = difference.equals(DifferenceConstants.ATTR_NAME_NOT_FOUND);
+            
+            if ((attributeChange || createdOrDeleted) && !attributeAdded) {
                 try {
                     if (attributeChange) {
-                        String newValue = controlNodeDetail.getValue();
-                        xpathToElement = controlNodeDetail.getXpathLocation();
+                        String elementValue = controlNodeDetail.getValue();
+                        xpathToElement = testNodeDetail.getXpathLocation();
                         attributeToChange = xpathToElement.substring(xpathToElement.indexOf('@') + 1); // attr is after @ in xpath
+                        String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
                         
-                        String xpathToTestElement = testNodeDetail.getXpathLocation();
-                        String xpathToTestParent = xpathToTestElement.substring(0, xpathToTestElement.lastIndexOf("/"));
-                        Node testNode = (Node) testXPath.evaluate(xpathToTestParent, testDoc.getDocumentElement(), XPathConstants.NODE);
+                        Node testNode = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
+                         
                         elementToChange = (Element) testNode;
                         elementToChange.setAttribute("state", "modified");
-                        elementToChange.setAttribute("new" + attributeToChange.substring(0, 1).toUpperCase() + attributeToChange.substring(1), newValue);
+                        elementToChange.setAttribute("new" + attributeToChange.substring(0, 1).toUpperCase() + attributeToChange.substring(1), elementValue);
+                        
                     } else if (createdOrDeleted) {
+
                         if (controlNodeDetail.getValue().equals("null")) { //testNode was deleted
                             xpathToElement = testNodeDetail.getXpathLocation();
                             Node testNode = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
