@@ -6,13 +6,15 @@
 
 package file.tree.analyzer;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -69,5 +71,17 @@ public class FileInfoTest {
          assertEquals(0, dir2.getNumberOfDirectories());
          
          assertEquals(4, dir2.getChildren().size());
+     }
+     
+     @Test
+     public void testRealDirectory() throws IOException {
+         TestFileTree.createFileTree();
+         FileInfo root = new FileInfo(new File("testDir").toPath());
+         
+         assertEquals("testDir", root.getName());
+         assertNotNull(root.getPath());
+         assertTrue(root.isDirectory());
+         
+         TestFileTree.deleteFileTree();
      }
 }
