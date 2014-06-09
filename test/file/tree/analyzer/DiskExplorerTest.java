@@ -17,13 +17,12 @@ import org.junit.Test;
  * @author martina
  */
 public class DiskExplorerTest {
-
-    public DiskExplorerTest() {
-    }
+    
+    private boolean testSymLink;
 
     @Before
     public void setUp() throws Exception {
-        TestFileTree.createFileTree();
+        testSymLink = TestFileTree.createFileTree();
     }
 
     @After
@@ -87,6 +86,10 @@ public class DiskExplorerTest {
         assertEquals(0, file2Result.getNumberOfFiles());
         assertEquals(0, file2Result.getNumberOfDirectories());
         assertEquals(f2.getName(), file2Result.getName());
+        
+        if(testSymLink) {
+            assertTrue(file2Result.isSymbolicLink());
+        }
     }
 
 }

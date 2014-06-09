@@ -5,7 +5,6 @@
  */
 package file.tree.analyzer;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -22,10 +21,11 @@ import org.w3c.dom.Element;
  * @author martina
  */
 public class FileInfoConverterTest {
-
+    private boolean testSymLink;
+    
     @Before
     public void setUp() throws Exception {
-        TestFileTree.createFileTree();
+        testSymLink = TestFileTree.createFileTree();
     }
 
     @After
@@ -84,6 +84,10 @@ public class FileInfoConverterTest {
             assertEquals(0, file2Result.getChildNodes().getLength());
             assertEquals(file2.getName(), file2Result.getAttribute("name"));
             assertTrue(file2Result.hasAttribute("size"));
+            
+            if(testSymLink) {
+                assertEquals(file2.isSymbolicLink(), Boolean.getBoolean(file2Result.getAttribute("symbolicLink")));
+            }
 
             assertEquals(file2.getLastAccessTime(), dateFormat.parse(file2Result.getAttribute("lastAccessTime")));
 

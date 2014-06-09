@@ -8,20 +8,25 @@ package file.tree.analyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.Ignore;
 
 /**
  *
  * @author martina
  */
+@Ignore
 public class TestFileTree {
     
     /**
      * Creates file tree for testing.
+     * 
+     * @return true if symLink was created, false if not
      */
-    public static void createFileTree() throws IOException {
+    public static boolean createFileTree() throws IOException {
         File root = new File(".", "testDir");
         if (root.mkdir()) {
             File f1 = new File(root, "file1.txt");
@@ -33,9 +38,17 @@ public class TestFileTree {
                 File f2 = new File(d, "file2.txt");
                 File f3 = new File(d, "file3.txt");
                 f3.createNewFile();
-                Files.createSymbolicLink(f2.toPath(), f3.toPath());
+                
+                try {
+                    Files.createSymbolicLink(f2.toPath(), f3.toPath());
+                } catch(FileSystemException ex) {
+                    f2.createNewFile();
+                    return false;
+                }
+                
             }
         }
+        return true;
     }
     
     /**
