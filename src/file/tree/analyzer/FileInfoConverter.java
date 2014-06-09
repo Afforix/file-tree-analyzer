@@ -80,7 +80,7 @@ public class FileInfoConverter {
 
         if (fileInfo.isAccessible()) {
             currentElement.setAttribute("accessible", "true");
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             currentElement.setAttribute("creationTime", dateFormat.format(fileInfo.getCreationTime()));
             currentElement.setAttribute("lastAccessTime", dateFormat.format(fileInfo.getLastAccessTime()));
             currentElement.setAttribute("lastModifiedTime", dateFormat.format(fileInfo.getLastModifiedTime()));
@@ -139,7 +139,7 @@ public class FileInfoConverter {
         }
 
         item.setSymbolicLink(Boolean.parseBoolean(element.getAttribute("symbolicLink")));
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
         try {
             item.setCreationTime(dateFormat.parse(element.getAttribute("creationTime")));
@@ -231,7 +231,7 @@ public class FileInfoConverter {
             isSymbolicLink = true;
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
         Date creationTime = null;
         Date lastAccessTime = null;
@@ -348,7 +348,7 @@ public class FileInfoConverter {
         boolean isNewlyAccessible = false;
         boolean isChangedFromAccessibleToUnaccessible = false; //if so, do not try to collect new* attributes
         
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date creationTime = null;
         Date lastAccessTime = null;
         Date lastModifiedTime = null;

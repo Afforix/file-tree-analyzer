@@ -45,7 +45,7 @@ public class FileInfoConverterTest {
             Document result = FileInfoConverter.fileInfoToDom(root);
 
             //DateFormat for time attributes tests
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
             //test root element
             Element resultRoot = result.getDocumentElement();
