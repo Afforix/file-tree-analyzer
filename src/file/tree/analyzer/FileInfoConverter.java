@@ -125,7 +125,7 @@ public class FileInfoConverter {
 
         if (item.isDirectory()) {
             item.setNumberOfFiles(Integer.parseInt(element.getAttribute("numberOfFiles")));
-            item.setNumberofDirectories(Integer.parseInt(element.getAttribute("numberOfDirectories")));
+            item.setNumberOfDirectories(Integer.parseInt(element.getAttribute("numberOfDirectories")));
 
             for (int i = 0; i < element.getChildNodes().getLength(); i++) {
                 Node node = element.getChildNodes().item(i);
