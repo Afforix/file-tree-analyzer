@@ -8,13 +8,8 @@ package file.tree.analyzer;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Date;
-import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
