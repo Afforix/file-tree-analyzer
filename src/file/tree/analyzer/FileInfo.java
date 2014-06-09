@@ -432,7 +432,7 @@ public class FileInfo implements Comparable<FileInfo> {
 
             list.add(new Pair("Creation Time", creationTime.toString()));
             list.add(new Pair("Last Access Time", lastAccessTime.toString()));
-            list.add(new Pair("Creation Time", lastModifiedTime.toString()));
+            list.add(new Pair("Last Modification Time", lastModifiedTime.toString()));
             list.add(new Pair("Symbolic Link", Boolean.toString(symbolicLink)));
             list.add(new Pair("Path", path));
         } else {
