@@ -7,7 +7,6 @@ package file.tree.analyzer;
 
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import org.junit.After;
 import static org.junit.Assert.*;
@@ -57,7 +56,7 @@ public class FileInfoConverterTest {
             assertEquals("2", resultRoot.getAttribute("numberOfDirectories"));
             assertEquals(root.getName(), resultRoot.getAttribute("name"));
 
-            assertEquals(root.getCreationTime(), dateFormat.parse(resultRoot.getAttribute("creationTime")));
+            assertEquals(dateFormat.format(root.getCreationTime()), resultRoot.getAttribute("creationTime"));
 
             //test first directory
             Element firstDirResult = (Element) resultRoot.getFirstChild();
@@ -71,7 +70,7 @@ public class FileInfoConverterTest {
             assertEquals(firstDir.getName(), firstDirResult.getAttribute("name"));
             assertFalse(firstDirResult.hasAttribute("size")); //only file have attribute size
 
-            assertEquals(firstDir.getLastModifiedTime(), dateFormat.parse(firstDirResult.getAttribute("lastModifiedTime")));
+            assertEquals(dateFormat.format(firstDir.getLastModifiedTime()), firstDirResult.getAttribute("lastModifiedTime"));
 
             //test file2.txt          
             Element file2Result = (Element) firstDirResult.getLastChild();
@@ -89,12 +88,10 @@ public class FileInfoConverterTest {
                 assertEquals(file2.isSymbolicLink(), Boolean.getBoolean(file2Result.getAttribute("symbolicLink")));
             }
 
-            assertEquals(file2.getLastAccessTime(), dateFormat.parse(file2Result.getAttribute("lastAccessTime")));
+            assertEquals(dateFormat.format(file2.getLastAccessTime()), file2Result.getAttribute("lastAccessTime"));
 
         } catch (IOException ex) {
             fail("couldn't create FileInfo");
-        } catch (ParseException ex) {
-            fail("couldn't parse date");
         }
     }
 
@@ -134,7 +131,7 @@ public class FileInfoConverterTest {
         assertEquals(exp.getAttribute("name"), result.getName());
         assertEquals(exp.getAttribute("numberOfFiles"), "" + result.getNumberOfFiles());
         assertEquals(exp.getAttribute("numberOfDirectories"), "" + result.getNumberOfDirectories());
-        assertEquals(dateFormat.parse(exp.getAttribute("creationTime")), result.getCreationTime());
+        assertEquals(exp.getAttribute("creationTime"), dateFormat.format(result.getCreationTime()));
         
         //TODO
         
