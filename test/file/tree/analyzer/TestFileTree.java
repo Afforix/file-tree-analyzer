@@ -27,7 +27,6 @@ public class TestFileTree {
             File f1 = new File(root, "file1.txt");
             List<String> lines = Arrays.asList("test");
             Files.write(f1.toPath(), lines);
-            f1.createNewFile();
 
             File d = new File(root, "dir1");
             if (d.mkdir()) {

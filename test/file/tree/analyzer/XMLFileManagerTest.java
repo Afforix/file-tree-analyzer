@@ -7,9 +7,9 @@ package file.tree.analyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,8 @@ public class XMLFileManagerTest {
         File f2 = new File(testDir, "file2.xml");
         File f3 = new File(testDir, "file3.xml");
 
-        f1.createNewFile();
+        List<String> lines = Arrays.asList("<root>test</root>");
+        Files.write(f1.toPath(), lines);
         f2.createNewFile();
         f3.createNewFile();
 
@@ -162,13 +163,11 @@ public class XMLFileManagerTest {
     @Test
     public void testFindXMLFile_String() {
         System.out.println("findXMLFile test");
-        String fileName = "";
-        XMLFileManager instance = null;
-        Document expResult = null;
-        Document result = instance.findXMLFile(fileName);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
+        Document result = manager.findXMLFile("file1.xml");
+        assertEquals("root", result.getDocumentElement().getTagName());
+        assertEquals("test", result.getDocumentElement().getFirstChild().getNodeValue());
+        
     }
     
     /**

@@ -7,8 +7,6 @@ package file.tree.analyzer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -67,7 +65,7 @@ public class DiskExplorerTest {
         assertEquals(0, file1Result.getNumberOfFiles());
         assertEquals(0, file1Result.getNumberOfDirectories());
         assertEquals(f1.getName(), file1Result.getName());
-        //assertEquals(f1.getTotalSpace(), file1Result.getSize()); TODO ????
+        assertEquals((Long)f1.length(), (Long)file1Result.getSize()); 
 
         //test dir1
         File dir1 = new File(rootDir.getPath(), "dir1");
