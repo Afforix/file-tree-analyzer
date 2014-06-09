@@ -48,28 +48,29 @@ public class DiskExplorerTest {
         File rootDir = new File(".", "testDir");
 
         assertEquals(rootDir.isDirectory(), result.isDirectory()); 
-        assertEquals(2, result.getChildren().size());
+        assertEquals(3, result.getChildren().size());
         assertEquals(3, result.getNumberOfFiles());
-        assertEquals(1, result.getNumberOfDirectories());
+        assertEquals(2, result.getNumberOfDirectories());
         assertEquals(rootDir.getName(), result.getName());
 
         assertEquals(rootDir.lastModified(), result.getLastModifiedTime().getTime());
         
         //test file1.txt
         File f1 = new File(rootDir.getPath(), "file1.txt");
-        FileInfo file1Result = result.getChildren().get(1);
+        FileInfo file1Result = result.getChildren().get(2);
 
         assertEquals(f1.isDirectory(), file1Result.isDirectory());
         assertEquals(f1.getAbsolutePath(), file1Result.getPath());
         assertEquals(0, file1Result.getNumberOfFiles());
         assertEquals(0, file1Result.getNumberOfDirectories());
         assertEquals(f1.getName(), file1Result.getName());
-        assertEquals((Long)f1.length(), (Long)file1Result.getSize()); 
+        assertEquals((Long)f1.length(), file1Result.getSize()); 
 
         //test dir1
         File dir1 = new File(rootDir.getPath(), "dir1");
         FileInfo dir1Result = result.getChildren().get(0);
 
+        assertTrue(dir1Result.isAccessible());
         assertEquals(dir1.isDirectory(), dir1Result.isDirectory());
         assertEquals(dir1.getAbsolutePath(), dir1Result.getPath());
         assertEquals(2, dir1Result.getChildren().size());
@@ -87,9 +88,22 @@ public class DiskExplorerTest {
         assertEquals(0, file2Result.getNumberOfDirectories());
         assertEquals(f2.getName(), file2Result.getName());
         
+        //test symbolic link
         if(testSymLink) {
             assertTrue(file2Result.isSymbolicLink());
         }
+        
+        //test not accessible directory dir2
+        File dir2 = new File(rootDir.getPath(), "dir2");
+        FileInfo dir2Result = result.getChildren().get(1);
+        
+        assertFalse(dir2Result.isAccessible());
+        assertFalse(dir2Result.isSymbolicLink());
+        assertTrue(dir2Result.isDirectory());
+        assertEquals(dir2.getName(), dir2Result.getName());
+        assertNull(dir2Result.getCreationTime());
+        assertNull(dir2Result.getLastAccessTime());
+        assertNull(dir2Result.getLastModifiedTime());
     }
 
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<directory accessible="true" creationTime="2014-06-09T14:13:11" lastAccessTime="2014-06-09T14:13:11" lastModifiedTime="2014-06-09T14:13:11" name="test" numberOfDirectories="1" numberOfFiles="3" path="/home/test" symbolicLink="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../analysesXmlSchema.xsd">
+  <directory accessible="true" creationTime="2014-06-09T14:13:23" lastAccessTime="2014-06-09T14:13:23" lastModifiedTime="2014-06-09T14:13:23" name="dir1" numberOfDirectories="0" numberOfFiles="2" symbolicLink="false">
+    <file accessible="true" creationTime="2014-06-09T14:13:02" lastAccessTime="2014-06-09T14:13:02" lastModifiedTime="2014-06-09T14:13:02" name="file2.txt" size="5" symbolicLink="false"/>
+    <file accessible="true" creationTime="2014-06-09T14:13:23" lastAccessTime="2014-06-09T14:13:23" lastModifiedTime="2014-06-09T14:13:23" name="file3.txt" size="0" symbolicLink="false"/>
+  </directory>
+  <file accessible="true" creationTime="2014-06-09T14:12:26" lastAccessTime="2014-06-09T14:12:26" lastModifiedTime="2014-06-09T14:12:26" name="file1.txt" size="4" symbolicLink="false"/>
+</directory>
+

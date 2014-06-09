@@ -52,9 +52,9 @@ public class FileInfoConverterTest {
 
             assertEquals("directory", resultRoot.getTagName()); //root is directory
             assertTrue(resultRoot.hasAttribute("path")); //root has attribute path
-            assertEquals(2, resultRoot.getChildNodes().getLength());
+            assertEquals(3, resultRoot.getChildNodes().getLength());
             assertEquals("3", resultRoot.getAttribute("numberOfFiles"));
-            assertEquals("1", resultRoot.getAttribute("numberOfDirectories"));
+            assertEquals("2", resultRoot.getAttribute("numberOfDirectories"));
             assertEquals(root.getName(), resultRoot.getAttribute("name"));
 
             assertEquals(root.getCreationTime(), dateFormat.parse(resultRoot.getAttribute("creationTime")));
@@ -117,14 +117,27 @@ public class FileInfoConverterTest {
      * Test of domToFileInfo method, of class FileInfoConverter.
      */
     @Test
-    public void testDomToFileInfo() {
+    public void testDomToFileInfo() throws Exception{
         System.out.println("domToFileInfo test");
-        Document doc = null;
-        FileInfo expResult = null;
+        XMLFileManager manager = new XMLFileManager("./test/file/tree/analyzer");
+        Document doc = manager.findXMLFile("testXMLDocument.xml");
+        
+        //DateFormat for time attributes tests
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        
+        //test root
         FileInfo result = FileInfoConverter.domToFileInfo(doc);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Element exp = doc.getDocumentElement();
+        
+        assertTrue(result.isDirectory());
+        assertFalse(result.isSymbolicLink());
+        assertEquals(exp.getAttribute("name"), result.getName());
+        assertEquals(exp.getAttribute("numberOfFiles"), "" + result.getNumberOfFiles());
+        assertEquals(exp.getAttribute("numberOfDirectories"), "" + result.getNumberOfDirectories());
+        assertEquals(dateFormat.parse(exp.getAttribute("creationTime")), result.getCreationTime());
+        
+        //TODO
+        
     }
 
     /**

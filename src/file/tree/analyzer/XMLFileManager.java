@@ -32,24 +32,24 @@ import org.xml.sax.SAXException;
  */
 public class XMLFileManager {
 
-    private  Path analysesPath;
+    private Path analysesPath;
 
     public XMLFileManager(String path) {
-        
-        analysesPath = Paths.get(path);        
+
+        analysesPath = Paths.get(path);
         File dir = analysesPath.toFile();
 
         if (!dir.exists()) {
             dir.mkdir();
-        }else if(!dir.isDirectory()){
+        } else if (!dir.isDirectory()) {
             throw new IllegalArgumentException("Argument path isn't directory.");
         }
-        
+
         try {
-           analysesPath = analysesPath.toRealPath();
+            analysesPath = analysesPath.toRealPath();
         } catch (IOException ex) {
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, null, ex);
-        }       
+        }
     }
 
     /**
@@ -59,17 +59,19 @@ public class XMLFileManager {
      * @return name of created file
      */
     public String createXMLFile(Document xmlDom) {
-        if(xmlDom==null) throw new IllegalArgumentException("xmlDom is null");
-        
+        if (xmlDom == null) {
+            throw new IllegalArgumentException("xmlDom is null");
+        }
+
         try {
 
-            File file = new File(analysesPath.toFile(),getTimestamp() + ".xml");
+            File file = new File(analysesPath.toFile(), getTimestamp() + ".xml");
             Transformer t = TransformerFactory.newInstance().newTransformer();
-            
+
             //set indent
             t.setOutputProperty(OutputKeys.INDENT, "yes");
             t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            
+
             t.transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(file));
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.INFO, "File {0} created.", file.toPath().getFileName().toString());
             return file.toPath().getFileName().toString();
@@ -96,8 +98,10 @@ public class XMLFileManager {
      * @param fileName name of the XML file to be deleted
      */
     public void deleteXMLFile(String fileName) {
-        if(fileName == null) throw new IllegalArgumentException("fileName is null");
-        
+        if (fileName == null) {
+            throw new IllegalArgumentException("fileName is null");
+        }
+
         File analysesDirectory = analysesPath.toFile();
         File xmlFile = null;
 
@@ -159,9 +163,9 @@ public class XMLFileManager {
                 xmlFilesNames.add(f.getName());
             }
         }
-        
+
         Logger.getLogger(XMLFileManager.class.getName()).log(Level.INFO, "{0} analyses found.", xmlFiles.length);
-        
+
         return xmlFilesNames;
     }
 
@@ -171,22 +175,24 @@ public class XMLFileManager {
      * @param fileName name of the xml file
      * @return XML DOM loaded from XML file
      */
-    public Document findXMLFile(String fileName) { 
-        if(fileName == null) throw new IllegalArgumentException("fileName is null");
-        
+    public Document findXMLFile(String fileName) {
+        if (fileName == null) {
+            throw new IllegalArgumentException("fileName is null");
+        }
+
         Document xmlDoc = this.findXMLFile(fileName, false);
         return xmlDoc;
     }
-    
+
     /**
-     * Returns XML DOM loaded from XML file.
-     * added by Jindra because deferred DOM was causing troubles in Differ 
-     * 
+     * Returns XML DOM loaded from XML file. added by Jindra because deferred
+     * DOM was causing troubles in Differ
+     *
      * @param fileName name of the xml file
-     * @param turnOffDefferedDom true to disable deffered version of DOM 
+     * @param turnOffDefferedDom true to disable deffered version of DOM
      * @return XML DOM loaded from XML file
      */
-     public Document findXMLFile(String fileName, Boolean turnOffDefferedDom) {
+    public Document findXMLFile(String fileName, Boolean turnOffDefferedDom) {
         Document xmlDoc = null;
 
         try {
@@ -213,18 +219,22 @@ public class XMLFileManager {
 
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             //dbFactory.setValidating(true); TODO validating xml files
-            
-            if(turnOffDefferedDom)
-            {
+
+            if (turnOffDefferedDom) {
                 dbFactory.setFeature("http://apache.org/xml/features/dom/defer-node-expansion", false);
             }
-                        
+
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            xmlDoc = dBuilder.parse(xmlFile);
+            if(xmlFile!=null) {
+                xmlDoc = dBuilder.parse(xmlFile);
+            } else {
+                Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "File does not exist.");
+            }
+            
         } catch (IOException | ParserConfigurationException | SAXException ex) {
             Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return xmlDoc;
+            return xmlDoc;
+        }
     }
-}

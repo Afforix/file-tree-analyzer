@@ -47,6 +47,13 @@ public class TestFileTree {
                 }
                 
             }
+            
+            File d2 = new File(root, "dir2");
+            if (d2.mkdir()) {
+                File f4 = new File(d, "file2.txt");
+                f4.createNewFile();   
+            }
+            d2.setReadable(false);
         }
         return true;
     }
@@ -70,6 +77,14 @@ public class TestFileTree {
             f3.delete();
 
             d.delete();
+            
+            File d2 = new File(root, "dir2");
+            d2.setReadable(true);
+            
+            File f4 = new File(d2, "file4.txt");
+            f4.delete();
+
+            d2.delete();
             
             root.delete();
         }    
