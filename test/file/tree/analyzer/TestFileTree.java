@@ -7,7 +7,6 @@ package file.tree.analyzer;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
@@ -22,10 +21,8 @@ public class TestFileTree {
 
     /**
      * Creates file tree for testing.
-     *
-     * @return true if symLink was created, false if not
      */
-    public static boolean createFileTree() throws IOException {
+    public static void createFileTree() throws IOException {
         File root = new File(".", "testDir");
         if (root.mkdir()) {
             File f1 = new File(root, "file1.txt");
@@ -39,23 +36,21 @@ public class TestFileTree {
                     File f4 = new File(d, "file2.txt");
                     f4.createNewFile();
                 }
-                d2.setReadable(false);
+//                d2.setReadable(false);
 
                 File f2 = new File(d, "file2.txt");
                 File f3 = new File(d, "file3.txt");
                 f3.createNewFile();
 
-                try {
-                    Files.createSymbolicLink(f2.toPath(), f3.toPath());
-                } catch (FileSystemException ex) {
-                    f2.createNewFile();
-                    return false;
-                }
-
+//                try {
+//                    Files.createSymbolicLink(f2.toPath(), f3.toPath());
+//                } catch (FileSystemException ex) {
+//                    f2.createNewFile();
+//                    return false;
+//                }
             }
-
         }
-        return true;
+//        return true;
     }
 
     /**
@@ -79,7 +74,7 @@ public class TestFileTree {
             d.delete();
 
             File d2 = new File(root, "dir2");
-            d2.setReadable(true);
+//            d2.setReadable(true);
 
             File f4 = new File(d2, "file4.txt");
             f4.delete();

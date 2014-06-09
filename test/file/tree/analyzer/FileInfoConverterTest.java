@@ -20,11 +20,11 @@ import org.w3c.dom.Element;
  * @author martina
  */
 public class FileInfoConverterTest {
-    private boolean testSymLink;
+//    private boolean testSymLink;
     
     @Before
     public void setUp() throws Exception {
-        testSymLink = TestFileTree.createFileTree();
+        TestFileTree.createFileTree();
     }
 
     @After
@@ -84,9 +84,9 @@ public class FileInfoConverterTest {
             assertEquals(file2.getName(), file2Result.getAttribute("name"));
             assertTrue(file2Result.hasAttribute("size"));
             
-            if(testSymLink) {
-                assertEquals(file2.isSymbolicLink(), Boolean.getBoolean(file2Result.getAttribute("symbolicLink")));
-            }
+//            if(testSymLink) {
+//                assertEquals(file2.isSymbolicLink(), Boolean.getBoolean(file2Result.getAttribute("symbolicLink")));
+//            }
 
             assertEquals(dateFormat.format(file2.getLastAccessTime()), file2Result.getAttribute("lastAccessTime"));
 
