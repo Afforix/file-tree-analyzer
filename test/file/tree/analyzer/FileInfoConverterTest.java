@@ -25,41 +25,12 @@ public class FileInfoConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        File root = new File(".", "testDir");
-        if (root.mkdir()) {
-            File f1 = new File(root, "file1.txt");
-            f1.createNewFile();
-
-            File d = new File(root, "dir1");
-            if (d.mkdir()) {
-                File f2 = new File(d, "file2.txt");
-                f2.createNewFile();
-                File f3 = new File(d, "file3.txt");
-                f3.createNewFile();
-            }
-        }
+        TestFileTree.createFileTree();
     }
 
     @After
     public void tearDown() throws Exception {
-        File root = new File(".", "testDir");
-
-        if (root.exists()) {
-            File f = new File(root, "file1.txt");
-            f.delete();
-
-            File d = new File(root, "dir1");
-
-            File f2 = new File(d, "file2.txt");
-            f2.delete();
-
-            File f3 = new File(d, "file3.txt");
-            f3.delete();
-
-            d.delete();
-            
-            root.delete();
-        }     
+         TestFileTree.deleteFileTree();
     }
 
     /**
