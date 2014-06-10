@@ -6,14 +6,21 @@
 
 package file.tree.analyzer.utils;
 
+import file.tree.analyzer.FileInfo;
 import file.tree.analyzer.XMLFileManager;
 import file.tree.analyzer.gui.ComboBoxItem;
+import file.tree.analyzer.gui.MainController;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
 import org.w3c.dom.Document;
@@ -23,6 +30,44 @@ import org.w3c.dom.Document;
  * @author ansy
  */
 public class Utils {
+    
+   
+    private static Image genericFileImg;
+    private static Image genericDirectoryImg;
+
+    static {
+        try {
+            File genericFile = Files.createTempFile(null, "").toFile();
+            File genericDirectory = Files.createTempDirectory(null).toFile();
+            genericFileImg = Utils.FileToImg(genericFile);
+            genericDirectoryImg = Utils.FileToImg(genericDirectory);
+            genericFile.delete();
+            genericDirectory.delete();
+        } catch (IOException ex) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    } 
+    
+    public static ImageView getImageView(FileInfo info){
+         Image img = null;
+        try { // try to set icon           
+
+            if (info.isDirectory()) {
+                img = genericDirectoryImg;
+            } else if (info.toFile().exists() && !info.isSymbolicLink()) {
+                img = Utils.FileToImg(info.toFile());
+            }            
+
+        } catch (Exception e) {
+        }
+
+        if (img == null) {
+            img = genericFileImg;            
+        }
+        return new ImageView(img);
+    }
+    
+    
     
     public static List<ComboBoxItem> FilenameToComboBoxItem(List<String> list,XMLFileManager xmlFileManager){
         List<ComboBoxItem> out = new ArrayList<>();
@@ -41,7 +86,7 @@ public class Utils {
         return new ComboBoxItem(path, file);
     }
     
-    public static Image FileToImg(File file) {
+    private static Image FileToImg(File file) {
         
         ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView()
                 .getSystemIcon(file);

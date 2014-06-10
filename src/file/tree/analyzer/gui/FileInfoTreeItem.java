@@ -25,21 +25,6 @@ import javafx.scene.image.ImageView;
 class FileInfoTreeItem extends TreeItem<FileInfo> {
 
     private boolean hasLoadedChildren = false;
-    private static Image genericFileImg;
-    private static Image genericDirectoryImg;
-
-    static {
-        try {
-            File genericFile = Files.createTempFile(null, "").toFile();
-            File genericDirectory = Files.createTempDirectory(null).toFile();
-            genericFileImg = Utils.FileToImg(genericFile);
-            genericDirectoryImg = Utils.FileToImg(genericDirectory);
-            genericFile.delete();
-            genericDirectory.delete();
-        } catch (IOException ex) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
     public FileInfoTreeItem(FileInfo directory) {
         super(directory);
@@ -64,25 +49,8 @@ class FileInfoTreeItem extends TreeItem<FileInfo> {
     @SuppressWarnings("unchecked")
     private void loadChildren() {
         hasLoadedChildren = true;
-        FileInfo elementVal = super.getValue();
-        Image img = null;
-        try { // try to set icon           
-
-            if (elementVal.isDirectory()) {
-                img = genericDirectoryImg;
-            } else if (elementVal.toFile().exists() && !elementVal.isSymbolicLink()) {
-                img = Utils.FileToImg(elementVal.toFile());
-            }
-            super.setGraphic(new ImageView(img));
-
-        } catch (Exception e) {
-        }
-
-        if (img == null) {
-            img = genericFileImg;
-            super.setGraphic(new ImageView(img));
-        }
-
+        FileInfo elementVal = super.getValue();       
+       
         if (elementVal.isDirectory() && elementVal.isAccessible()) {
             if (elementVal instanceof DiffInfo) {
                 DiffInfo info = (DiffInfo)elementVal;

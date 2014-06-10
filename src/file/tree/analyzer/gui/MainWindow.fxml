@@ -22,7 +22,7 @@
 </Menu>
     <Menu mnemonicParsing="false" text="Tools">
       <items>
-        <MenuItem fx:id="menuDiffTo" disable="true" mnemonicParsing="false" onAction="#handleMenuDiffToAction" text="Diff to" /><MenuItem fx:id="menuDiffToCurrent" disable="true" mnemonicParsing="false" onAction="#handleMenuDiffToCurrentAction" text="Diff to Current State" />
+        <MenuItem fx:id="menuDiffToCurrent" disable="true" mnemonicParsing="false" onAction="#handleMenuDiffToCurrentAction" text="Diff to Current State" />
       </items>
     </Menu><Menu mnemonicParsing="false" text="Help">
 <items>
