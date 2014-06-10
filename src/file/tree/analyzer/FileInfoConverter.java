@@ -5,7 +5,6 @@
  */
 package file.tree.analyzer;
 
-import com.sun.jmx.snmp.BerDecoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,11 +41,14 @@ public class FileInfoConverter {
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            
+            //create new document
             doc = docBuilder.newDocument();
             doc.setXmlVersion("1.0");
 
             childrenToDom(doc, doc, root);
 
+            //add xml schema
             doc.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
                     "xsi:noNamespaceSchemaLocation", "../analysesXmlSchema.xsd");
 
@@ -58,6 +60,8 @@ public class FileInfoConverter {
     }
 
     private static void childrenToDom(Document doc, Node parent, FileInfo fileInfo) {
+        //create new element that represents fileInfo and add all attributes
+        
         Element currentElement;
 
         if (fileInfo.isDirectory()) {
@@ -81,6 +85,7 @@ public class FileInfoConverter {
 
         if (fileInfo.isAccessible()) {
             currentElement.setAttribute("accessible", "true");
+            //set date format for time attributes
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             currentElement.setAttribute("creationTime", dateFormat.format(fileInfo.getCreationTime()));
             currentElement.setAttribute("lastAccessTime", dateFormat.format(fileInfo.getLastAccessTime()));
@@ -113,6 +118,8 @@ public class FileInfoConverter {
     }
 
     private static FileInfo childrenToFileInfo(Element element, String path) {
+        //get all file info from element
+        
         FileInfo item = new FileInfo();
 
         item.setName(element.getAttribute("name"));
@@ -140,6 +147,7 @@ public class FileInfoConverter {
         }
 
         item.setSymbolicLink(Boolean.parseBoolean(element.getAttribute("symbolicLink")));
+        //set date format for time attributes
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
         try {

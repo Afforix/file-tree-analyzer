@@ -88,7 +88,7 @@ public class XMLFileManager {
      */
     private String getTimestamp() {
         Date date = new Date();
-        SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd'T'hhmmss");
+        SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss");
         return timeStampFormat.format(date);
     }
 
@@ -105,6 +105,7 @@ public class XMLFileManager {
         File analysesDirectory = analysesPath.toFile();
         File xmlFile = null;
 
+        //set filter for xml files
         FilenameFilter xmlFilter = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -149,6 +150,7 @@ public class XMLFileManager {
 
         File analysesDirectory = analysesPath.toFile();
 
+        //set filter for xml files
         FilenameFilter xmlFilter = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -218,7 +220,6 @@ public class XMLFileManager {
             }
 
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            //dbFactory.setValidating(true); TODO validating xml files
 
             if (turnOffDefferedDom) {
                 dbFactory.setFeature("http://apache.org/xml/features/dom/defer-node-expansion", false);

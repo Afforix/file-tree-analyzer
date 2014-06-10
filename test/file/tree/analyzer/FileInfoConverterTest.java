@@ -14,6 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -83,10 +85,6 @@ public class FileInfoConverterTest {
             assertEquals(0, file2Result.getChildNodes().getLength());
             assertEquals(file2.getName(), file2Result.getAttribute("name"));
             assertTrue(file2Result.hasAttribute("size"));
-            
-//            if(testSymLink) {
-//                assertEquals(file2.isSymbolicLink(), Boolean.getBoolean(file2Result.getAttribute("symbolicLink")));
-//            }
 
             assertEquals(dateFormat.format(file2.getLastAccessTime()), file2Result.getAttribute("lastAccessTime"));
 
@@ -132,9 +130,40 @@ public class FileInfoConverterTest {
         assertEquals(exp.getAttribute("numberOfFiles"), "" + result.getNumberOfFiles());
         assertEquals(exp.getAttribute("numberOfDirectories"), "" + result.getNumberOfDirectories());
         assertEquals(exp.getAttribute("creationTime"), dateFormat.format(result.getCreationTime()));
+        assertTrue(exp.hasAttribute("path"));
+        assertEquals(exp.getAttribute("creationTime"), dateFormat.format(result.getCreationTime()));
+        assertEquals(exp.getAttribute("accessible"), Boolean.toString(result.isAccessible()));
+        assertEquals(exp.getAttribute("symbolicLink"), Boolean.toString(result.isSymbolicLink()));
         
-        //TODO
+        //test first directory
+        result = result.getChildren().get(0);
+        exp = (Element)exp.getChildNodes().item(1);
         
+        assertTrue(result.isDirectory());
+        assertFalse(result.isSymbolicLink());
+        assertEquals(exp.getAttribute("name"), result.getName());
+        assertEquals(exp.getAttribute("numberOfFiles"), "" + result.getNumberOfFiles());
+        assertEquals(exp.getAttribute("numberOfDirectories"), "" + result.getNumberOfDirectories());
+        assertEquals(exp.getAttribute("creationTime"), dateFormat.format(result.getCreationTime()));
+        assertFalse(exp.hasAttribute("path"));
+        assertEquals(exp.getAttribute("creationTime"), dateFormat.format(result.getCreationTime())); 
+        assertEquals(exp.getAttribute("accessible"), Boolean.toString(result.isAccessible()));
+        assertEquals(exp.getAttribute("symbolicLink"), Boolean.toString(result.isSymbolicLink()));
+        
+        //test first file
+        result = result.getChildren().get(1);
+        exp = (Element)exp.getChildNodes().item(3);
+        
+        assertFalse(result.isDirectory());
+        assertFalse(result.isSymbolicLink());
+        assertEquals(exp.getAttribute("name"), result.getName());
+        assertFalse(exp.hasAttribute("numberOfFiles"));
+        assertFalse(exp.hasAttribute("numberOfDirectories"));
+        assertEquals(exp.getAttribute("creationTime"), dateFormat.format(result.getCreationTime()));
+        assertFalse(exp.hasAttribute("path"));
+        assertEquals(exp.getAttribute("creationTime"), dateFormat.format(result.getCreationTime())); 
+        assertEquals(exp.getAttribute("accessible"), Boolean.toString(result.isAccessible()));
+        assertEquals(exp.getAttribute("symbolicLink"), Boolean.toString(result.isSymbolicLink()));
     }
 
     /**

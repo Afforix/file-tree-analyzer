@@ -48,7 +48,7 @@ public class DiskExplorerTest {
         File rootDir = new File(".", "testDir");
 
         assertEquals(rootDir.isDirectory(), result.isDirectory()); 
-        assertEquals(3, result.getChildren().size());
+        assertEquals(rootDir.listFiles().length, result.getChildren().size());
         assertEquals(3, result.getNumberOfFiles());
         assertEquals(2, result.getNumberOfDirectories());
         assertEquals(rootDir.getName(), result.getName());
@@ -87,17 +87,11 @@ public class DiskExplorerTest {
         assertEquals(0, file2Result.getNumberOfFiles());
         assertEquals(0, file2Result.getNumberOfDirectories());
         assertEquals(f2.getName(), file2Result.getName());
-        
-        //test symbolic link
-//        if(testSymLink) {
-//            assertTrue(file2Result.isSymbolicLink());
-//        }
-        
-        //test not accessible directory dir2
+                
+        //test dir2
         File dir2 = new File(rootDir.getPath(), "dir2");
         FileInfo dir2Result = result.getChildren().get(1);
         
-        //assertFalse(dir2Result.isAccessible()); TODO on Windows
         assertFalse(dir2Result.isSymbolicLink());
         assertTrue(dir2Result.isDirectory());
         assertEquals(dir2.getName(), dir2Result.getName());
