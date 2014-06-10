@@ -27,6 +27,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -58,11 +59,13 @@ public class MainController {
     @FXML
     private TreeView<FileInfo> treeView;
     @FXML
-    private TableView<Pair<String, String>> tableView;
+    private TableView<RowInfo> tableView;
     @FXML
-    private TableColumn<Pair<String, String>, String> attributeName;
+    private TableColumn<RowInfo, String> attributeName;
     @FXML
-    private TableColumn<Pair<String, String>, String> attribute;
+    private TableColumn<RowInfo, String> attribute;
+    @FXML
+    private TableColumn<RowInfo, String> changedAttribute;
     @FXML
     private ComboBox<ComboBoxItem> openComboBox;
     @FXML
@@ -71,8 +74,8 @@ public class MainController {
     private MenuItem menuDelete;
     @FXML
     private MenuItem menuClear;
-  /*  @FXML
-    private MenuItem menuDiffTo;*/
+    /*  @FXML
+     private MenuItem menuDiffTo;*/
     @FXML
     private MenuItem menuDiffToCurrent;
     @FXML
@@ -88,8 +91,36 @@ public class MainController {
                 new PropertyValueFactory<>("key"));
         attribute.setCellValueFactory(
                 new PropertyValueFactory<>("value"));
+        changedAttribute.setCellValueFactory(
+                new PropertyValueFactory<>("newValue"));
         attribute.setCellFactory(TextFieldTableCell.forTableColumn());
         tableView.setPlaceholder(new Label("Properties"));
+     
+        changedAttribute.setCellFactory(new Callback<TableColumn<RowInfo, String>,
+                        TableCell<RowInfo, String>>() { //(TextFieldTableCell.forTableColumn());
+        @Override
+        public TableCell call(TableColumn param) {
+            return new TableCell<RowInfo, String>(){
+
+                @Override
+                public void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    
+                    if (!isEmpty()) {
+                        RowInfo info = (RowInfo) getTableRow().getItem();
+                        this.setTextFill(info.getColor());                                          
+                        setText(item);
+                    }else{
+                        setText(null);
+                    }
+                }
+                
+                
+            };
+        }
+    }
+);
+
         tableView.getSelectionModel().setCellSelectionEnabled(true);
 
         treeView.getSelectionModel().selectedItemProperty()
@@ -100,12 +131,11 @@ public class MainController {
 
                         if (newValue != null) {
                             TreeItem<FileInfo> selectedItem = (TreeItem<FileInfo>) newValue;
-                            tableView.setItems(selectedItem.getValue().getPairedVariables());
+                            tableView.setItems(selectedItem.getValue().getTableRows());
                         } else {
                             tableView.setPlaceholder(new Label("Properties"));
                         }
                     }
-
                 });
 
         treeView.setCellFactory(new Callback<TreeView<FileInfo>, TreeCell<FileInfo>>() {
@@ -197,22 +227,21 @@ public class MainController {
         clear();
     }
 
-   /* @FXML
-    void handleMenuDiffToAction(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML", "*.xml"));
+    /* @FXML
+     void handleMenuDiffToAction(ActionEvent event) {
+     FileChooser fileChooser = new FileChooser();
+     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML", "*.xml"));
 
-        File selectedFile = fileChooser.showOpenDialog(root.getScene().getWindow());
+     File selectedFile = fileChooser.showOpenDialog(root.getScene().getWindow());
 
-        if (selectedFile != null) {
-            System.out.println("Diff " + selectedFile.getAbsolutePath());
-        }
-    }*/
-
+     if (selectedFile != null) {
+     System.out.println("Diff " + selectedFile.getAbsolutePath());
+     }
+     }*/
     @FXML
     void handleMenuDiffToCurrentAction(ActionEvent event) throws IOException {
 
-        if (openComboBox.getValue() != null) {            
+        if (openComboBox.getValue() != null) {
             newAnalysis(new File(openComboBox.getValue().getPath()), openComboBox.getValue());
         }
     }
@@ -271,22 +300,22 @@ public class MainController {
                             diffComboBox.getItems().add(displayString);
                             openComboBox.getSelectionModel().select(displayString);
                             enableItems(true, false);
-                            
-                            if (oldItem != null) {       
+
+                            if (oldItem != null) {
                                 try {
-                                    treeAlreadyLoaded = true;                                   
+                                    treeAlreadyLoaded = true;
                                     openComboBox.getSelectionModel().select(oldItem);
-                                    String oldFile = oldItem.getFile();     
-                                    diff(file, oldFile);                                    
+                                    String oldFile = oldItem.getFile();
+                                    diff(file, oldFile);
                                     xmlFileManager.deleteXMLFile(file);
                                     openComboBox.getItems().remove(displayString);
-                                    diffComboBox.getItems().remove(displayString); 
+                                    diffComboBox.getItems().remove(displayString);
                                     diffComboBox.setDisable(true);
                                 } catch (IOException ex) {
                                     Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-                                } 
+                                }
                             }
-                            
+
                             subStage.close();
 
                         }
@@ -342,7 +371,7 @@ public class MainController {
     }
 
     private void enableItems(boolean items, boolean checkbox) {
-        menuDelete.setDisable(!items);      
+        menuDelete.setDisable(!items);
         menuClear.setDisable(!items);
         diffComboBox.setDisable(!items);
         menuDiffToCurrent.setDisable(!items);

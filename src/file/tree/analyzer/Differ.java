@@ -217,8 +217,8 @@ public class Differ {
             }
         }
         
-        XMLFileManager testingFileManager = new XMLFileManager("./saved_analyses"); //FOR TESTING ONLY!!!
-        testingFileManager.createXMLFile(testDoc); // Write to XML - not necessary
+//        XMLFileManager testingFileManager = new XMLFileManager("./saved_analyses"); //FOR TESTING ONLY!!!
+//        testingFileManager.createXMLFile(testDoc); // Write to XML - not necessary
 
         return FileInfoConverter.domToDiffInfo2(testDoc);
     }

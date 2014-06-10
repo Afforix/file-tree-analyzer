@@ -5,6 +5,7 @@
  */
 package file.tree.analyzer;
 
+import file.tree.analyzer.gui.RowInfo;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,18 +26,18 @@ import javafx.util.Pair;
  */
 public class FileInfo implements Comparable<FileInfo> {
 
-    private String name;
-    private boolean directory;
-    private boolean symbolicLink;
-    private boolean accessibility;
-    private Long size;
-    private Date creationTime;
-    private Date lastAccessTime;
-    private Date lastModifiedTime;
-    private List<FileInfo> children;
-    private String path;
-    private int numberOfFiles;
-    private int numberOfDirectories;
+    protected String name;
+    protected boolean directory;
+    protected boolean symbolicLink;
+    protected boolean accessibility;
+    protected Long size;
+    protected Date creationTime;
+    protected Date lastAccessTime;
+    protected Date lastModifiedTime;
+    protected List<FileInfo> children;
+    protected String path;
+    protected int numberOfFiles;
+    protected int numberOfDirectories;
 
     /**
      * Constructor designed to use during hard disk analysis.
@@ -416,34 +417,34 @@ public class FileInfo implements Comparable<FileInfo> {
         }
     }
 
-    public ObservableList<Pair<String, String>> getPairedVariables() {
+    public ObservableList<RowInfo> getTableRows() {
 
-        ArrayList<Pair<String, String>> list = new ArrayList<>();
+        ArrayList<RowInfo> list = new ArrayList<>();
 
-        list.add(new Pair("Name", name));
+        list.add(new RowInfo("Name", name));
         if (isAccessible()) {
 
             if (!directory) {
-                list.add(new Pair("Size", humanReadableByteCount(size, true) + " (" + size + " bytes)"));
+                list.add(new RowInfo("Size", humanReadableByteCount(size, true) + " (" + size + " bytes)"));
             } else {
-                list.add(new Pair("Number of Files", String.valueOf(numberOfFiles)));
-                list.add(new Pair("Number of Directories", String.valueOf(numberOfDirectories)));
+                list.add(new RowInfo("Number of Files", String.valueOf(numberOfFiles)));
+                list.add(new RowInfo("Number of Directories", String.valueOf(numberOfDirectories)));
             }
 
-            list.add(new Pair("Creation Time", creationTime.toString()));
-            list.add(new Pair("Last Access Time", lastAccessTime.toString()));
-            list.add(new Pair("Last Modification Time", lastModifiedTime.toString()));
-            list.add(new Pair("Symbolic Link", Boolean.toString(symbolicLink)));
-            list.add(new Pair("Path", path));
+            list.add(new RowInfo("Creation Time", creationTime.toString()));
+            list.add(new RowInfo("Last Access Time", lastAccessTime.toString()));
+            list.add(new RowInfo("Last Modification Time", lastModifiedTime.toString()));
+            list.add(new RowInfo("Symbolic Link", Boolean.toString(symbolicLink)));
+            list.add(new RowInfo("Path", path));
         } else {
-            list.add(new Pair("Not Accessible", "true"));
+            list.add(new RowInfo("Accessible", "false"));
         }
 
         return FXCollections.observableArrayList(list);
 
     }
 
-    private static String humanReadableByteCount(long bytes, boolean si) {
+    protected static String humanReadableByteCount(long bytes, boolean si) {
         int unit = si ? 1000 : 1024;
         if (bytes < unit) {
             return bytes + " B";
