@@ -20,12 +20,10 @@ import java.util.List;
 public class DiffInfo extends FileInfo {
 
     private final ItemState state;
-    //commented because newDirectory says the same as FileInfo.directory + state="created"
-    //private final boolean newDirectory; 
-    //same as newDirectory
-    //private final boolean newSymbolicLink;
     private final List<DiffInfo> diffChildren;
     private final boolean newAccesibility;
+    private final int newNumberOfFiles;
+    private final int newNumberOfDirectories;
     private final Long newSize;
     private final Date newCreationTime;
     private final Date newLastAccessTime;
@@ -35,7 +33,9 @@ public class DiffInfo extends FileInfo {
         super(file, attributes);
         this.state = null;
         this.diffChildren = null;
-        this.newAccesibility = false;
+        this.newAccesibility = false;   
+        this.newNumberOfFiles = 0; //or something else?
+        this.newNumberOfDirectories = 0;
         this.newSize = null;
         this.newCreationTime = null;
         this.newLastAccessTime = null;
@@ -43,17 +43,18 @@ public class DiffInfo extends FileInfo {
     }
     
     public DiffInfo(String name, String path, boolean directory, boolean symbolicLink, boolean accessibility, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
-        ItemState state, List<DiffInfo> diffChildren, boolean newAccessibility, Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
+        ItemState state, List<DiffInfo> diffChildren, boolean newAccessibility, int newNumberOfFiles, int newNumberOfDirectories, Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
         super(name, path, directory, symbolicLink, accessibility, size, creationTime, lastAccessTime, lastModifiedTime, children, numberOfFiles, numberofDirectories);
         this.state = state;
-        this.newAccesibility = newAccessibility;
         this.diffChildren = diffChildren;
+        this.newAccesibility = newAccessibility;
+        this.newNumberOfFiles = newNumberOfFiles;
+        this.newNumberOfDirectories = newNumberOfDirectories;
         this.newSize = newSize;
         this.newCreationTime = newCreationTime;
         this.newLastAccessTime = newLastAccessTime;
         this.newLastModifiedTime = newLastModifiedTime;
     }
-    
     
     public ItemState getState() {
         return state;
@@ -77,6 +78,14 @@ public class DiffInfo extends FileInfo {
         } else {
             throw new IllegalStateException("Files don't have children! " + getPath());
         }
+    }
+    
+    public int getNewNumberOfFiles() {
+        return newNumberOfFiles;
+    }
+    
+    public int getNewNumberOfDirectories() {
+        return newNumberOfDirectories;
     }
 
     public Long getNewSize() {

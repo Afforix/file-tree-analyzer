@@ -5,6 +5,7 @@
  */
 package file.tree.analyzer;
 
+import com.sun.jmx.snmp.BerDecoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -296,6 +297,25 @@ public class FileInfoConverter {
 
         return date;
     }
+    
+    /**
+     * Set newNumberOfFiles or newNumberOfDirectories 
+     * @param newAttributeValue string to parse value from
+     * @param state 
+     * @param oldAttributeValue
+     * @return int
+     */
+    private static int setNumber(String newAttributeValue, ItemState state, int oldAttributeValue) {
+        int number;
+        if (!newAttributeValue.isEmpty()) {
+            number = Integer.parseInt(newAttributeValue);
+        } else if (state == ItemState.DELETED) {
+            number = 0;
+        } else {
+            number = oldAttributeValue;
+        }
+        return number;
+    }
 
     //ALL FOLLOWING IS SUGGESTION
     /**
@@ -344,7 +364,10 @@ public class FileInfoConverter {
         Long newSize = null;
         int numberOfFiles = 0;
         int numberOfDirectories = 0;
+        
         ItemState state = null; //for DiffInfo only
+        int newNumberOfFiles = 0;
+        int newNumberOfDirectories = 0;
         boolean isNewlyAccessible = false;
         boolean isChangedFromAccessibleToUnaccessible = false; //if so, do not try to collect new* attributes
         
@@ -403,7 +426,7 @@ public class FileInfoConverter {
             }
         }
 
-        if (isDiffInfo) { //get isNewlyAccessible and state, then decide whether get newSize, newCreatT, newLastAccT, newLastModT, diffInfoChildren
+        if (isDiffInfo) { //get isNewlyAccessible and state, then decide whether get newSize, newNumberOfFiles, newNumberOfDirectories, newCreatT, newLastAccT, newLastModT, diffInfoChildren
             newString = parent.getAttribute("state");
             if (!newString.isEmpty()) {
                 state = ItemState.valueOf(parent.getAttribute("state").toUpperCase());
@@ -419,12 +442,23 @@ public class FileInfoConverter {
                 }
             } //else isNewlyAccessible remains false
 
-            if (!isChangedFromAccessibleToUnaccessible) { //get newSize, newCreatT, newLastAccT, newLastModT, diffInfoChildren
-                newString = parent.getAttribute("newSize");
-                if (!newString.isEmpty()) {
-                    newSize = Long.parseLong(newString); //else remain null
+            if (!isChangedFromAccessibleToUnaccessible) { //get newSize/newNumberOfFiles+newNumberOfDirectories, newCreatT, newLastAccT, newLastModT, diffInfoChildren
+                if (!isDirectory) { //get newSize
+                    newString = parent.getAttribute("newSize");
+                    if (!newString.isEmpty()) {
+                        newSize = Long.parseLong(newString);
+                    } else if(state == ItemState.DELETED){
+                        newSize = Long.valueOf(0);
+                    } else {
+                        newSize = size;
+                    }
+                } else { 
+                    newString = parent.getAttribute("newNumberOfFiles");
+                    newNumberOfFiles = setNumber(newString, state, numberOfFiles);
+                    newString = parent.getAttribute("newNumberOfDirectories");
+                    newNumberOfDirectories = setNumber(newString, state, numberOfDirectories);
                 }
-
+                
                 diffInfoChildren = new ArrayList<>();
                 for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
                     if (parent.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE) {
@@ -443,8 +477,7 @@ public class FileInfoConverter {
         if (isDiffInfo) {
             DiffInfo root = new DiffInfo(name, path, isDirectory, isSymbolicLink, isAccessible, size, creationTime,
                     lastAccessTime, lastModifiedTime, fileInfoChildren, numberOfFiles, numberOfDirectories,
-                    state, diffInfoChildren, isNewlyAccessible, newSize, newCreationTime, newLastAccessTime, newLastModifiedTime);
-
+                    state, diffInfoChildren, isNewlyAccessible, newNumberOfFiles, newNumberOfDirectories, newSize, newCreationTime, newLastAccessTime, newLastModifiedTime);
             return (FileInfo) root;
         } else {
             FileInfo root = new FileInfo(name, path, isDirectory, isSymbolicLink, isAccessible, size, creationTime,

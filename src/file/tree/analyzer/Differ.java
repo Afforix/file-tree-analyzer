@@ -20,18 +20,12 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.DifferenceConstants;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
-import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
-import org.custommonkey.xmlunit.ElementNameQualifier;
 import org.custommonkey.xmlunit.NodeDetail;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.exceptions.ConfigurationException;
-import org.custommonkey.xmlunit.exceptions.XMLUnitException;
-import org.custommonkey.xmlunit.exceptions.XMLUnitRuntimeException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Class for finding differences between two XML docs, storing them and
@@ -51,33 +45,51 @@ public class Differ {
         Differ differ = new Differ();
         DiffInfo diffInfo;
         try {
-            System.out.println("wombat");
-            diffInfo = differ.diffXMLs("./saved_analyses", "2014-05-24T111111.xml", "2014-05-24T222222.xml");
+            diffInfo = differ.diffXMLs("./test/file/tree/analyzer", "controlXMLForDiffer.xml", "testXMLForDiffer.xml");
             printIt(diffInfo, 0);
-        } catch (IOException e) {
-            System.out.println("error in main");
+        } catch (IllegalArgumentException e) {
+            System.out.println("error in main" + e);
         }
     }
-    
+
     //print DiffInfo for testing only
     private static void printIt(DiffInfo parent, int level) {
-        System.out.println("name:" + parent.getName() + 
-                " directory:" + parent.isDirectory() + 
-                //" symlink:" + parent.isSymbolicLink() + 
-                " accesible: " + parent.isAccessible() + 
-                //" size:" + parent.getSize() + 
-                //" creationTime:" + parent.getCreationTime() + 
-                //" lastAccessTime:" + parent.getLastAccessTime() + 
-                //" lastModifiedTime:" + parent.getLastModifiedTime() + 
-                //" numberOfFiles:" + parent.getNumberOfFiles() + 
-                //" numberOfDirectories:"  + parent.getNumberOfDirectories() + 
-                //" path:" + parent.getPath() + 
-                //" ||| newSize:" + parent.getNewSize() + 
-                //" newCreationTime:" + parent.getNewCreationTime() +  
-                //" newLastAccessTime:" + parent.getNewLastAccessTime() + 
-                //" newLastModifiedTime:" + parent.getNewLastModifiedTime() +
-                //" state: " + parent.getState());
-                "");
+        System.out.println("NAME:" + parent.getName()
+                + " path:" + parent.getPath()
+                + " directory:" + parent.isDirectory()
+                + " symlink:" + parent.isSymbolicLink()
+                + " accesible: " + parent.isAccessible()
+                + " state: " + parent.getState()
+        );
+
+        if (parent.isAccessible() || parent.isNewlyAccessible()) {
+            if (parent.isDirectory()) {
+                System.out.println("numberOfFiles:" + parent.getNumberOfFiles() + " new:" + parent.getNewNumberOfFiles());                        
+                System.out.println("numberOfDirectories:" + parent.getNumberOfDirectories() + " new:" + parent.getNewNumberOfDirectories());
+            } else {
+                System.out.println("size:" + parent.getSize() + " new:" + parent.getNewSize());
+            }
+            //System.out.println(" creationTime:" + parent.getCreationTime()
+            //        + " lastAccessTime:" + parent.getLastAccessTime()
+            //        + " lastModifiedTime:" + parent.getLastModifiedTime()
+            //);
+            //if (!parent.getCreationTime().toString().isEmpty()) {
+            //   System.out.println("creationTime:" + parent.getCreationTime() + " new:" + parent.getNewCreationTime());
+            //}
+            //if (!parent.getNewLastAccessTime().toString().isEmpty()) {
+            //    System.out.println("lastAccessTime:" + parent.getLastAccessTime() + " new:" + parent.getNewLastAccessTime());
+            //
+            //if (!parent.getNewLastModifiedTime().toString().isEmpty()) {
+            //    System.out.println("lastModifiedTime:" + parent.getLastModifiedTime() + " new:" + parent.getNewLastModifiedTime());
+            //}
+
+            //System.out.println(" newSize:" + parent.getNewSize()
+            //        + " newCreationTime:" + parent.getNewCreationTime()
+            //        + " newLastAccessTime:" + parent.getNewLastAccessTime()
+            //        + " newLastModifiedTime:" + parent.getNewLastModifiedTime()
+            //        + " ||| "
+            //);
+        }
         
         if(parent.isDirectory() && (parent.isNewlyAccessible() || parent.isAccessible())){
             List<DiffInfo> children = parent.getDiffChildren();
@@ -101,15 +113,15 @@ public class Differ {
      * @throws IOException
      * @return DiffInfo (which is extended FileInfo)
      */
-    public DiffInfo diffXMLs(String cwd, String controlName, String testName) throws IOException, IllegalArgumentException, ConfigurationException {
-        //try {
+    public DiffInfo diffXMLs(String cwd, String controlName, String testName) throws NullPointerException, ConfigurationException {
+        try {
             XMLUnit.setCompareUnmatched(false); //TODO - deal with deleted / created items (they are unmatched) 
             //XMLUnit.setIgnoreComments(true); 
             XMLUnit.setIgnoreAttributeOrder(true);
             //XMLUnit.setIgnoreWhitespace(true); //causes bug - why?
-        //} catch (ConfigurationException ex) {
-        //    Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "XMLUnit configuration failed.", ex);
-        //}
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "XMLUnit configuration failed.", ex);
+        } 
 
         XMLFileManager fileManager = new XMLFileManager(cwd);
 
@@ -117,10 +129,10 @@ public class Differ {
             controlDoc = fileManager.findXMLFile(controlName, true);
             olderDoc = fileManager.findXMLFile(testName, true);
             testDoc = (Document) olderDoc.cloneNode(true); // for modifying attrs, we don't want to edit source XML olderDoc
-        } catch (IllegalArgumentException ex) {
+        } catch (NullPointerException ex) {
             Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "Differ: input document not found.", ex);
         }
-
+        
         Diff diff = new Diff(controlDoc, testDoc);
         //name of element + attribute "name" is ID
         String attributeUsedAsID = "name";
@@ -204,9 +216,10 @@ public class Differ {
                 }
             }
         }
+        
+        XMLFileManager testingFileManager = new XMLFileManager("./saved_analyses"); //FOR TESTING ONLY!!!
+        testingFileManager.createXMLFile(testDoc); // Write to XML - not necessary
 
-        fileManager.createXMLFile(testDoc); // Write to XML - not necessary
-        //System.out.println("testDoc: " + testDoc.getDocumentURI());
         return FileInfoConverter.domToDiffInfo2(testDoc);
     }
 }

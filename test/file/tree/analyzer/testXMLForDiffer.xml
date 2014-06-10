@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<directory accessible="true" creationTime="2014-06-02T05:17:50" lastAccessTime="2014-06-02T05:18:08" lastModifiedTime="2014-06-02T05:18:08" name="testing-structure" numberOfDirectories="5" numberOfFiles="4" path="G:\testing-structure" symbolicLink="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../analysesXmlSchema.xsd">
+  <directory accessible="true" creationTime="2014-06-02T05:18:08" lastAccessTime="2014-06-07T01:54:52" lastModifiedTime="2014-06-07T01:54:52" name="changeInLastModifiedTime" numberOfDirectories="4" numberOfFiles="4" symbolicLink="false">
+    <directory accessible="false" name="changeInAccessibility"/>
+    <directory accessible="true" creationTime="2014-06-02T05:19:54" lastAccessTime="2014-06-02T05:51:35" lastModifiedTime="2014-06-02T05:51:35" name="changeInNumberOfDirectories" numberOfDirectories="0" numberOfFiles="0" symbolicLink="false">
+         </directory>
+    <directory accessible="true" creationTime="2014-06-02T05:20:13" lastAccessTime="2014-06-02T05:20:52" lastModifiedTime="2014-06-02T05:20:52" name="changeInSymbolicLink" numberOfDirectories="0" numberOfFiles="2" symbolicLink="false">
+      <file accessible="true" creationTime="2014-06-02T05:20:32" lastAccessTime="2014-06-02T05:20:32" lastModifiedTime="2014-06-02T05:20:32" name="willBeDeleted.txt" size="10" symbolicLink="false"/>
+      <file accessible="true" creationTime="2014-06-02T05:20:32" lastAccessTime="2014-06-02T05:20:32" lastModifiedTime="2014-06-02T05:20:32" name="noChange.txt" size="0" symbolicLink="false"/>
+    </directory>
+    <file accessible="true" creationTime="2014-06-02T05:18:29" lastAccessTime="2014-06-02T05:18:29" lastModifiedTime="2014-06-02T05:52:11" name="changeInSize.txt" size="15" symbolicLink="false"/>
+    <file accessible="true" creationTime="2014-06-02T05:52:23" lastAccessTime="2014-06-02T05:52:30" lastModifiedTime="2014-06-02T05:52:50" name="changeInSymbolicLink.lnk" size="931" symbolicLink="false"/>
+  </directory>
+</directory>
