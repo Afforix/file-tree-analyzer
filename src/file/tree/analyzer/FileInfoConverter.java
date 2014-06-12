@@ -223,7 +223,6 @@ public class FileInfoConverter {
         return bool;
     }
 
-    //ALL FOLLOWING IS SUGGESTION
     /**
      * Takes object representing XML DOM and converts it to FileInfo.
      *
@@ -244,15 +243,13 @@ public class FileInfoConverter {
      * @param doc XML Dom
      * @return FileInfo with DiffInfo
      */
-    //if accepted, change name to domToDiffInfo
-    public static DiffInfo domToDiffInfo2(Document doc) {
+    public static DiffInfo domToDiffInfo(Document doc) {
         Element rootElement = doc.getDocumentElement();
         DiffInfo root = (DiffInfo) childrenToInfo(rootElement, "", true);
 
         return root;
     }
 
-    //should be used by both domToFileInfo and domToDiffInfo
     /**
      *
      * @param parent Element to be processed

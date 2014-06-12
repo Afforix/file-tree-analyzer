@@ -106,20 +106,11 @@ public class Differ {
      * @throws ConfigurationException
      * @throws NullPointerException
      * @param cwd current working directory (path to analyses directory)
-     * @param controlName name of an XML file with oldest file tree
-     * @param testName name of an XML file with newest file tree
+     * @param controlName name of an XML file with older file tree
+     * @param testName name of an XML file with newer file tree
      * @return root of file tree with diff information
      */
-    public static DiffInfo diffXMLs(String cwd, String controlName, String testName) throws NullPointerException, ConfigurationException {
-        try {
-            XMLUnit.setCompareUnmatched(false); //TODO - deal with deleted / created items (they are unmatched) 
-            //XMLUnit.setIgnoreComments(true); 
-            XMLUnit.setIgnoreAttributeOrder(true);
-            //XMLUnit.setIgnoreWhitespace(true); //causes bug - why?
-        } catch (ConfigurationException ex) {
-            Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "XMLUnit configuration failed.", ex);
-        }
-
+    public static DiffInfo diffXMLs(String cwd, String controlName, String testName) throws NullPointerException {
         XMLFileManager fileManager = new XMLFileManager(cwd);
         Document controlDoc;
         Document newDoc;
@@ -143,7 +134,16 @@ public class Differ {
      * @param newDoc document representing newer file tree
      * @return root of file tree with diff information
      */
-    public static DiffInfo diffDocuments(Document controlDoc, Document newDoc) {
+    public static DiffInfo diffDocuments(Document controlDoc, Document newDoc) throws ConfigurationException {
+        try {
+            XMLUnit.setCompareUnmatched(false); //TODO - deal with deleted / created items (they are unmatched) 
+            //XMLUnit.setIgnoreComments(true); 
+            XMLUnit.setIgnoreAttributeOrder(true);
+            //XMLUnit.setIgnoreWhitespace(true); //causes bug - why?
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "XMLUnit configuration failed.", ex);
+        }
+        
         Document testDoc = (Document) newDoc.cloneNode(true);
 
         Diff diff = new Diff(controlDoc, testDoc);
@@ -232,6 +232,6 @@ public class Differ {
 
 //        XMLFileManager testingFileManager = new XMLFileManager("./saved_analyses"); //FOR TESTING ONLY!!!
 //        testingFileManager.createXMLFile(testDoc); // Write to XML - not necessary
-        return FileInfoConverter.domToDiffInfo2(testDoc);
+        return FileInfoConverter.domToDiffInfo(testDoc);
     }
 }
