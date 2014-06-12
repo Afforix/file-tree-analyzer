@@ -21,6 +21,7 @@ public class TestFileTree {
 
     /**
      * Creates file tree for testing.
+     *
      * @throws java.io.IOException
      */
     public static void createFileTree() throws IOException {
@@ -37,11 +38,12 @@ public class TestFileTree {
                 f2.createNewFile();
                 f3.createNewFile();
             }
-            
+
             File d2 = new File(root, "dir2");
             d2.mkdir();
+            File innerFile = new File(d2, "innerFile");
+            innerFile.createNewFile();
         }
-
     }
 
     /**
@@ -65,27 +67,33 @@ public class TestFileTree {
             d.delete();
 
             File d2 = new File(root, "dir2");
-
+            new File(d2, "innerFile").delete();
             d2.delete();
 
             root.delete();
         }
     }
-    
+
     /**
-     * Creates changed version of the testing file structure.
+     * Creates changed version of the testing file structure. 
      * Changes:
-     * * file1.txt - changed size
-     * * file3.txt - deleted
-     * * newFile - new file
-     * * newFolder - new folder
-     * * newInnerFile - file in the newFolder
-     * @throws IOException 
+     * - file1.txt - changed size 
+     * - file3.txt - deleted 
+     * - newFile - new file
+     * - newFolder - new folder 
+     * - newInnerFile - file in the newFolder
+     * - dir2 deleted
+     * @throws IOException
      */
     public static void createChangedFileTree() throws IOException {
-        File root = new File(".", "changedTestDir");
-        if (root.mkdir()) {
+        File folderWithRoot = new File(".", "changedTestDir");
+
+        if (folderWithRoot.mkdir()) {
+            File root = new File(folderWithRoot, "testDir");
+            root.mkdir();
+            
             File f1 = new File(root, "file1.txt");
+            //f1.createNewFile();
             List<String> lines = Arrays.asList("test_changed");
             Files.write(f1.toPath(), lines);
 
@@ -94,29 +102,26 @@ public class TestFileTree {
                 File f2 = new File(d, "file2.txt");
                 f2.createNewFile();
             }
-            
-            File d2 = new File(root, "dir2");
-            d2.mkdir();
-            
-            //new file
+
             File newFile = new File(root, "newFile");
             newFile.createNewFile();
-            
+
             File newFolder = new File(root, "newFolder");
             newFolder.mkdir();
-            
+
             File newInnerFile = new File(newFolder, "newInnerFile");
             newInnerFile.createNewFile();
         }
     }
-    
+
     /**
      * Deletes changed testing file tree.
      */
     public static void deleteChangedFileTree() {
-        File root = new File(".", "changedTestDir");
+        File folderWithRoot = new File(".", "changedTestDir");
 
-        if (root.exists()) {
+        if (folderWithRoot.exists()) {
+            File root = new File(folderWithRoot, "testDir");
             File f = new File(root, "file1.txt");
             f.delete();
 
@@ -127,17 +132,14 @@ public class TestFileTree {
 
             d.delete();
 
-            File d2 = new File(root, "dir2");
-
-            d2.delete();
-            
             new File(root, "newFile").delete();
-            
+
             File newFolder = new File(root, "newFolder");
             new File(newFolder, "newInnerFile").delete();
             newFolder.delete();
-            
+
             root.delete();
+            folderWithRoot.delete();
         }
     }
 }
