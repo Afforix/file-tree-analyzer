@@ -14,8 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -70,7 +68,7 @@ public class FileInfoConverterTest {
             assertEquals("2", firstDirResult.getAttribute("numberOfFiles"));
             assertEquals("0", firstDirResult.getAttribute("numberOfDirectories"));
             assertEquals(firstDir.getName(), firstDirResult.getAttribute("name"));
-            assertFalse(firstDirResult.hasAttribute("size")); //only file have attribute size
+            assertFalse(firstDirResult.hasAttribute("size")); //only files have attribute size
 
             assertEquals(dateFormat.format(firstDir.getLastModifiedTime()), firstDirResult.getAttribute("lastModifiedTime"));
 
@@ -87,6 +85,20 @@ public class FileInfoConverterTest {
             assertTrue(file2Result.hasAttribute("size"));
 
             assertEquals(dateFormat.format(file2.getLastAccessTime()), file2Result.getAttribute("lastAccessTime"));
+            
+            //test dir2
+            Element secondDirResult = (Element) resultRoot.getChildNodes().item(1);
+            FileInfo secondDir = root.getChildren().get(1);
+            
+            assertEquals("directory", secondDirResult.getTagName());
+            assertFalse(secondDirResult.hasAttribute("path")); 
+            assertEquals(0, secondDirResult.getChildNodes().getLength());
+            assertEquals("0", secondDirResult.getAttribute("numberOfFiles"));
+            assertEquals("0", secondDirResult.getAttribute("numberOfDirectories"));
+            assertEquals(secondDir.getName(), secondDirResult.getAttribute("name"));
+            assertFalse(secondDirResult.hasAttribute("size")); 
+
+            assertEquals(dateFormat.format(secondDir.getLastAccessTime()), secondDirResult.getAttribute("lastAccessTime"));
 
         } catch (IOException ex) {
             fail("couldn't create FileInfo");

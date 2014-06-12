@@ -65,10 +65,6 @@ public class TestFileTree {
             d.delete();
 
             File d2 = new File(root, "dir2");
-//            d2.setReadable(true);
-
-            File f4 = new File(d2, "file4.txt");
-            f4.delete();
 
             d2.delete();
 
