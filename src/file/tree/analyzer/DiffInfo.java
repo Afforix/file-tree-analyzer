@@ -21,35 +21,27 @@ import javafx.collections.ObservableList;
  */
 public class DiffInfo extends FileInfo {
 
-    private final ItemState state;
-    private final List<DiffInfo> diffChildren;
-    private final boolean newAccesibility;
-    private final int newNumberOfFiles;
-    private final int newNumberOfDirectories;
-    private final Long newSize;
-    private final Date newCreationTime;
-    private final Date newLastAccessTime;
-    private final Date newLastModifiedTime;
+    protected ItemState state;
+    protected List<DiffInfo> diffChildren;
+    protected boolean newSymbolicLink;
+    protected boolean newAccessibility;
+    protected int newNumberOfFiles;
+    protected int newNumberOfDirectories;
+    protected Long newSize;
+    protected Date newCreationTime;
+    protected Date newLastAccessTime;
+    protected Date newLastModifiedTime;
 
-    public DiffInfo(Path file, BasicFileAttributes attributes) {
-        super(file, attributes);
-        this.state = null;
-        this.diffChildren = null;
-        this.newAccesibility = false;
-        this.newNumberOfFiles = 0; //or something else?
-        this.newNumberOfDirectories = 0;
-        this.newSize = null;
-        this.newCreationTime = null;
-        this.newLastAccessTime = null;
-        this.newLastModifiedTime = null;
-    }
-
+    /**
+     * @deprecated  
+     */
     public DiffInfo(String name, String path, boolean directory, boolean symbolicLink, boolean accessibility, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
-            ItemState state, List<DiffInfo> diffChildren, boolean newAccessibility, int newNumberOfFiles, int newNumberOfDirectories, Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
+            ItemState state, List<DiffInfo> diffChildren, boolean newSymbolicLink, boolean newAccessibility, int newNumberOfFiles, int newNumberOfDirectories, Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
         super(name, path, directory, symbolicLink, accessibility, size, creationTime, lastAccessTime, lastModifiedTime, children, numberOfFiles, numberofDirectories);
         this.state = state;
+        this.newSymbolicLink = newSymbolicLink;
         this.diffChildren = diffChildren;
-        this.newAccesibility = newAccessibility;
+        this.newAccessibility = newAccessibility;
         this.newNumberOfFiles = newNumberOfFiles;
         this.newNumberOfDirectories = newNumberOfDirectories;
         this.newSize = newSize;
@@ -57,53 +49,14 @@ public class DiffInfo extends FileInfo {
         this.newLastAccessTime = newLastAccessTime;
         this.newLastModifiedTime = newLastModifiedTime;
     }
-
-    public ItemState getState() {
-        return state;
+    
+    
+    public DiffInfo() {
+        super();
     }
-
-    public boolean isNewlyAccessible() { //or how should it be named
-        return newAccesibility;
-    }
-
-    public List<DiffInfo> getDiffChildren() {
-        if (!isAccessible() && !isNewlyAccessible()) {
-            throw new IllegalStateException("file is not accessible: " + getPath());
-        }
-
-        if (isDirectory()) {
-            if (diffChildren == null) {
-                return Collections.emptyList();
-            } else {
-                return Collections.unmodifiableList(diffChildren);
-            }
-        } else {
-            throw new IllegalStateException("Files don't have children! " + getPath());
-        }
-    }
-
-    public int getNewNumberOfFiles() {
-        return newNumberOfFiles;
-    }
-
-    public int getNewNumberOfDirectories() {
-        return newNumberOfDirectories;
-    }
-
-    public Long getNewSize() {
-        return newSize;
-    }
-
-    public Date getNewCreationTime() {
-        return new Date(newCreationTime.getTime());
-    }
-
-    public Date getNewLastAccessTime() {
-        return new Date(newLastAccessTime.getTime());
-    }
-
-    public Date getNewLastModifiedTime() {
-        return new Date(newLastModifiedTime.getTime());
+    
+    public DiffInfo(Path file) {
+        super(file);
     }
 
     @Override
@@ -114,19 +67,18 @@ public class DiffInfo extends FileInfo {
         list.add(new RowInfo("Name", name, "(diffed)" + name));   
     
         if (!directory) {
-            addToList(list, "Size", size, newSize);
+            addToList(list, "Size", size, getNewSize());
              } else {
-            addToList(list, "Number of Files", numberOfFiles, newNumberOfFiles);
-            addToList(list, "Number of Directories", numberOfDirectories, newNumberOfDirectories);            
+            addToList(list, "Number of Files", numberOfFiles, getNewNumberOfFiles());
+            addToList(list, "Number of Directories", numberOfDirectories, getNewNumberOfDirectories());            
         }
-         addToList(list, "Creation Time", creationTime, newCreationTime);  
-         addToList(list, "Last Access Time", lastAccessTime, newLastAccessTime);  
-          addToList(list, "Symbolic Link", symbolicLink, null); 
+         addToList(list, "Creation Time", creationTime, getNewCreationTime());  
+         addToList(list, "Last Access Time", lastAccessTime, getNewLastAccessTime());  
+          addToList(list, "Symbolic Link", symbolicLink, newSymbolicLink); 
           addToList(list, "Path", path, null); 
           list.add(new RowInfo("Accessible", Boolean.toString(isAccessible()), Boolean.toString(!isNewlyAccessible())));
         
         return FXCollections.observableArrayList(list);
-
     }
 
     private void addToList(ArrayList<RowInfo> list, String key, Object value, Object newValue) {
@@ -167,29 +119,158 @@ public class DiffInfo extends FileInfo {
             return (String) obj;
         }
         return "";
+    }
+    
+    public void addChild(DiffInfo child) {
+        if (isDirectory()) {
+            if (diffChildren == null) {
+                diffChildren = new ArrayList<>();
+            }
+            diffChildren.add(child);
+        } else {
+            throw new IllegalStateException("Files don't have children! " + path);
+        }
+    }
+    
+    public List<DiffInfo> getDiffChildren() {
+        if (!isAccessible() && !isNewlyAccessible()) {
+            throw new IllegalStateException("file is not accessible: " + getPath());
+        }
 
+        if (isDirectory()) {
+            if (diffChildren == null) {
+                return Collections.emptyList();
+            } else {
+                return Collections.unmodifiableList(diffChildren);
+            }
+        } else {
+            throw new IllegalStateException("Files don't have children! " + getPath());
+        }
     }
 
-    /*
-     public List<DiffInfo> getChildrenInDiff() {
-     if (this.isDirectory()) {
-     return (List<DiffInfo>)children);
-     //return (List<DiffInfo>) Collections.unmodifiableList((List<? extends T>) children);
-     } else {
-     throw new IllegalStateException("Files don't have children!");
-     }
-     }
+    /**
+     * @return the state
      */
-    /*
-     if (this.isDirectory()) {
-     List<FileInfo> fileInfo = this.getChildren();
-     List<DiffInfo> diffInfo;
-     for(Item i: diffInfo)
-     //diffInfo.addAll(fileInfo);
-     fileInfo.addAll(diffInfo);
-     return Collections.unmodifiableList();
-     } else {
-     throw new IllegalStateException("Files don't have children!");
-     }
+    public ItemState getState() {
+        return state;
+    }
+
+    /**
+     * @return the newSymbolicLink
      */
+    public boolean isNewlySymbolicLink() {
+        return newSymbolicLink;
+    }
+
+    /**
+     * @return the newAccesibility
+     */
+    public boolean isNewlyAccessible() {
+        return newAccessibility;
+    }
+
+    /**
+     * @return the newNumberOfFiles
+     */
+    public int getNewNumberOfFiles() {
+        return newNumberOfFiles;
+    }
+
+    /**
+     * @return the newNumberOfDirectories
+     */
+    public int getNewNumberOfDirectories() {
+        return newNumberOfDirectories;
+    }
+
+    /**
+     * @return the newSize
+     */
+    public Long getNewSize() {
+        return newSize;
+    }
+
+    /**
+     * @return the newCreationTime
+     */
+    public Date getNewCreationTime() {
+        return newCreationTime;
+    }
+
+    /**
+     * @return the newLastAccessTime
+     */
+    public Date getNewLastAccessTime() {
+        return newLastAccessTime;
+    }
+
+    /**
+     * @return the newLastModifiedTime
+     */
+    public Date getNewLastModifiedTime() {
+        return newLastModifiedTime;
+    }
+
+    /**
+     * @param state the state to set
+     */
+    public void setState(ItemState state) {
+        this.state = state;
+    }
+
+    /**
+     * @param newSymbolicLink the newSymbolicLink to set
+     */
+    public void setNewSymbolicLink(boolean newSymbolicLink) {
+        this.newSymbolicLink = newSymbolicLink;
+    }
+
+    /**
+     * @param newAccesibility the newAccesibility to set
+     */
+    public void setNewAccesibility(boolean newAccesibility) {
+        this.newAccessibility = newAccesibility;
+    }
+
+    /**
+     * @param newNumberOfFiles the newNumberOfFiles to set
+     */
+    public void setNewNumberOfFiles(int newNumberOfFiles) {
+        this.newNumberOfFiles = newNumberOfFiles;
+    }
+
+    /**
+     * @param newNumberOfDirectories the newNumberOfDirectories to set
+     */
+    public void setNewNumberOfDirectories(int newNumberOfDirectories) {
+        this.newNumberOfDirectories = newNumberOfDirectories;
+    }
+
+    /**
+     * @param newSize the newSize to set
+     */
+    public void setNewSize(Long newSize) {
+        this.newSize = newSize;
+    }
+
+    /**
+     * @param newCreationTime the newCreationTime to set
+     */
+    public void setNewCreationTime(Date newCreationTime) {
+        this.newCreationTime = newCreationTime;
+    }
+
+    /**
+     * @param newLastAccessTime the newLastAccessTime to set
+     */
+    public void setNewLastAccessTime(Date newLastAccessTime) {
+        this.newLastAccessTime = newLastAccessTime;
+    }
+
+    /**
+     * @param newLastModifiedTime the newLastModifiedTime to set
+     */
+    public void setNewLastModifiedTime(Date newLastModifiedTime) {
+        this.newLastModifiedTime = newLastModifiedTime;
+    }
 }

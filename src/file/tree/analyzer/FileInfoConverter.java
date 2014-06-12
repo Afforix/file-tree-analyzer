@@ -1,3 +1,5 @@
+
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -107,6 +109,7 @@ public class FileInfoConverter {
      *
      * @param doc XML DOM
      * @return FileInfo
+     *  
      */
     public static FileInfo domToFileInfo(Document doc) {
         if(doc == null) throw new IllegalArgumentException("doc is null");
@@ -117,6 +120,9 @@ public class FileInfoConverter {
         return root;
     }
 
+    /**
+     * @deprecated
+     */
     private static FileInfo childrenToFileInfo(Element element, String path) {
         //get all file info from element
         
@@ -160,123 +166,6 @@ public class FileInfoConverter {
 
         return item;
     }
-
-    /**
-     * Takes object representing XML DOM and converts it to DiffInfo.
-     *
-     * @param doc XML Dom
-     * @return FileInfo with DiffInfo
-     * @deprecated
-     */
-    /*
-    public static DiffInfo domToDiffInfo(Document doc) {
-        Element rootElement = doc.getDocumentElement();
-        DiffInfo root = childrenToDiffInfo(rootElement, "");
-
-        return root;
-    }
-    */
-
-    /**
-     * @deprecated
-     */
-    /*
-    private static DiffInfo childrenToDiffInfo(Element parent, String path) {
-        String name = "";
-        boolean isDirectory = false;
-        List<FileInfo> fileInfoChildren = null;
-        List<DiffInfo> diffInfoChildren = null;
-        Long size = null;
-        Long newSize = null;
-        int numberOfFiles = 0;
-        int numberOfDirectories = 0;
-
-        //DiffInfo lines - this is different from childrenToFileInfo
-        String newString = ""; //temporary variable, not part of DiffInfo
-        ItemState state = null;
-        //end
-
-        //added to enable program run - not safe, untested
-        boolean isAccessible = parent.getAttribute("Accessibility").equals("true");
-        //end
-
-        name = parent.getAttribute("name");
-        //System.out.println("NAME:" + name);
-
-        if (parent.getTagName().equals("directory")) {
-            isDirectory = true;
-            numberOfFiles = Integer.parseInt(parent.getAttribute("numberOfFiles"));
-            numberOfDirectories = Integer.parseInt(parent.getAttribute("numberOfDirectories"));
-
-            if (parent.hasAttribute("path")) {
-                path = parent.getAttribute("path");
-            } else {
-                path += "/" + name;
-            }
-
-            diffInfoChildren = new ArrayList<>();
-            for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
-                //DiffInfo modification - added if()
-                if (parent.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    Element child = (Element) parent.getChildNodes().item(i);
-                    diffInfoChildren.add(childrenToDiffInfo(child, path));
-                }
-            }
-        } else {
-            size = Long.parseLong(parent.getAttribute("size"));
-            path += "/" + name;
-
-            //DiffInfo lines
-            newString = parent.getAttribute("newSize");
-            if (!newString.isEmpty()) {
-                newSize = Long.parseLong(newString);
-            }
-            //end
-        }
-        //System.out.println("PATH:" + path);
-
-        boolean isSymbolicLink = false;
-        if (parent.getAttribute("symbolicLink").equals("true")) {
-            isSymbolicLink = true;
-        }
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-        Date creationTime = null;
-        Date lastAccessTime = null;
-        Date lastModifiedTime = null;
-        //System.out.println("*Time:");
-        try {
-            creationTime = dateFormat.parse(parent.getAttribute("creationTime"));
-            //System.out.println("CREATIONTIME:" + creationTime);
-            lastAccessTime = dateFormat.parse(parent.getAttribute("lastAccessTime"));
-            lastModifiedTime = dateFormat.parse(parent.getAttribute("lastModifiedTime"));
-        } catch (ParseException ex) {
-            Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        //DiffInfo lines
-        Date newCreationTime = setDate(parent, creationTime, "newCreationTime", dateFormat);
-        Date newLastAccessTime = setDate(parent, lastAccessTime, "newLastAccessTime", dateFormat);
-        Date newLastModifiedTime = setDate(parent, lastModifiedTime, "newLastModifiedTime", dateFormat);
-
-        newString = parent.getAttribute("state");
-        if (!newString.isEmpty()) {
-            state = ItemState.valueOf(parent.getAttribute("state"));
-        } else {
-            state = ItemState.CREATED; //maybe choose other option
-        }
-        //end
-
-        //DiffInfo lines, create new DiffInfo instead of new FileInfo
-        DiffInfo root = new DiffInfo(name, path, isDirectory, isSymbolicLink, isAccessible, size, creationTime,
-                lastAccessTime, lastModifiedTime, fileInfoChildren, numberOfFiles, numberOfDirectories,
-                state, diffInfoChildren, newSize, newCreationTime, newLastAccessTime, newLastModifiedTime);
-        //end
-
-        return root; //DiffInfo type
-    }
-    */
     
     /**
      * Gets date from desired attribute or uses "older" attribute.
@@ -299,7 +188,6 @@ public class FileInfoConverter {
                 Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else { //use value from already existing attribute
-            //TODO: try if new*Time can be null && not throw exception
             date = oldAttribute;
         }
 
@@ -313,7 +201,7 @@ public class FileInfoConverter {
      * @param oldAttributeValue
      * @return int
      */
-    private static int setNumber(String newAttributeValue, ItemState state, int oldAttributeValue) {
+    private static int setNewNumber(String newAttributeValue, ItemState state, int oldAttributeValue) {
         int number;
         if (!newAttributeValue.isEmpty()) {
             number = Integer.parseInt(newAttributeValue);
@@ -323,6 +211,16 @@ public class FileInfoConverter {
             number = oldAttributeValue;
         }
         return number;
+    }
+    
+    private static boolean setNewBoolean(String newAttributevalue, boolean oldAttributeValue) {
+        boolean bool;
+        if (!newAttributevalue.isEmpty()) {
+                bool = Boolean.getBoolean(newAttributevalue);
+            } else {
+                bool = oldAttributeValue;
+            }
+        return bool;
     }
 
     //ALL FOLLOWING IS SUGGESTION
@@ -364,6 +262,8 @@ public class FileInfoConverter {
      */
     private static FileInfo childrenToInfo(Element parent, String path, boolean isDiffInfo) {
         String name = "";
+        FileInfo fileInfoRoot = null; 
+
         boolean isDirectory = false;
         boolean isAccessible = false;
         boolean isSymbolicLink = false;
@@ -373,22 +273,23 @@ public class FileInfoConverter {
         int numberOfFiles = 0;
         int numberOfDirectories = 0;
         
-        ItemState state = null; //for DiffInfo only
-        int newNumberOfFiles = 0;
-        int newNumberOfDirectories = 0;
-        boolean isNewlyAccessible = false;
-        boolean isChangedFromAccessibleToUnaccessible = false; //if so, do not try to collect new* attributes
-        
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date creationTime = null;
         Date lastAccessTime = null;
         Date lastModifiedTime = null;
+                
+        //variables for DiffInfo
+        ItemState state = null; 
+        DiffInfo diffInfoRoot = null;
+        int newNumberOfFiles = 0;
+        int newNumberOfDirectories = 0;
+        boolean isNewlyAccessible = false;
+        boolean isNewlySymbolicLink = false;
+        boolean isChangedFromAccessibleToUnaccessible = false; //if true, copy values from old attributes to new*
+        
         Date newCreationTime = null;
         Date newLastAccessTime = null;
         Date newLastModifiedTime = null;
-
-        List<FileInfo> fileInfoChildren = null;
-        List<DiffInfo> diffInfoChildren = null;
 
         String newString = "";  //temporary variable
         
@@ -401,26 +302,14 @@ public class FileInfoConverter {
         }
         
         isAccessible = parent.getAttribute("accessible").equals("true");
-        
         isDirectory = parent.getTagName().equals("directory");
         isSymbolicLink = parent.getAttribute("symbolicLink").equals("true");
         
         //if isAccessible: get size/(numberOfFiles, numberOfDirectories), creatT, lastAccT, lastModT, 
-        //if isAccessible && !isDiffInfo get also fileInfoChildren 
         if (isAccessible) {
             if (isDirectory) {
                 numberOfFiles = Integer.parseInt(parent.getAttribute("numberOfFiles"));
                 numberOfDirectories = Integer.parseInt(parent.getAttribute("numberOfDirectories"));
-
-                if (!isDiffInfo) {
-                    fileInfoChildren = new ArrayList<>();
-                    for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
-                        if (parent.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE) {
-                            Element child = (Element) parent.getChildNodes().item(i);
-                            fileInfoChildren.add((FileInfo) childrenToInfo(child, path, false));
-                        }
-                    }
-                }
             } else { //is not directory
                 size = Long.parseLong(parent.getAttribute("size"));
             }
@@ -434,23 +323,28 @@ public class FileInfoConverter {
             }
         }
 
-        if (isDiffInfo) { //get isNewlyAccessible and state, then decide whether get newSize, newNumberOfFiles, newNumberOfDirectories, newCreatT, newLastAccT, newLastModT, diffInfoChildren
+        if (isDiffInfo) { //get isNewlyAccessible isNewlySymbolicLink and state, then decide whether get newSize, newNumberOfFiles, newNumberOfDirectories, newCreatT, newLastAccT, newLastModT, diffInfoChildren
             newString = parent.getAttribute("state");
             if (!newString.isEmpty()) {
                 state = ItemState.valueOf(parent.getAttribute("state").toUpperCase());
             } else {
                 state = ItemState.UNMODIFIED; //maybe choose other option
             }
-
+            
+            newString = parent.getAttribute("newSymbolicLink");
+            isNewlySymbolicLink = setNewBoolean(newString, isSymbolicLink);
+            
             newString = parent.getAttribute("newAccessible");
             if (!newString.isEmpty()) {
-                isNewlyAccessible = parent.getAttribute("newAccessible").equals("true");
+                isNewlyAccessible = newString.equals("true");
                 if (!isNewlyAccessible) {
                     isChangedFromAccessibleToUnaccessible = true;
                 }
-            } //else isNewlyAccessible remains false
-
-            if (!isChangedFromAccessibleToUnaccessible) { //get newSize/newNumberOfFiles+newNumberOfDirectories, newCreatT, newLastAccT, newLastModT, diffInfoChildren
+            } else {
+                isNewlyAccessible = isAccessible;
+            }
+            
+            if (!isChangedFromAccessibleToUnaccessible) { //get newSize/(newNumberOfFiles, newNumberOfDirectories), newCreatT, newLastAccT, newLastModT, diffInfoChildren
                 if (!isDirectory) { //get newSize
                     newString = parent.getAttribute("newSize");
                     if (!newString.isEmpty()) {
@@ -462,35 +356,75 @@ public class FileInfoConverter {
                     }
                 } else { 
                     newString = parent.getAttribute("newNumberOfFiles");
-                    newNumberOfFiles = setNumber(newString, state, numberOfFiles);
+                    newNumberOfFiles = setNewNumber(newString, state, numberOfFiles);
                     newString = parent.getAttribute("newNumberOfDirectories");
-                    newNumberOfDirectories = setNumber(newString, state, numberOfDirectories);
-                }
-                
-                diffInfoChildren = new ArrayList<>();
-                for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
-                    if (parent.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE) {
-                        Element child = (Element) parent.getChildNodes().item(i);
-                        diffInfoChildren.add((DiffInfo) childrenToInfo(child, path, true)); //casting type to avoid "Object type" files 
-                    }
+                    newNumberOfDirectories = setNewNumber(newString, state, numberOfDirectories);
                 }
 
                 newCreationTime = setDate(parent, creationTime, "newCreationTime", dateFormat);
                 newLastAccessTime = setDate(parent, lastAccessTime, "newLastAccessTime", dateFormat);
                 newLastModifiedTime = setDate(parent, lastModifiedTime, "newLastModifiedTime", dateFormat);
+                newLastModifiedTime = null;
             }
         }
-
-
-        if (isDiffInfo) {
-            DiffInfo root = new DiffInfo(name, path, isDirectory, isSymbolicLink, isAccessible, size, creationTime,
-                    lastAccessTime, lastModifiedTime, fileInfoChildren, numberOfFiles, numberOfDirectories,
-                    state, diffInfoChildren, isNewlyAccessible, newNumberOfFiles, newNumberOfDirectories, newSize, newCreationTime, newLastAccessTime, newLastModifiedTime);
-            return (FileInfo) root;
+        
+        if(isDiffInfo) {
+            diffInfoRoot = new DiffInfo();
+            diffInfoRoot.setAccessibility(isAccessible);
+            diffInfoRoot.setCreationTime(creationTime);
+            diffInfoRoot.setDirectory(isDirectory);
+            diffInfoRoot.setLastAccessTime(lastAccessTime);
+            diffInfoRoot.setLastModifiedTime(lastModifiedTime);
+            diffInfoRoot.setName(name);
+            diffInfoRoot.setNumberOfDirectories(numberOfDirectories);
+            diffInfoRoot.setNumberOfFiles(numberOfFiles);
+            diffInfoRoot.setPath(path);
+            diffInfoRoot.setSize(size);
+            diffInfoRoot.setSymbolicLink(isSymbolicLink);
+            
+            diffInfoRoot.setState(state);
+            //diffInfoRoot.setNewAccesibility(isNewlyAccessible); 
+            diffInfoRoot.setNewAccesibility(false); //hack
+            diffInfoRoot.setNewCreationTime(newCreationTime);
+            diffInfoRoot.setNewLastAccessTime(newLastAccessTime);
+            diffInfoRoot.setNewLastModifiedTime(newLastModifiedTime);
+            diffInfoRoot.setNewNumberOfDirectories(newNumberOfDirectories);
+            diffInfoRoot.setNewNumberOfFiles(newNumberOfFiles);
+            diffInfoRoot.setNewSize(newSize);
+            diffInfoRoot.setNewSymbolicLink(isSymbolicLink);
+                        
+            if(isDirectory) {
+                for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
+                        if (parent.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE) {
+                            Element child = (Element) parent.getChildNodes().item(i);
+                            diffInfoRoot.addChild((DiffInfo) childrenToInfo(child, diffInfoRoot.getPath(), isDiffInfo));
+                        }
+                    }
+            }
+            
+            return (FileInfo) diffInfoRoot;
         } else {
-            FileInfo root = new FileInfo(name, path, isDirectory, isSymbolicLink, isAccessible, size, creationTime,
-                    lastAccessTime, lastModifiedTime, fileInfoChildren, numberOfFiles, numberOfDirectories);
-            return root;
+            fileInfoRoot = new FileInfo();
+            fileInfoRoot.setAccessibility(isAccessible);
+            fileInfoRoot.setCreationTime(creationTime);
+            fileInfoRoot.setDirectory(isDirectory);
+            fileInfoRoot.setLastAccessTime(lastAccessTime);
+            fileInfoRoot.setLastModifiedTime(lastModifiedTime);
+            fileInfoRoot.setName(name);
+            fileInfoRoot.setNumberOfDirectories(numberOfDirectories);
+            fileInfoRoot.setNumberOfFiles(numberOfFiles);
+            fileInfoRoot.setPath(path);
+            fileInfoRoot.setSize(size);
+            fileInfoRoot.setSymbolicLink(isSymbolicLink);
+
+            for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
+                if (parent.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE) {
+                    Element child = (Element) parent.getChildNodes().item(i);
+                    fileInfoRoot.addChild(childrenToInfo(child, fileInfoRoot.getPath(), isDiffInfo));
+                }
+            }
+
+            return fileInfoRoot;
         }
     }
 }
