@@ -380,8 +380,7 @@ public class FileInfoConverter {
             diffInfoRoot.setSymbolicLink(isSymbolicLink);
             
             diffInfoRoot.setState(state);
-            //diffInfoRoot.setNewAccesibility(isNewlyAccessible); 
-            diffInfoRoot.setNewAccesibility(false); //hack
+            diffInfoRoot.setNewAccesibility(isNewlyAccessible); 
             diffInfoRoot.setNewCreationTime(newCreationTime);
             diffInfoRoot.setNewLastAccessTime(newLastAccessTime);
             diffInfoRoot.setNewLastModifiedTime(newLastModifiedTime);

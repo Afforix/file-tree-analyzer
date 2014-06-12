@@ -76,7 +76,7 @@ public class DiffInfo extends FileInfo {
          addToList(list, "Last Access Time", lastAccessTime, getNewLastAccessTime());  
           addToList(list, "Symbolic Link", symbolicLink, newSymbolicLink); 
           addToList(list, "Path", path, null); 
-          list.add(new RowInfo("Accessible", Boolean.toString(isAccessible()), Boolean.toString(!isNewlyAccessible())));
+          list.add(new RowInfo("Accessible", Boolean.toString(isAccessible()), Boolean.toString(isNewlyAccessible())));
         
         return FXCollections.observableArrayList(list);
     }
@@ -85,13 +85,13 @@ public class DiffInfo extends FileInfo {
         String val = "";
         String newVal = "";
         
-        if (!isAccessible() && isNewlyAccessible()) {
+        if (!isAccessible() && !isNewlyAccessible()) {
             return;
         }
         if (isAccessible()) {
             val = objectToString(value);
         }
-        if (!isNewlyAccessible()) {
+        if (isNewlyAccessible()) {
             newVal = objectToString(newValue);
         }
 
