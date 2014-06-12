@@ -342,8 +342,7 @@ public class MainController {
     private void diff(String first, String second) throws IOException {
 
         System.out.println("Diff " + first + " " + second); // log
-        Differ differ = new Differ();
-        DiffInfo info = differ.diffXMLs("./saved_analyses", first, second);
+        DiffInfo info = Differ.diffXMLs("./saved_analyses", first, second);
         loadFile(info);
         menuDelete.setDisable(true);
     }
