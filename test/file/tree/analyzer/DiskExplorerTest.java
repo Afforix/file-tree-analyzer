@@ -49,7 +49,7 @@ public class DiskExplorerTest {
 
         assertEquals(rootDir.isDirectory(), result.isDirectory()); 
         assertEquals(rootDir.listFiles().length, result.getChildren().size());
-        assertEquals(3, result.getNumberOfFiles());
+        assertEquals(4, result.getNumberOfFiles());
         assertEquals(2, result.getNumberOfDirectories());
         assertEquals(rootDir.getName(), result.getName());
 

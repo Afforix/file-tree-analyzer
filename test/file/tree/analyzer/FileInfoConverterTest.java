@@ -52,7 +52,7 @@ public class FileInfoConverterTest {
             assertEquals("directory", resultRoot.getTagName()); //root is directory
             assertTrue(resultRoot.hasAttribute("path")); //root has attribute path
             assertEquals(3, resultRoot.getChildNodes().getLength());
-            assertEquals("3", resultRoot.getAttribute("numberOfFiles"));
+            assertEquals("4", resultRoot.getAttribute("numberOfFiles"));
             assertEquals("2", resultRoot.getAttribute("numberOfDirectories"));
             assertEquals(root.getName(), resultRoot.getAttribute("name"));
 
@@ -92,8 +92,8 @@ public class FileInfoConverterTest {
             
             assertEquals("directory", secondDirResult.getTagName());
             assertFalse(secondDirResult.hasAttribute("path")); 
-            assertEquals(0, secondDirResult.getChildNodes().getLength());
-            assertEquals("0", secondDirResult.getAttribute("numberOfFiles"));
+            assertEquals(1, secondDirResult.getChildNodes().getLength());
+            assertEquals("1", secondDirResult.getAttribute("numberOfFiles"));
             assertEquals("0", secondDirResult.getAttribute("numberOfDirectories"));
             assertEquals(secondDir.getName(), secondDirResult.getAttribute("name"));
             assertFalse(secondDirResult.hasAttribute("size")); 
