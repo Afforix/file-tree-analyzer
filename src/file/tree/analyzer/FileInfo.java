@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package file.tree.analyzer;
 
 import file.tree.analyzer.gui.RowInfo;
@@ -16,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.util.Pair;
 
 /**
  * Entity class for storing information about file or directory. In case of
@@ -41,13 +35,8 @@ public class FileInfo implements Comparable<FileInfo> {
 
     /**
      * Constructor designed to use during hard disk analysis.
-     * MUST BE REWRITTEN!
      * 
      * @throws NullPointerException if parameter file or attributes is null
-     * @throws IllegalStateException if directory features are used on an object
-     * representing file. Client must always check if the object is directory
-     * using {@code isDirectory()} method when using methods for directories:
-     * {@code getChildren()} and {@code addChild()}.
      * @param file file, which attributes are going to be stored
      * @param attributes attributes of the files
      */
@@ -72,9 +61,6 @@ public class FileInfo implements Comparable<FileInfo> {
         lastModifiedTime = new Date(attributes.lastModifiedTime().toMillis());
         
         accessibility = true;
-//        numberOfFiles = 0;
-//        numberOfDirectories = 0;
-//        exception = null;
     }
 
     /**
@@ -110,10 +96,20 @@ public class FileInfo implements Comparable<FileInfo> {
 
     }
 
+    /**
+     * Standard non-parametric constructor.
+     */
     public FileInfo() {
     }
 
-    FileInfo(Path file) {
+    /**
+     * Constructor for cases when we only know path to the file.
+     * Tries to set name, path, and directory attributes, accesibility is set 
+     * to false (this means that the file/folder is not readable).
+     * 
+     * @param file path to the file/directory
+     */
+    public FileInfo(Path file) {
         if (file == null) {
             throw new NullPointerException("file");
         }
@@ -122,6 +118,11 @@ public class FileInfo implements Comparable<FileInfo> {
         accessibility = false;
     }
 
+    /**
+     * Sets name and path.
+     * 
+     * @param filePath path to resolve
+     */
     private void resolvePath(Path filePath) {
         //needs special treatment with root, because root does not have  
         //a regular file name, so it's necessary to obtain root name
@@ -149,9 +150,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @param child file to be added to the children list
      */
     public void addChildAndCount(FileInfo child) {
-//        if (!this.isAccessible()) {
-//            throw new IllegalStateException("file is not accessible: " + path);
-//        }
         if (child == null) {
             throw new NullPointerException("file");
         }
@@ -167,6 +165,11 @@ public class FileInfo implements Comparable<FileInfo> {
         }
     }
 
+    /**
+     * Adds child without calculating number of files and subdirectories.
+     * 
+     * @param child file to be added to the children list
+     */
     public void addChild(FileInfo child) {
         if (directory) {
             if (children == null) {
@@ -180,13 +183,10 @@ public class FileInfo implements Comparable<FileInfo> {
 
     @Override
     public String toString() {
-        return name;// + " files: " + numberOfFiles + " directories: " + numberOfDirectories;
-        // return "FileInfo{" + "name=" + name + ", directory=" + directory + ", symbolicLink=" + symbolicLink + ", size=" + size + ", creationTime=" + creationTime + ", lastAccessTime=" + lastAccessTime + ", lastModifiedTime=" + lastModifiedTime + '}';
+        return name;
     }
 
     public File toFile() {
-//        if (!this.isAccessible()) throw new IllegalStateException("file is not accessible: " + path);
-
         return new File(path);
     }
 
@@ -211,8 +211,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @return if the instance is file or directory
      */
     public boolean isDirectory() {
-//        if (!this.isAccessible()) throw new IllegalStateException("file is not accessible: " + path);
-
         return directory;
     }
 
@@ -221,8 +219,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @return if the instance is symbolic link
      */
     public boolean isSymbolicLink() {
-//        if (!this.isAccessible()) throw new IllegalStateException("file is not accessible: " + path);
-
         return symbolicLink;
     }
 
@@ -231,8 +227,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @return return size of the file
      */
     public Long getSize() {
-//        if (!this.isAccessible()) throw new IllegalStateException("file is not accessible: " + path);
-
         return size;
     }
 
@@ -241,8 +235,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @return creation time
      */
     public Date getCreationTime() {
-//        if (!this.isAccessible()) throw new IllegalStateException("file is not accessible: " + path);
-
         return creationTime;
     }
 
@@ -251,8 +243,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @return last access time
      */
     public Date getLastAccessTime() {
-//        if (!this.isAccessible()) throw new IllegalStateException("file is not accessible: " + path);
-
         return lastAccessTime;
     }
 
@@ -261,8 +251,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @return last modification time
      */
     public Date getLastModifiedTime() {
-//        if (!this.isAccessible()) throw new IllegalStateException("file is not accessible: " + path);
-
         return lastModifiedTime;
     }
 
@@ -271,8 +259,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @return number of files in the directory
      */
     public int getNumberOfFiles() {
-//        if (!this.isAccessible()) throw new IllegalStateException("file is not accessible: " + path);
-
         return numberOfFiles;
     }
 
@@ -281,8 +267,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @return number of subdirectories in the folder
      */
     public int getNumberOfDirectories() {
-//        if (!this.isAccessible()) throw new IllegalStateException("file is not accessible: " + path);
-
         return numberOfDirectories;
     }
 
@@ -291,10 +275,6 @@ public class FileInfo implements Comparable<FileInfo> {
      * @return list of children of the directory
      */
     public List<FileInfo> getChildren() {
-//        if (!this.isAccessible()) {
-//            throw new IllegalStateException("file is not accessible: " + path);
-//        }
-
         if (directory) {
             if (children == null) {
                 return Collections.emptyList();
@@ -384,11 +364,6 @@ public class FileInfo implements Comparable<FileInfo> {
      */
     @Override
     public int compareTo(FileInfo o) {
-//        int accessCompare = -Boolean.compare(this.isAccessible(), o.isAccessible());
-//        if (accessCompare != 0) {
-//            return accessCompare;
-//        }
-
         int dirCompare = -Boolean.compare(directory, o.directory);
         if (dirCompare != 0) {
             return dirCompare;
@@ -417,6 +392,10 @@ public class FileInfo implements Comparable<FileInfo> {
         }
     }
 
+    /**
+     * 
+     * @return information about file in a form of rows for table
+     */
     public ObservableList<RowInfo> getTableRows() {
 
         ArrayList<RowInfo> list = new ArrayList<>();
@@ -454,46 +433,90 @@ public class FileInfo implements Comparable<FileInfo> {
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
+    /**
+     *
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     *
+     * @param directory if the record is a directory
+     */
     public void setDirectory(boolean directory) {
         this.directory = directory;
     }
 
+    /**
+     *
+     * @param symbolicLink if the record is symbolic link
+     */
     public void setSymbolicLink(boolean symbolicLink) {
         this.symbolicLink = symbolicLink;
     }
 
+    /**
+     *
+     * @param accessibility if the record is accesible (readable) file/folder
+     */
     public void setAccessibility(boolean accessibility) {
         this.accessibility = accessibility;
     }
 
+    /**
+     *
+     * @param size
+     */
     public void setSize(Long size) {
         this.size = size;
     }
 
+    /**
+     *
+     * @param creationTime
+     */
     public void setCreationTime(Date creationTime) {
         this.creationTime = creationTime;
     }
 
+    /**
+     *
+     * @param lastAccessTime
+     */
     public void setLastAccessTime(Date lastAccessTime) {
         this.lastAccessTime = lastAccessTime;
     }
 
+    /**
+     *
+     * @param lastModifiedTime
+     */
     public void setLastModifiedTime(Date lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
     }
 
+    /**
+     *
+     * @param path
+     */
     public void setPath(String path) {
         this.path = path;
     }
 
+    /**
+     *
+     * @param numberOfFiles
+     */
     public void setNumberOfFiles(int numberOfFiles) {
         this.numberOfFiles = numberOfFiles;
     }
 
+    /**
+     *
+     * @param numberOfDirectories
+     */
     public void setNumberOfDirectories(int numberOfDirectories) {
         this.numberOfDirectories = numberOfDirectories;
     }
