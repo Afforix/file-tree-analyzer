@@ -15,4 +15,4 @@ Tool for directory hierarchy analysis written in Java. Final version will be abl
 Project chat available at https://gitter.im/Afforix/file-tree-analyzer
 
 # Documentation
-Javadoc available [here](documentation/javadoc/index.html)
+Javadoc available [here](http://afforix.github.io/file-tree-analyzer/javadoc/index.html)
