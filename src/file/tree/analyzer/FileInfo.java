@@ -1,6 +1,7 @@
 package file.tree.analyzer;
 
 import file.tree.analyzer.gui.RowInfo;
+import file.tree.analyzer.utils.Utils;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -404,7 +405,7 @@ public class FileInfo implements Comparable<FileInfo> {
         if (isAccessible()) {
 
             if (!directory) {
-                list.add(new RowInfo("Size", humanReadableByteCount(size, true) + " (" + size + " bytes)"));
+                list.add(new RowInfo("Size", Utils.humanReadableByteCount(size, true) + " (" + size + " bytes)"));
             } else {
                 list.add(new RowInfo("Number of Files", String.valueOf(numberOfFiles)));
                 list.add(new RowInfo("Number of Directories", String.valueOf(numberOfDirectories)));
@@ -423,15 +424,6 @@ public class FileInfo implements Comparable<FileInfo> {
 
     }
 
-    protected static String humanReadableByteCount(long bytes, boolean si) {
-        int unit = si ? 1000 : 1024;
-        if (bytes < unit) {
-            return bytes + " B";
-        }
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
-        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
-    }
 
     /**
      *

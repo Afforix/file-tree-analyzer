@@ -1,0 +1,48 @@
+Jun 13, 2014 4:14:55 PM file.tree.analyzer.FileTreeAnalyzer start
+INFO: message 1
+Jun 13, 2014 4:14:56 PM file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Jun 13, 2014 4:14:56 PM sun.awt.X11.XToolkit setBackingStoreType
+CONFIG: The system property sun.awt.backingStore is not set, by default backingStore=NotUseful
+Jun 13, 2014 4:14:57 PM file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Jun 13, 2014 4:20:35 PM file.tree.analyzer.FileTreeAnalyzer start
+INFO: message 1
+Jun 13, 2014 4:20:36 PM file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Jun 13, 2014 4:20:36 PM sun.awt.X11.XToolkit setBackingStoreType
+CONFIG: The system property sun.awt.backingStore is not set, by default backingStore=NotUseful
+Jun 13, 2014 4:20:37 PM file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Jun 13, 2014 4:26:40 PM file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Jun 13, 2014 4:26:40 PM file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Jun 13, 2014 4:27:11 PM file.tree.analyzer.XMLFileManager createXMLFile
+INFO: File 2014-06-13T162711.xml created.
+Jun 13, 2014 4:27:30 PM file.tree.analyzer.XMLFileManager deleteXMLFile
+INFO: File 2014-06-13T162711.xml deleted.
+Jun 13, 2014 4:36:37 PM file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Jun 13, 2014 4:36:38 PM file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-10T185611.xml 
+Jun 13, 2014 4:36:38 PM file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T151405.xml 
+Jun 13, 2014 4:36:38 PM file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-10T192940.xml 
+Jun 13, 2014 4:36:38 PM file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Jun 13, 2014 4:36:38 PM file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-10T185611.xml 
+Jun 13, 2014 4:36:38 PM file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T151405.xml 
+Jun 13, 2014 4:36:38 PM file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-10T192940.xml 
+Jun 13, 2014 4:37:27 PM file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-10T185611.xml 
+Jun 13, 2014 4:37:30 PM file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T151405.xml 
+Jun 13, 2014 4:37:30 PM file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-10T185611.xml 
+Jun 13, 2014 4:37:32 PM file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-13T151405.xml and 2014-06-10T185611.xml

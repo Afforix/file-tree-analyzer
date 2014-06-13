@@ -6,6 +6,7 @@
 package file.tree.analyzer;
 
 import file.tree.analyzer.gui.RowInfo;
+import file.tree.analyzer.utils.Utils;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ public class DiffInfo extends FileInfo {
             return "";
         }
         if (obj instanceof Long) {
-            return humanReadableByteCount((Long) obj, true) + " (" + (Long) obj + " bytes)";
+            return Utils.humanReadableByteCount((Long) obj, true) + " (" + (Long) obj + " bytes)";
         }
         if (obj instanceof Integer) {
             return String.valueOf((int) obj);

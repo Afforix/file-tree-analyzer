@@ -33,6 +33,7 @@ import org.w3c.dom.Node;
  */
 public class Differ {
 
+    private final static Logger logger = Logger.getLogger(FileTreeAnalyzer.class.getName());
 //    private Document controlDoc; //newer doc, this doc will stay unchanged
 //    private Document olderDoc; //current Disc state, this doc will stay unchanged
 //    private Document testDoc; //testDoc is copy of olderDoc, will be modified and used for FileInfo transformation
@@ -99,6 +100,7 @@ public class Differ {
      }
      }
      */
+
     /**
      * Finds differences between two two XML docs, stores differences in third
      * DOM
@@ -117,19 +119,20 @@ public class Differ {
 
         controlDoc = fileManager.findXMLFile(controlName, true);
         newDoc = fileManager.findXMLFile(testName, true);
-        
+
         if (controlDoc == null || newDoc == null) {
             throw new NullPointerException("failed to load XML file");
         }
-
-        return diffDocuments(controlDoc, newDoc);
+        DiffInfo ret = diffDocuments(controlDoc, newDoc);
+        logger.log(Level.INFO, "diffed " + controlName + " and "+testName);
+        return ret;
     }
 
     /**
-     * Compares two documents representing file trees with the same root and 
-     * returns data structure with comparison information.
-     * Both given documents will remain unchanged.
-     * 
+     * Compares two documents representing file trees with the same root and
+     * returns data structure with comparison information. Both given documents
+     * will remain unchanged.
+     *
      * @param controlDoc document representing older file tree
      * @param newDoc document representing newer file tree
      * @return root of file tree with diff information
@@ -141,9 +144,9 @@ public class Differ {
             XMLUnit.setIgnoreAttributeOrder(true);
             //XMLUnit.setIgnoreWhitespace(true); //causes bug - why?
         } catch (ConfigurationException ex) {
-            Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, "XMLUnit configuration failed.", ex);
+           logger.log(Level.SEVERE, "XMLUnit configuration failed.", ex);
         }
-        
+
         Document testDoc = (Document) newDoc.cloneNode(true);
 
         Diff diff = new Diff(controlDoc, testDoc);
@@ -165,40 +168,37 @@ public class Differ {
         boolean attributeChange = false;
         boolean createdOrDeleted = false;
         boolean attributeAdded = false;
-        
+
         XPath testXPath = XPathFactory.newInstance().newXPath();
         XPath controlXPath = XPathFactory.newInstance().newXPath();
-        Element elementToChange = null; 
+        Element elementToChange = null;
         String xpathToElement = null;
         String attributeToChange = null;
 
         String testRootPath = testDoc.getDocumentElement().getAttribute("path");
         String controlRootPath = controlDoc.getDocumentElement().getAttribute("path");
         System.out.println("testRootPath: " + testRootPath + " controlRootPath: " + controlRootPath);
-        
-        
+
         while (listIterator.hasNext()) {
             difference = (Difference) listIterator.next();
             description = difference.getDescription();
             String whatChanged = description.substring(0, description.indexOf(" "));
             controlNodeDetail = difference.getControlNodeDetail();
             testNodeDetail = difference.getTestNodeDetail();
-            
+
             //TODO: XPATHNODETRACKER
             attributeChange = whatChanged.equals("attribute");
             String testValue = testNodeDetail.getValue();
             String controlValue = controlNodeDetail.getValue();
-            
-           //System.out.println(testValue + " " + controlValue);
-           createdOrDeleted = (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
+
+            //System.out.println(testValue + " " + controlValue);
+            createdOrDeleted = (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
                     && (((testValue.equals("file") || testValue.equals("directory")) && controlValue.equals("null"))
                     || ((controlValue.equals("file") || controlValue.equals("directory")) && testValue.equals("null"))));
-            
+
             //createdOrDeleted = (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
             //        && (testValue.equals("file") || testValue.equals("directory") || testValue.equals("null"))
             //        && (controlValue.equals("file") || controlValue.equals("directory") || controlValue.equals("null")));
-         
-            
             attributeAdded = difference.equals(DifferenceConstants.ATTR_NAME_NOT_FOUND);
 
             if (!attributeAdded) {
@@ -207,7 +207,7 @@ public class Differ {
                         xpathToElement = testNodeDetail.getXpathLocation();
                         attributeToChange = xpathToElement.substring(xpathToElement.indexOf('@') + 1); // attr is after @ in xpath
                         String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
-                        
+
                         Node node = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
 
                         elementToChange = (Element) node;
@@ -228,31 +228,28 @@ public class Differ {
                         } else if (testValue.equals("null")) { //testNode is null so controlNode was created - copy from controlDoc to testDoc
                             xpathToElement = controlNodeDetail.getXpathLocation();
                             String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
-                            
+
                             Node controlNode = controlNodeDetail.getNode();
                             Node importNode = testDoc.importNode(controlNode, false); //importedbut not placed yet
                             Element importElement = (Element) importNode;
                             importElement.setAttribute("state", "created");
-                            
+
                             Node testNode = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
                             testNode.appendChild(importNode);
-                            
-                            //Node appendedNode = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
 
+                            //Node appendedNode = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
                             //elementToChange = (Element) appendedNode;
                             //elementToChange.setAttribute("state", "created");
                         }
-                    }                   
+                    }
                 } catch (XPathExpressionException ex) {
-                    Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, null, ex); //some monster
+                   logger.log(Level.SEVERE, null, ex); //some monster
                 }
             }
         }
-        
-        
 
         XMLFileManager testingFileManager = new XMLFileManager("./saved_analyses"); //FOR TESTING ONLY!!!
-        testingFileManager.createXMLFile(testDoc); // Write to XML - not necessary
+//        testingFileManager.createXMLFile(testDoc); // Write to XML - not necessary
         return FileInfoConverter.domToDiffInfo(testDoc);
     }
 }

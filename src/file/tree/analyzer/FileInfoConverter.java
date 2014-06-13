@@ -28,6 +28,8 @@ import org.w3c.dom.Node;
  */
 public class FileInfoConverter {
 
+    private final static Logger logger = Logger.getLogger(FileTreeAnalyzer.class.getName());
+    
     /**
      * Takes object representing root of the directory tree and converts it to
      * XML DOM.
@@ -55,7 +57,7 @@ public class FileInfoConverter {
                     "xsi:noNamespaceSchemaLocation", "../analysesXmlSchema.xsd");
 
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         return doc;
@@ -164,7 +166,7 @@ public class FileInfoConverter {
             item.setLastAccessTime(dateFormat.parse(element.getAttribute("lastAccessTime")));
             item.setLastModifiedTime(dateFormat.parse(element.getAttribute("lastModifiedTime")));
         } catch (ParseException ex) {
-            Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
+           logger.log(Level.SEVERE, null, ex);
         }
 
         return item;
@@ -189,7 +191,7 @@ public class FileInfoConverter {
 
                 date = dateFormat.parse(newAttribute);
             } catch (ParseException ex) {
-                Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
+               logger.log(Level.SEVERE, null, ex);
             }
         } else { //use value from already existing attribute
             date = oldAttribute;
@@ -324,7 +326,7 @@ public class FileInfoConverter {
                 lastAccessTime = dateFormat.parse(parent.getAttribute("lastAccessTime"));
                 lastModifiedTime = dateFormat.parse(parent.getAttribute("lastModifiedTime"));
             } catch (ParseException ex) {
-                Logger.getLogger(FileInfoConverter.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 
