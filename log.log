@@ -72,3 +72,37 @@ INFO: open 2014-06-13T165658.xml
 INFO: open 2014-06-13T165705.xml 
 Čer 13, 2014 6:03:08 ODP. file.tree.analyzer.XMLFileManager findXMLFile
 INFO: open 2014-06-13T165658.xml 
+Čer 13, 2014 7:34:06 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 0 analyses found.
+Čer 13, 2014 7:34:06 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 0 analyses found.
+Čer 13, 2014 7:34:55 ODP. file.tree.analyzer.XMLFileManager createXMLFile
+INFO: File 2014-06-13T193455.xml created.
+Čer 13, 2014 7:34:55 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T193455.xml 
+Čer 13, 2014 7:35:15 ODP. file.tree.analyzer.XMLFileManager createXMLFile
+INFO: File 2014-06-13T193515.xml created.
+Čer 13, 2014 7:35:15 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T193515.xml 
+Čer 13, 2014 7:35:26 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T193455.xml 
+Čer 13, 2014 7:35:26 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T193515.xml 
+Čer 13, 2014 7:35:26 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-13T193455.xml and 2014-06-13T193515.xml
+Čer 13, 2014 7:36:47 ODP. file.tree.analyzer.XMLFileManager createXMLFile
+INFO: File 2014-06-13T193647.xml created.
+Čer 13, 2014 7:36:47 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T193647.xml 
+Čer 13, 2014 7:37:15 ODP. file.tree.analyzer.XMLFileManager createXMLFile
+INFO: File 2014-06-13T193715.xml created.
+Čer 13, 2014 7:37:15 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T193715.xml 
+Čer 13, 2014 7:37:19 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T193647.xml 
+Čer 13, 2014 7:37:22 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T193715.xml 
+Čer 13, 2014 7:37:22 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-13T193647.xml 
+Čer 13, 2014 7:37:23 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-13T193715.xml and 2014-06-13T193647.xml
