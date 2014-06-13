@@ -165,73 +165,94 @@ public class Differ {
         boolean attributeChange = false;
         boolean createdOrDeleted = false;
         boolean attributeAdded = false;
-
+        
         XPath testXPath = XPathFactory.newInstance().newXPath();
         XPath controlXPath = XPathFactory.newInstance().newXPath();
-        Element elementToChange;
+        Element elementToChange = null; 
         String xpathToElement = null;
         String attributeToChange = null;
 
+        String testRootPath = testDoc.getDocumentElement().getAttribute("path");
+        String controlRootPath = controlDoc.getDocumentElement().getAttribute("path");
+        System.out.println("testRootPath: " + testRootPath + " controlRootPath: " + controlRootPath);
+        
+        
         while (listIterator.hasNext()) {
             difference = (Difference) listIterator.next();
             description = difference.getDescription();
             String whatChanged = description.substring(0, description.indexOf(" "));
             controlNodeDetail = difference.getControlNodeDetail();
             testNodeDetail = difference.getTestNodeDetail();
-
+            
             //TODO: XPATHNODETRACKER
             attributeChange = whatChanged.equals("attribute");
-            String testString = difference.getTestNodeDetail().getValue();
-            String controlString = difference.getControlNodeDetail().getValue();
-            createdOrDeleted = (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
-                    && (testString.equals("file") || testString.equals("directory") || testString.equals("null"))
-                    && (controlString.equals("file") || controlString.equals("directory") || controlString.equals("null")));
+            String testValue = testNodeDetail.getValue();
+            String controlValue = controlNodeDetail.getValue();
+            
+           //System.out.println(testValue + " " + controlValue);
+           createdOrDeleted = (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
+                    && (((testValue.equals("file") || testValue.equals("directory")) && controlValue.equals("null"))
+                    || ((controlValue.equals("file") || controlValue.equals("directory")) && testValue.equals("null"))));
+            
+            //createdOrDeleted = (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
+            //        && (testValue.equals("file") || testValue.equals("directory") || testValue.equals("null"))
+            //        && (controlValue.equals("file") || controlValue.equals("directory") || controlValue.equals("null")));
+         
+            
             attributeAdded = difference.equals(DifferenceConstants.ATTR_NAME_NOT_FOUND);
 
-            if ((attributeChange || createdOrDeleted) && !attributeAdded) {
+            if (!attributeAdded) {
                 try {
                     if (attributeChange) {
-                        String elementValue = controlNodeDetail.getValue();
                         xpathToElement = testNodeDetail.getXpathLocation();
                         attributeToChange = xpathToElement.substring(xpathToElement.indexOf('@') + 1); // attr is after @ in xpath
                         String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
+                        
+                        Node node = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
 
-                        Node testNode = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
-
-                        elementToChange = (Element) testNode;
+                        elementToChange = (Element) node;
                         elementToChange.setAttribute("state", "modified");
-                        elementToChange.setAttribute("new" + attributeToChange.substring(0, 1).toUpperCase() + attributeToChange.substring(1), elementValue);
+                        elementToChange.setAttribute("new" + attributeToChange.substring(0, 1).toUpperCase() + attributeToChange.substring(1), controlValue);
 
                     } else if (createdOrDeleted) {
 
-                        if (controlNodeDetail.getValue().equals("null")) { //testNode was deleted
+                        if (controlValue.equals("null")) { //testNode was deleted
                             xpathToElement = testNodeDetail.getXpathLocation();
-                            Node testNode = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
-                            elementToChange = (Element) testNode;
+                            String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
+                            //System.out.println("path:" + testNodeDetail.getValue());
+
+                            Node node = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
+                            elementToChange = (Element) node;
                             elementToChange.setAttribute("state", "deleted");
 
-                        } else if (difference.getTestNodeDetail().getValue().equals("null")) { //testNode is null so controlNode was created - copy from controlDoc to testDoc
+                        } else if (testValue.equals("null")) { //testNode is null so controlNode was created - copy from controlDoc to testDoc
                             xpathToElement = controlNodeDetail.getXpathLocation();
                             String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
-
+                            
                             Node controlNode = controlNodeDetail.getNode();
-                            Node copyNode = testDoc.importNode(controlNode, false); //importedbut not placed yet
+                            Node importNode = testDoc.importNode(controlNode, false); //importedbut not placed yet
+                            Element importElement = (Element) importNode;
+                            importElement.setAttribute("state", "created");
+                            
                             Node testNode = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
-                            testNode.appendChild(copyNode); //testNode is parent
-                            Node copiedNode = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
+                            testNode.appendChild(importNode);
+                            
+                            //Node appendedNode = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
 
-                            elementToChange = (Element) copiedNode;
-                            elementToChange.setAttribute("state", "created");
+                            //elementToChange = (Element) appendedNode;
+                            //elementToChange.setAttribute("state", "created");
                         }
-                    }
+                    }                   
                 } catch (XPathExpressionException ex) {
                     Logger.getLogger(Differ.class.getName()).log(Level.SEVERE, null, ex); //some monster
                 }
             }
         }
+        
+        
 
-//        XMLFileManager testingFileManager = new XMLFileManager("./saved_analyses"); //FOR TESTING ONLY!!!
-//        testingFileManager.createXMLFile(testDoc); // Write to XML - not necessary
+        XMLFileManager testingFileManager = new XMLFileManager("./saved_analyses"); //FOR TESTING ONLY!!!
+        testingFileManager.createXMLFile(testDoc); // Write to XML - not necessary
         return FileInfoConverter.domToDiffInfo(testDoc);
     }
 }

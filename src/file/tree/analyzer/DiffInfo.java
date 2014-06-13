@@ -32,9 +32,7 @@ public class DiffInfo extends FileInfo {
     protected Date newLastAccessTime;
     protected Date newLastModifiedTime;
 
-    /**
-     * @deprecated  
-     */
+    
     public DiffInfo(String name, String path, boolean directory, boolean symbolicLink, boolean accessibility, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
             ItemState state, List<DiffInfo> diffChildren, boolean newSymbolicLink, boolean newAccessibility, int newNumberOfFiles, int newNumberOfDirectories, Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
         super(name, path, directory, symbolicLink, accessibility, size, creationTime, lastAccessTime, lastModifiedTime, children, numberOfFiles, numberofDirectories);
@@ -51,7 +49,7 @@ public class DiffInfo extends FileInfo {
     }
     
     
-    public DiffInfo() {
+    public DiffInfo(){
         super();
     }
     
@@ -62,22 +60,28 @@ public class DiffInfo extends FileInfo {
     @Override
     public ObservableList<RowInfo> getTableRows() {
 
-        ArrayList<RowInfo> list = new ArrayList<>();     
+        ArrayList<RowInfo> list = new ArrayList<>();
 
-        list.add(new RowInfo("Name", name, "(diffed)" + name));   
-    
+        list.add(new RowInfo("Name", name, "(diffed)" + name));
+        /*if(state == ItemState.UNMODIFIED || state == ItemState.DELETED) {
+            addToList(list, "State", state.toString(), null);
+        } else {
+            addToList(list, "State", null, state.toString());
+        }*/
+        addToList(list, "State", state.toString(), null);
+
         if (!directory) {
             addToList(list, "Size", size, getNewSize());
-             } else {
+        } else {
             addToList(list, "Number of Files", numberOfFiles, getNewNumberOfFiles());
-            addToList(list, "Number of Directories", numberOfDirectories, getNewNumberOfDirectories());            
+            addToList(list, "Number of Directories", numberOfDirectories, getNewNumberOfDirectories());
         }
-         addToList(list, "Creation Time", creationTime, getNewCreationTime());  
-         addToList(list, "Last Access Time", lastAccessTime, getNewLastAccessTime());  
-          addToList(list, "Symbolic Link", symbolicLink, newSymbolicLink); 
-          addToList(list, "Path", path, null); 
-          list.add(new RowInfo("Accessible", Boolean.toString(isAccessible()), Boolean.toString(isNewlyAccessible())));
-        
+        addToList(list, "Creation Time", creationTime, getNewCreationTime());
+        addToList(list, "Last Access Time", lastAccessTime, getNewLastAccessTime());
+        addToList(list, "Symbolic Link", symbolicLink, newSymbolicLink);
+        addToList(list, "Path", path, null);
+        list.add(new RowInfo("Accessible", Boolean.toString(isAccessible()), Boolean.toString(isNewlyAccessible())));
+
         return FXCollections.observableArrayList(list);
     }
 
