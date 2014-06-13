@@ -5,6 +5,10 @@
 package file.tree.analyzer;
 
 import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -18,15 +22,18 @@ import javafx.stage.WindowEvent;
  *
  * @author ansy
  */
-public class FileTreeAnalyzer extends Application{
+public class FileTreeAnalyzer extends Application {
 
-      
+    private final static Logger logger = Logger.getLogger(FileTreeAnalyzer.class.getName());
+    private static FileHandler fh = null;
+
     @Override
-    public void start(Stage primaryStage) throws IOException {     
-   //    setUserAgentStylesheet(STYLESHEET_MODENA); //STYLESHEET_CASPIAN
-        Parent root = FXMLLoader.load(getClass().getResource("gui/MainWindow.fxml"));      
-        Scene scene = new Scene(root);  
-       
+    public void start(Stage primaryStage) throws IOException {
+        initLogger();        
+        try{
+        Parent root = FXMLLoader.load(getClass().getResource("gui/MainWindow.fxml"));
+        Scene scene = new Scene(root);
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("File Tree Analyzer");
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -35,10 +42,14 @@ public class FileTreeAnalyzer extends Application{
                 Platform.exit();
                 System.exit(0);
             }
-        });        
-        
-        primaryStage.show();        
-        
+        });
+
+        primaryStage.show();
+        }catch(Exception ex){
+            logger.log(Level.SEVERE,ex.getMessage());
+            throw ex;
+        }
+
         //FOR TESTING ONLY
 //        System.out.println("Contents of the parent directory:");
 //        FileInfo directory = null;
@@ -52,11 +63,23 @@ public class FileTreeAnalyzer extends Application{
 //        }                 
         //END TESTING
     }
-    
+
+    private static void initLogger() {
+        try {
+            fh = new FileHandler("log.log",10240,1, true);
+        } catch (SecurityException | IOException e) {
+            e.printStackTrace();
+        }
+       // Logger l = Logger.getLogger("");
+        
+        fh.setFormatter(new SimpleFormatter());
+        logger.addHandler(fh);        
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-         launch(args);     
+        launch(args);
     }
 }

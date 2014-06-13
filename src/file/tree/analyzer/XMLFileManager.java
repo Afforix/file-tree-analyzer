@@ -32,7 +32,8 @@ import org.xml.sax.SAXException;
  */
 public class XMLFileManager {
 
-    private Path analysesPath;
+    private final static Logger logger = Logger.getLogger(FileTreeAnalyzer.class.getName());
+    private Path analysesPath;    
 
     public XMLFileManager(String path) {
 
@@ -48,7 +49,7 @@ public class XMLFileManager {
         try {
             analysesPath = analysesPath.toRealPath();
         } catch (IOException ex) {
-            Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -73,10 +74,10 @@ public class XMLFileManager {
             t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
             t.transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(file));
-            Logger.getLogger(XMLFileManager.class.getName()).log(Level.INFO, "File {0} created.", file.toPath().getFileName().toString());
+           logger.log(Level.INFO, "File {0} created.", file.toPath().getFileName().toString());           
             return file.toPath().getFileName().toString();
         } catch (TransformerException ex) {
-            Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "Cannot save file.", ex);
+            logger.log(Level.SEVERE, "Cannot save file.", ex);
             return null;
         }
     }
@@ -125,16 +126,16 @@ public class XMLFileManager {
         }
 
         if (xmlFile == null) {
-            Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "File not found!");
+           logger.log(Level.SEVERE, "File not found!");
             return;
         }
 
         try {
             String name = xmlFile.toPath().getFileName().toString();
             xmlFile.delete();
-            Logger.getLogger(XMLFileManager.class.getName()).log(Level.INFO, "File {0} deleted.", name);
+           logger.log(Level.INFO, "File {0} deleted.", name);
         } catch (Exception ex) {
-            Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "Cannot delete file.", ex);
+          logger.log(Level.SEVERE, "Cannot delete file.", ex);
         }
 
     }
@@ -166,7 +167,7 @@ public class XMLFileManager {
             }
         }
 
-        Logger.getLogger(XMLFileManager.class.getName()).log(Level.INFO, "{0} analyses found.", xmlFiles.length);
+       logger.log(Level.INFO, "{0} analyses found.", xmlFiles.length);
 
         return xmlFilesNames;
     }
@@ -229,13 +230,13 @@ public class XMLFileManager {
             if(xmlFile!=null) {
                 xmlDoc = dBuilder.parse(xmlFile);
             } else {
-                Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, "File does not exist.");
+               logger.log(Level.SEVERE, "File does not exist.");
             }
             
         } catch (IOException | ParserConfigurationException | SAXException ex) {
-            Logger.getLogger(XMLFileManager.class.getName()).log(Level.SEVERE, null, ex);
+          logger.log(Level.SEVERE, null, ex);
         }
-
+            logger.log(Level.INFO, "open {0} ", fileName);
             return xmlDoc;
         }
     }

@@ -4,6 +4,7 @@ import file.tree.analyzer.DiffInfo;
 import file.tree.analyzer.Differ;
 import file.tree.analyzer.FileInfo;
 import file.tree.analyzer.FileInfoConverter;
+import file.tree.analyzer.FileTreeAnalyzer;
 import file.tree.analyzer.XMLFileManager;
 import file.tree.analyzer.utils.Utils;
 import java.io.File;
@@ -82,6 +83,7 @@ public class MainController {
     private CheckBox fullDiffCheckBox;
 
     // </editor-fold>
+    private final static Logger logger = Logger.getLogger(FileTreeAnalyzer.class.getName());
     private final XMLFileManager xmlFileManager = new XMLFileManager(("./saved_analyses"));
     private boolean treeAlreadyLoaded = false;
 
@@ -95,31 +97,29 @@ public class MainController {
                 new PropertyValueFactory<>("newValue"));
         attribute.setCellFactory(TextFieldTableCell.forTableColumn());
         tableView.setPlaceholder(new Label("Properties"));
-     
-        changedAttribute.setCellFactory(new Callback<TableColumn<RowInfo, String>,
-                        TableCell<RowInfo, String>>() { //(TextFieldTableCell.forTableColumn());
-        @Override
-        public TableCell call(TableColumn param) {
-            return new TableCell<RowInfo, String>(){
 
-                @Override
-                public void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    
-                    if (!isEmpty()) {
-                        RowInfo info = (RowInfo) getTableRow().getItem();
-                        this.setTextFill(info.getColor());                                          
-                        setText(item);
-                    }else{
-                        setText(null);
+        changedAttribute.setCellFactory(new Callback<TableColumn<RowInfo, String>, TableCell<RowInfo, String>>() { //(TextFieldTableCell.forTableColumn());
+            @Override
+            public TableCell call(TableColumn param) {
+                return new TableCell<RowInfo, String>() {
+
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (!isEmpty()) {
+                            RowInfo info = (RowInfo) getTableRow().getItem();
+                            this.setTextFill(info.getColor());
+                            setText(item);
+                        } else {
+                            setText(null);
+                        }
                     }
-                }
-                
-                
-            };
+
+                };
+            }
         }
-    }
-);
+        );
 
         tableView.getSelectionModel().setCellSelectionEnabled(true);
 
@@ -227,17 +227,6 @@ public class MainController {
         clear();
     }
 
-    /* @FXML
-     void handleMenuDiffToAction(ActionEvent event) {
-     FileChooser fileChooser = new FileChooser();
-     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML", "*.xml"));
-
-     File selectedFile = fileChooser.showOpenDialog(root.getScene().getWindow());
-
-     if (selectedFile != null) {
-     System.out.println("Diff " + selectedFile.getAbsolutePath());
-     }
-     }*/
     @FXML
     void handleMenuDiffToCurrentAction(ActionEvent event) throws IOException {
 
@@ -257,13 +246,14 @@ public class MainController {
             Stage stage = InitializeWindow("AboutWindow.fxml", "About");
             stage.show();
         } catch (IOException ex) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+           logger.log(Level.SEVERE, null, ex);
         }
     }
 
     @FXML
     void handleQuitAction(ActionEvent event) {
         Platform.exit();
+        logger.log(Level.INFO,"exit");
         System.exit(0);
     }
     // </editor-fold>
@@ -312,7 +302,7 @@ public class MainController {
                                     diffComboBox.getItems().remove(displayString);
                                     diffComboBox.setDisable(true);
                                 } catch (IOException ex) {
-                                    Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+                                   logger.log(Level.SEVERE, null, ex);
                                 }
                             }
 
@@ -320,9 +310,9 @@ public class MainController {
 
                         }
                     } else if (newState.equals(Worker.State.FAILED)) {
-                        System.out.println("Analysis failed");
+                        logger.log(Level.SEVERE, "Analysis failed");
                     } else if (newState.equals(Worker.State.CANCELLED)) {
-                        System.out.println("Analysis was canceled");
+                        logger.log(Level.SEVERE, "Analysis was canceled");
                     }
                 }
             });
@@ -333,8 +323,7 @@ public class MainController {
             return subStage;
 
         } else {
-            Logger.getLogger(MainController.class.getName()).
-                    log(Level.SEVERE, "No selected directory!");
+            logger.log(Level.SEVERE, "No selected directory!");
         }
         return null;
     }
