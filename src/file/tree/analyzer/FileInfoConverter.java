@@ -111,6 +111,7 @@ public class FileInfoConverter {
      * @return FileInfo
      *  
      */
+    /*
     public static FileInfo domToFileInfo(Document doc) {
         if(doc == null) throw new IllegalArgumentException("doc is null");
         
@@ -119,10 +120,12 @@ public class FileInfoConverter {
 
         return root;
     }
+    */
 
     /**
      * @deprecated
      */
+    /*
     private static FileInfo childrenToFileInfo(Element element, String path) {
         //get all file info from element
         
@@ -166,6 +169,7 @@ public class FileInfoConverter {
 
         return item;
     }
+    */
     
     /**
      * Gets date from desired attribute or uses "older" attribute.
@@ -205,8 +209,8 @@ public class FileInfoConverter {
         int number;
         if (!newAttributeValue.isEmpty()) {
             number = Integer.parseInt(newAttributeValue);
-        } else if (state == ItemState.DELETED) {
-            number = 0;
+        /*} else if (state == ItemState.DELETED) {
+            number = 0; */
         } else {
             number = oldAttributeValue;
         }
@@ -229,8 +233,10 @@ public class FileInfoConverter {
      * @param doc XML Dom
      * @return FileInfo
      */
-    //if accepted, change name to domToFIleInfo
-    public static FileInfo domToFileInfo2(Document doc) {
+    //name changed from domToFileInfo2
+    public static FileInfo domToFileInfo(Document doc) {
+        if(doc == null) throw new IllegalArgumentException("doc is null");
+
         Element rootElement = doc.getDocumentElement();
         FileInfo root = childrenToInfo(rootElement, "", false);
 
@@ -244,6 +250,8 @@ public class FileInfoConverter {
      * @return FileInfo with DiffInfo
      */
     public static DiffInfo domToDiffInfo(Document doc) {
+        if(doc == null) throw new IllegalArgumentException("doc is null");
+
         Element rootElement = doc.getDocumentElement();
         DiffInfo root = (DiffInfo) childrenToInfo(rootElement, "", true);
 
@@ -322,11 +330,13 @@ public class FileInfoConverter {
 
         if (isDiffInfo) { //get isNewlyAccessible isNewlySymbolicLink and state, then decide whether get newSize, newNumberOfFiles, newNumberOfDirectories, newCreatT, newLastAccT, newLastModT, diffInfoChildren
             newString = parent.getAttribute("state");
+            //System.out.print(parent.getAttribute("name") + " " + newString + "|");
             if (!newString.isEmpty()) {
-                state = ItemState.valueOf(parent.getAttribute("state").toUpperCase());
+                state = ItemState.valueOf(newString.toUpperCase());
             } else {
                 state = ItemState.UNMODIFIED; //maybe choose other option
             }
+            //System.out.println(" " + state);
             
             newString = parent.getAttribute("newSymbolicLink");
             isNewlySymbolicLink = setNewBoolean(newString, isSymbolicLink);
@@ -389,13 +399,16 @@ public class FileInfoConverter {
             diffInfoRoot.setNewSize(newSize);
             diffInfoRoot.setNewSymbolicLink(isSymbolicLink);
                         
-            if(isDirectory) {
+            if (isDirectory) {
                 for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
-                        if (parent.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE) {
-                            Element child = (Element) parent.getChildNodes().item(i);
-                            diffInfoRoot.addChild((DiffInfo) childrenToInfo(child, diffInfoRoot.getPath(), isDiffInfo));
+                    if (parent.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE) {
+                        Element child = (Element) parent.getChildNodes().item(i);
+                        if (diffInfoRoot.getState() == ItemState.DELETED) { //mark children of deleted also as deleted
+                            child.setAttribute("state", "deleted");
                         }
+                        diffInfoRoot.addChild((DiffInfo) childrenToInfo(child, diffInfoRoot.getPath(), isDiffInfo));   
                     }
+                }
             }
             
             return (FileInfo) diffInfoRoot;
