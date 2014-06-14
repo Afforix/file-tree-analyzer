@@ -29,16 +29,13 @@ import org.w3c.dom.NodeList;
 
 /**
  * Class for finding differences between two XML docs, storing them and
- * converting to FileInfo
+ * converting it to DiffInfo
  *
  * @author jindra
  */
 public class Differ {
 
     private final static Logger logger = Logger.getLogger(FileTreeAnalyzer.class.getName());
-//    private Document controlDoc; //newer doc, this doc will stay unchanged
-//    private Document olderDoc; //current Disc state, this doc will stay unchanged
-//    private Document testDoc; //testDoc is copy of olderDoc, will be modified and used for FileInfo transformation
     //main is for testing purpose only
     /*
      public static void main(String[] args) {
