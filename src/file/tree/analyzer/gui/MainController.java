@@ -79,7 +79,7 @@ public class MainController {
     @FXML
     private MenuItem menuDelete;
     @FXML
-    private MenuItem menuClear;   
+    private MenuItem menuClear;
     @FXML
     private MenuItem menuDiffToCurrent;
     @FXML
@@ -89,6 +89,8 @@ public class MainController {
     private final static Logger logger = Logger.getLogger(FileTreeAnalyzer.class.getName());
     private final XMLFileManager xmlFileManager = new XMLFileManager(("./saved_analyses"));
     private boolean treeAlreadyLoaded = false;
+    private FileInfoTreeItem treeRoot;
+    private FileInfoTreeItem treeRootFiltered;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -163,6 +165,7 @@ public class MainController {
                             menuDiffToCurrent.setDisable(false);
                             menuDelete.setDisable(false);
                             menuClear.setDisable(false);
+                            fullDiffCheckBox.setDisable(true);
                         } else {
                             openComboBox.setPromptText("Choose File ...");
                             diffComboBox.setDisable(true);
@@ -170,11 +173,12 @@ public class MainController {
                             fullDiffCheckBox.setDisable(true);
                             menuDelete.setDisable(true);
                             menuClear.setDisable(true);
-                            loadFile(null);
+                            loadFile(null, false);
                         }
 
                     }
                 });
+
     }
 
     @FXML
@@ -186,7 +190,7 @@ public class MainController {
             }
             String fileName = source.getValue().getFile();
             FileInfo dir = FileInfoConverter.domToFileInfo(xmlFileManager.findXMLFile(fileName));
-            loadFile(dir);
+            loadFile(dir, false);
         } else {
             treeAlreadyLoaded = false;
         }
@@ -210,6 +214,16 @@ public class MainController {
 
         newAnalysis(selectedDirectory, null);
 
+    }
+
+    @FXML
+    void handleFullDiffAction(ActionEvent event) {
+        CheckBox diff = (CheckBox) event.getSource();
+        if (diff.isSelected()) {
+            treeView.setRoot(treeRootFiltered);
+        } else {
+            treeView.setRoot(treeRoot);
+        }     
     }
 
     private Stage InitializeWindow(String resource, String title) throws IOException {
@@ -290,7 +304,7 @@ public class MainController {
                     if (newState.equals(Worker.State.SUCCEEDED)) {
                         FileInfo dir = task.getValue();
                         if (dir != null) {
-                            loadFile(dir);
+                            loadFile(dir, false);
                             treeAlreadyLoaded = true;
                             // save directory                   
                             String file = xmlFileManager
@@ -339,19 +353,25 @@ public class MainController {
     private void diff(String first, String second) throws IOException {
 
         System.out.println("Diff " + first + " " + second); // log
+        fullDiffCheckBox.setDisable(false);
         DiffInfo info = Differ.diffXMLs("./saved_analyses", first, second);
-        loadFile(info);
+        loadFile(info, true);
         menuDelete.setDisable(true);
     }
 
-    private void loadFile(FileInfo directory) {
+    private void loadFile(FileInfo directory, boolean diff) {
         if (directory != null) {
-            FileInfoTreeItem treeRoot = new FileInfoTreeItem(directory);
-            treeView.setRoot(treeRoot);
+            treeRoot = new FileInfoTreeItem(directory);
+            treeRootFiltered = new FileInfoTreeItem(directory, true);
+            
+            treeRootFiltered.setExpanded(true);
             treeRoot.setExpanded(true);
+            
+           treeView.setRoot(treeRoot);
         } else {
             treeView.setRoot(null);
         }
+        fullDiffCheckBox.setSelected(false);
         tableView.setItems(null);
         tableView.getSelectionModel().clearSelection();
     }
@@ -364,10 +384,10 @@ public class MainController {
         if (selectOpen != null) {
             filter = filter.getName(filter.getNameCount() - 1);
             for (T item : items) {
-                Path path = Paths.get(((ComboBoxItem) item).getPath());               
+                Path path = Paths.get(((ComboBoxItem) item).getPath());
                 if (path.endsWith(filter) && !selectOpen.equals(item)) {
                     filteredItems.add(item);
-                }else{
+                } else {
                     filteredItems.add(item);
                 }
             }

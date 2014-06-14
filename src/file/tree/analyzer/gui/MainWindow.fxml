@@ -96,7 +96,7 @@
 <columnResizePolicy>
 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
 </columnResizePolicy>
-</TableView><CheckBox fx:id="fullDiffCheckBox" alignment="CENTER" contentDisplay="CENTER" disable="true" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Show Full Diff" GridPane.halignment="RIGHT">
+</TableView><CheckBox fx:id="fullDiffCheckBox" alignment="CENTER" contentDisplay="CENTER" disable="true" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#handleFullDiffAction" text="Show only changed" GridPane.halignment="RIGHT">
 <GridPane.margin>
 <Insets right="10.0" />
 </GridPane.margin></CheckBox>

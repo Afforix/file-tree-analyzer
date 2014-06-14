@@ -7,6 +7,7 @@ package file.tree.analyzer.gui;
 
 import file.tree.analyzer.DiffInfo;
 import file.tree.analyzer.FileInfo;
+import file.tree.analyzer.ItemState;
 import file.tree.analyzer.utils.Utils;
 import java.io.File;
 import java.io.IOException;
@@ -25,10 +26,17 @@ import javafx.scene.image.ImageView;
 class FileInfoTreeItem extends TreeItem<FileInfo> {
 
     private boolean hasLoadedChildren = false;
+    private boolean isFiltered = false;
 
-    public FileInfoTreeItem(FileInfo directory) {
-        super(directory);
+     public FileInfoTreeItem(FileInfo directory) {
+        super(directory);       
     }
+     
+    public FileInfoTreeItem(FileInfo directory,boolean isFiltered) {
+        super(directory);
+        this.isFiltered = isFiltered;
+    }
+    
 
     @Override
     public ObservableList<TreeItem<FileInfo>> getChildren() {
@@ -54,14 +62,19 @@ class FileInfoTreeItem extends TreeItem<FileInfo> {
         if (elementVal.isDirectory() && elementVal.isAccessible()) {
             if (elementVal instanceof DiffInfo) {
                 DiffInfo info = (DiffInfo)elementVal;
-               for (DiffInfo f : info.getDiffChildren()) {
-                    FileInfoTreeItem item = new FileInfoTreeItem(f);
-                    super.getChildren().add(item);
-                }      
+               for (DiffInfo f : info.getDiffChildren()) {                   
+                   if(isFiltered){
+                       if(f.getState() != ItemState.UNMODIFIED)
+                       {
+                           super.getChildren().add(new FileInfoTreeItem(f,true));
+                       }                         
+                   }else{
+                        super.getChildren().add(new FileInfoTreeItem(f));                        
+                   } 
+                }               
             } else {
-                for (FileInfo f : elementVal.getChildren()) {
-                    FileInfoTreeItem item = new FileInfoTreeItem(f);
-                    super.getChildren().add(item);
+                for (FileInfo f : elementVal.getChildren()) {                   
+                    super.getChildren().add(new FileInfoTreeItem(f));
                 }                
             }
 
