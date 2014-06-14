@@ -405,11 +405,9 @@ public class FileInfoConverter {
                 for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
                     if (parent.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE) {
                         Element child = (Element) parent.getChildNodes().item(i);
-                        if (diffInfoRoot.getState() == ItemState.DELETED) { //mark children of deleted also as deleted
-                            child.setAttribute("state", "deleted");
-                        } else if(diffInfoRoot.getState() == ItemState.CREATED) {
+                        if (diffInfoRoot.getState() == ItemState.CREATED) { //mark children of deleted also as deleted
                             child.setAttribute("state", "created");
-                        }
+                        } 
                         diffInfoRoot.addChild((DiffInfo) childrenToInfo(child, diffInfoRoot.getPath(), isDiffInfo));   
                     }
                 }

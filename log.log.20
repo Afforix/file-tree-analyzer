@@ -1,0 +1,12 @@
+Čer 14, 2014 4:47:44 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 8 analyses found.
+Čer 14, 2014 4:47:51 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T095243.xml 
+Čer 14, 2014 4:47:54 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T094207.xml 
+Čer 14, 2014 4:47:55 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T094207.xml 
+Čer 14, 2014 4:47:55 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T094213.xml 
+Čer 14, 2014 4:47:55 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T094207.xml and 2014-06-14T094213.xml
