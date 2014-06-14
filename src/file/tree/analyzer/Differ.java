@@ -110,23 +110,23 @@ public class Differ {
      * @throws ConfigurationException
      * @throws NullPointerException
      * @param cwd current working directory (path to analyses directory)
-     * @param controlName name of an XML file with newer file tree
-     * @param testName name of an XML file with older file tree
+     * @param controlName name of an XML file with older file tree
+     * @param testName name of an XML file with newer file tree
      * @return root of file tree with diff information
      */
     public static DiffInfo diffXMLs(String cwd, String controlName, String testName) throws NullPointerException {
         XMLFileManager fileManager = new XMLFileManager(cwd);
-        Document testDoc;
+        Document controlDoc;
         Document newDoc;
 
-        testDoc = fileManager.findXMLFile(testName, true);
-        newDoc = fileManager.findXMLFile(controlName, true);
+        controlDoc = fileManager.findXMLFile(controlName, true);
+        newDoc = fileManager.findXMLFile(testName, true);
 
-        if (newDoc == null || testDoc == null) {
+        if (controlDoc == null || newDoc == null) {
             throw new NullPointerException("failed to load XML file");
         }
-        DiffInfo ret = diffDocuments(testDoc, newDoc);
-        logger.log(Level.INFO, "diffed " + testName + " and " + controlName);
+        DiffInfo ret = diffDocuments(controlDoc, newDoc);
+        logger.log(Level.INFO, "diffed " + controlName + " and "+testName);
         return ret;
     }
 
@@ -135,20 +135,21 @@ public class Differ {
      * returns data structure with comparison information. Both given documents
      * will remain unchanged.
      *
-     * @param testDoc document representing older file tree
+     * @param controlDoc document representing older file tree
      * @param newDoc document representing newer file tree
      * @return root of file tree with diff information
      */
-    public static DiffInfo diffDocuments(Document newDoc, Document testDoc) throws ConfigurationException {
+    public static DiffInfo diffDocuments(Document controlDoc, Document newDoc) throws ConfigurationException {
         try {
-            XMLUnit.setCompareUnmatched(false); 
+            XMLUnit.setCompareUnmatched(false); //TODO - deal with deleted / created items (they are unmatched) 
+            //XMLUnit.setIgnoreComments(true); 
             XMLUnit.setIgnoreAttributeOrder(true);
             //XMLUnit.setIgnoreWhitespace(true); //causes bug - why?
         } catch (ConfigurationException ex) {
            logger.log(Level.SEVERE, "XMLUnit configuration failed.", ex);
         }
 
-        Document controlDoc = (Document) newDoc.cloneNode(true);
+        Document testDoc = (Document) newDoc.cloneNode(true);
 
         Diff diff = new Diff(controlDoc, testDoc);
         //name of element + attribute "name" is ID
@@ -164,8 +165,8 @@ public class Differ {
         Difference difference; //one item from allDifferences List
         String modifiedElement = null; //path to modified element
         String description = null;
-        NodeDetail testNodeDetail = null;
         NodeDetail controlNodeDetail = null;
+        NodeDetail testNodeDetail = null;
         boolean attributeChange = false;
         boolean createdOrDeleted = false;
         boolean attributeAdded = false;
@@ -184,9 +185,9 @@ public class Differ {
             difference = (Difference) listIterator.next();
             description = difference.getDescription();
             String whatChanged = description.substring(0, description.indexOf(" "));
-            testNodeDetail = difference.getTestNodeDetail();
             controlNodeDetail = difference.getControlNodeDetail();
-            
+            testNodeDetail = difference.getTestNodeDetail();
+
             //TODO: XPATHNODETRACKER
             attributeChange = whatChanged.equals("attribute");
             String testValue = testNodeDetail.getValue();
@@ -197,98 +198,100 @@ public class Differ {
                     && (((testValue.equals("file") || testValue.equals("directory")) && controlValue.equals("null"))
                     || ((controlValue.equals("file") || controlValue.equals("directory")) && testValue.equals("null"))));
 
+            //createdOrDeleted = (difference.equals(DifferenceConstants.CHILD_NODE_NOT_FOUND)
+            //        && (testValue.equals("file") || testValue.equals("directory") || testValue.equals("null"))
+            //        && (controlValue.equals("file") || controlValue.equals("directory") || controlValue.equals("null")));
             attributeAdded = difference.equals(DifferenceConstants.ATTR_NAME_NOT_FOUND);
 
             if (!attributeAdded) {
                 try {
                     if (attributeChange) {
-                        xpathToElement = controlNodeDetail.getXpathLocation();
+                        xpathToElement = testNodeDetail.getXpathLocation();
                         attributeToChange = xpathToElement.substring(xpathToElement.indexOf('@') + 1); // attr is after @ in xpath
                         String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
 
-                        Node node = (Node) controlXPath.evaluate(xpathToParent, controlDoc.getDocumentElement(), XPathConstants.NODE);
+                        Node node = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
 
                         elementToChange = (Element) node;
                         elementToChange.setAttribute("state", "modified");
-                        elementToChange.setAttribute("new" + attributeToChange.substring(0, 1).toUpperCase() + attributeToChange.substring(1), testValue);
+                        elementToChange.setAttribute("new" + attributeToChange.substring(0, 1).toUpperCase() + attributeToChange.substring(1), controlValue);
 
                     } else if (createdOrDeleted) {
 
-                        if (testValue.equals("null")) { //node was created
-                            xpathToElement = controlNodeDetail.getXpathLocation();
-                            
-                            Node node = (Node) controlXPath.evaluate(xpathToElement, controlDoc.getDocumentElement(), XPathConstants.NODE);
-                            elementToChange = (Element) node;
-                            elementToChange.setAttribute("state", "created");
-
-                        } else if (controlValue.equals("null")) { //node was deleted - copy from testDoc controlDoc
+                        if (controlValue.equals("null")) { //testNode was deleted
                             xpathToElement = testNodeDetail.getXpathLocation();
+                            //String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
+                            //System.out.println("path:" + testNodeDetail.getValue());
+
+                            Node node = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
+                            elementToChange = (Element) node;
+                            elementToChange.setAttribute("state", "deleted");
+
+                        } else if (testValue.equals("null")) { //testNode is null so controlNode was created - copy from controlDoc to testDoc
+                            xpathToElement = controlNodeDetail.getXpathLocation();
                             String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
                           
-                            Node testNode = testNodeDetail.getNode();
-                            Element testElement = (Element) testNode;
-                            String testNodeName = testElement.getAttribute("name");
+                            Node controlNode = controlNodeDetail.getNode();
+                            Element controlElement = (Element) controlNode;
+                            String controlNodeName = controlElement.getAttribute("name");
                             
-                            Node importNode = controlDoc.importNode(testNode, true);
+                            //importNode = controlNode.cloneNode(false);
+                            Node importNode = testDoc.importNode(controlNode, true);
                             Element importElement = (Element) importNode;
-                            importElement.setAttribute("state", "deleted");
+                            importElement.setAttribute("state", "created");
                             
-                            Node controlNodeParent = (Node) controlXPath.evaluate(xpathToParent, controlDoc.getDocumentElement(), XPathConstants.NODE); //where to append
+                            Node testNodeParent = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE); //where to append
+                            NodeList testChildren = testNodeParent.getChildNodes(); //future siblings of importNode
+                            Node testNextSibling = null;
+                            String testNextSiblingName = "";
                             
-                            if (!controlNodeParent.hasChildNodes()) {
-                                controlNodeParent.appendChild(importNode);
-                            } else {
-                                NodeList controlChildren = controlNodeParent.getChildNodes(); //future siblings of importNode
-                                Node controlNextSibling = null;
-                                String controlNextSiblingName = "";
-
                             //find where to place importNode - after alphabetically smaller names and before greater names
-                                //place file after all folders
-                                for (int i = 0; i < controlChildren.getLength(); i++) {
-                                    controlNextSibling = controlChildren.item(i);
-                                    if (controlNextSibling.getNodeName().equals("file") || controlNextSibling.getNodeName().equals("directory")) {
-                                        NamedNodeMap nnm = controlNextSibling.getAttributes(); //find out name of current file/directory
-                                        controlNextSiblingName = nnm.getNamedItem("name").getNodeValue();
-                                        int compare = String.CASE_INSENSITIVE_ORDER.compare(testNodeName, controlNextSiblingName);
-                                        if ((compare < 0) //greater than zero means controlNextSiblingName is greater
-                                                && !(controlNextSibling.getNodeName().equals("directory") && importNode.getNodeName().equals("file"))) { //avoid placing file before directory
-                                            //controlNodeParent.insertBefore(importNode, controlNextSibling); //place importNode before controlNextSibling 
-                                            //controlNodeParent.insertBefore(importNode, controlChildren.item(i - 2)); //-2 because then it does not fall - but still does not place importNode properly!!!
-                                            break;
-                                        } else if (controlNextSibling.getNodeName().equals("file") && importNode.getNodeName().equals("directory")) { //place directory before files
-                                            //controlNodeParent.insertBefore(importNode, controlChildren.item(i - 2));
-                                        }
+                            //place file after all folders
+                            for (int i = 0; i < testChildren.getLength(); i++) {
+                                testNextSibling = testChildren.item(i);
+                                if (testNextSibling.getNodeName().equals("file") || testNextSibling.getNodeName().equals("directory")) {
+                                    NamedNodeMap nnm = testNextSibling.getAttributes(); //find out name of current file/directory
+                                    testNextSiblingName = nnm.getNamedItem("name").getNodeValue();
+                                    int compare = String.CASE_INSENSITIVE_ORDER.compare(controlNodeName, testNextSiblingName);
+                                    if ((compare < 0 ) //greater than zero means testNextSiblingName is greater
+                                            && !(testNextSibling.getNodeName().equals("directory") && importNode.getNodeName().equals("file"))) { //avoid placing file before directory
+                                        //testNodeParent.insertBefore(importNode, testNextSibling); //place importNode before testNextSibling 
+                                        testNodeParent.insertBefore(importNode, testChildren.item(i-2)); //-2 because then it does not fall - but still does not place importNode properly!!!
+                                        break;
+                                    } else if (testNextSibling.getNodeName().equals("file") && importNode.getNodeName().equals("directory")) { //place directory before files
+                                        testNodeParent.insertBefore(importNode, testChildren.item(i-2));
                                     }
                                 }
                             }
 
-                            
-                            if (testValue.equals("directory")) { //append children (files and directories) to imported node - currently done by ChildrenToInfo
-                                Node node = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
+                            /*
+                            if (controlValue.equals("directory")) { //append children (files and directories) to imported node - currently done by ChildrenToInfo
+                                Node node = (Node) controlXPath.evaluate(xpathToElement, controlDoc.getDocumentElement(), XPathConstants.NODE);
                                 NodeList nodeList = node.getChildNodes();
-                                Node controlNode = (Node) controlXPath.evaluate(xpathToElement, controlDoc.getDocumentElement(), XPathConstants.NODE);
+                                testNodeParent = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE); //
                                 
                                 for (int i = 0; i < nodeList.getLength(); i++) {
-                                    testNodeName = nodeList.item(i).getNodeName();
-                                    if (testNodeName.equals("file") || testNodeName.equals("directory")) {
-                                        importNode = controlDoc.importNode(nodeList.item(i), false);
+                                    controlNodeName = nodeList.item(i).getNodeName();
+                                    if (controlNodeName.equals("file") || controlNodeName.equals("directory")) {
+                                        importNode = testDoc.importNode(nodeList.item(i), false);
                                         importElement = (Element) importNode;
-                                        importElement.setAttribute("state", "deleted");
+                                        importElement.setAttribute("state", "created");
                                         
-                                        controlNode.appendChild(importNode);
+                                        testNodeParent.appendChild(importNode);
                                     }
                                 }
-                            }                                     
+                            } 
+                                    */
                         }
                     }
                 } catch (XPathExpressionException ex) {
-                   logger.log(Level.SEVERE, null, ex);
+                   logger.log(Level.SEVERE, null, ex); //some monster
                 }
             }
         }
 
-        //XMLFileManager controlingFileManager = new XMLFileManager("./saved_analyses"); //FOR TESTING ONLY!!!
-        //controlingFileManager.createXMLFile(controlDoc); // Write to XML - not necessary
-        return FileInfoConverter.domToDiffInfo(controlDoc);
+        XMLFileManager testingFileManager = new XMLFileManager("./saved_analyses"); //FOR TESTING ONLY!!!
+        testingFileManager.createXMLFile(testDoc); // Write to XML - not necessary
+        return FileInfoConverter.domToDiffInfo(testDoc);
     }
 }
