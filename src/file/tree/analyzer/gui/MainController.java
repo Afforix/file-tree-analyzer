@@ -10,12 +10,17 @@ import file.tree.analyzer.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
@@ -74,9 +79,7 @@ public class MainController {
     @FXML
     private MenuItem menuDelete;
     @FXML
-    private MenuItem menuClear;
-    /*  @FXML
-     private MenuItem menuDiffTo;*/
+    private MenuItem menuClear;   
     @FXML
     private MenuItem menuDiffToCurrent;
     @FXML
@@ -147,33 +150,45 @@ public class MainController {
 
         openComboBox.getItems().addAll(Utils.FilenameToComboBoxItem(
                 xmlFileManager.findAllXMLFiles(), xmlFileManager));
+        openComboBox.getSelectionModel().selectedItemProperty()
+                .addListener(new ChangeListener<ComboBoxItem>() {
+                    @Override
+                    public void changed(ObservableValue<? extends ComboBoxItem> observable,
+                            ComboBoxItem oldValue, ComboBoxItem newValue) {
+                        if (newValue != null) {
+                            filterItems(Paths.get(newValue.getPath()), diffComboBox, openComboBox.getItems());
+                            diffComboBox.getSelectionModel().clearSelection();
+                            diffComboBox.setPromptText("Choose File ...");
+                            diffComboBox.setDisable(false);
+                            menuDiffToCurrent.setDisable(false);
+                            menuDelete.setDisable(false);
+                            menuClear.setDisable(false);
+                        } else {
+                            openComboBox.setPromptText("Choose File ...");
+                            diffComboBox.setDisable(true);
+                            menuDiffToCurrent.setDisable(true);
+                            fullDiffCheckBox.setDisable(true);
+                            menuDelete.setDisable(true);
+                            menuClear.setDisable(true);
+                            loadFile(null);
+                        }
 
-        diffComboBox.getItems().addAll(Utils.FilenameToComboBoxItem(
-                xmlFileManager.findAllXMLFiles(), xmlFileManager));
+                    }
+                });
     }
 
     @FXML
     void handleOpenComboBoxAction(ActionEvent event) {
-        if (diffComboBox.getValue() != null) {
-            clear2();
-
-        }
         if (!treeAlreadyLoaded) { // to prevent double loading when creating new analysis
             ComboBox<ComboBoxItem> source = (ComboBox<ComboBoxItem>) event.getSource();
             if (source.getValue() == null) {
-                clear();
                 return;
             }
             String fileName = source.getValue().getFile();
             FileInfo dir = FileInfoConverter.domToFileInfo(xmlFileManager.findXMLFile(fileName));
             loadFile(dir);
-            tableView.setItems(null);
-            tableView.getSelectionModel().clearSelection();
         } else {
             treeAlreadyLoaded = false;
-        }
-        if (menuClear.isDisable()) {
-            enableItems(true, false);
         }
 
     }
@@ -183,15 +198,12 @@ public class MainController {
         ComboBox<ComboBoxItem> source = (ComboBox<ComboBoxItem>) event.getSource();
         if (source.getValue() != null && openComboBox.getValue() != null) {
             diff(source.getValue().getFile(), openComboBox.getValue().getFile());
-        } else {
-            clear2();
         }
 
     }
 
     @FXML
     void handleNewAnalysisAction(ActionEvent event) throws IOException {
-        clear();
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File selectedDirectory = directoryChooser
                 .showDialog(root.getScene().getWindow());
@@ -217,14 +229,13 @@ public class MainController {
         if (value != null) {
             xmlFileManager.deleteXMLFile(value.getFile());
             openComboBox.getItems().remove(value);
-            diffComboBox.getItems().remove(value);
-            clear();
+            openComboBox.getSelectionModel().clearSelection();
         }
     }
 
     @FXML
     void handleClearAction(ActionEvent event) {
-        clear();
+        openComboBox.getSelectionModel().clearSelection();
     }
 
     @FXML
@@ -246,14 +257,14 @@ public class MainController {
             Stage stage = InitializeWindow("AboutWindow.fxml", "About");
             stage.show();
         } catch (IOException ex) {
-           logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
     @FXML
     void handleQuitAction(ActionEvent event) {
         Platform.exit();
-        logger.log(Level.INFO,"exit");
+        logger.log(Level.INFO, "exit");
         System.exit(0);
     }
     // </editor-fold>
@@ -287,9 +298,7 @@ public class MainController {
                             ComboBoxItem displayString = Utils
                                     .FilenameToComboBoxItem(file, xmlFileManager);
                             openComboBox.getItems().add(displayString);
-                            diffComboBox.getItems().add(displayString);
                             openComboBox.getSelectionModel().select(displayString);
-                            enableItems(true, false);
 
                             if (oldItem != null) {
                                 try {
@@ -299,10 +308,9 @@ public class MainController {
                                     diff(file, oldFile);
                                     xmlFileManager.deleteXMLFile(file);
                                     openComboBox.getItems().remove(displayString);
-                                    diffComboBox.getItems().remove(displayString);
                                     diffComboBox.setDisable(true);
                                 } catch (IOException ex) {
-                                   logger.log(Level.SEVERE, null, ex);
+                                    logger.log(Level.SEVERE, null, ex);
                                 }
                             }
 
@@ -337,33 +345,33 @@ public class MainController {
     }
 
     private void loadFile(FileInfo directory) {
-        FileInfoTreeItem treeRoot = new FileInfoTreeItem(directory);
-        treeView.setRoot(treeRoot);
-        treeRoot.setExpanded(true);
-    }
-
-    private void clear() {
-        openComboBox.getSelectionModel().clearSelection();
-        openComboBox.setPromptText("Choose File ...");
-        clear2();
-
-    }
-
-    private void clear2() {
-        diffComboBox.getSelectionModel().clearSelection();
-        diffComboBox.setPromptText("Choose File ...");
-        treeView.setRoot(null);
+        if (directory != null) {
+            FileInfoTreeItem treeRoot = new FileInfoTreeItem(directory);
+            treeView.setRoot(treeRoot);
+            treeRoot.setExpanded(true);
+        } else {
+            treeView.setRoot(null);
+        }
         tableView.setItems(null);
         tableView.getSelectionModel().clearSelection();
-        enableItems(false, false);
     }
 
-    private void enableItems(boolean items, boolean checkbox) {
-        menuDelete.setDisable(!items);
-        menuClear.setDisable(!items);
-        diffComboBox.setDisable(!items);
-        menuDiffToCurrent.setDisable(!items);
-        fullDiffCheckBox.setDisable(!checkbox);
-    }
+    private <T> void filterItems(Path filter, ComboBox<T> comboBox,
+            List<T> items) {
+        ComboBoxItem selectOpen = openComboBox.getSelectionModel().getSelectedItem();
+        List<T> filteredItems = new ArrayList<>();
 
+        if (selectOpen != null) {
+            filter = filter.getName(filter.getNameCount() - 1);
+            for (T item : items) {
+                Path path = Paths.get(((ComboBoxItem) item).getPath());               
+                if (path.endsWith(filter) && !selectOpen.equals(item)) {
+                    filteredItems.add(item);
+                }else{
+                    filteredItems.add(item);
+                }
+            }
+        }
+        comboBox.setItems(FXCollections.observableArrayList(filteredItems));
+    }
 }
