@@ -407,6 +407,8 @@ public class FileInfoConverter {
                         Element child = (Element) parent.getChildNodes().item(i);
                         if (diffInfoRoot.getState() == ItemState.DELETED) { //mark children of deleted also as deleted
                             child.setAttribute("state", "deleted");
+                        } else if(diffInfoRoot.getState() == ItemState.CREATED) {
+                            child.setAttribute("state", "created");
                         }
                         diffInfoRoot.addChild((DiffInfo) childrenToInfo(child, diffInfoRoot.getPath(), isDiffInfo));   
                     }
