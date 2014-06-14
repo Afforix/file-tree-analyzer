@@ -23,7 +23,9 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.exceptions.ConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Class for finding differences between two XML docs, storing them and
@@ -218,7 +220,7 @@ public class Differ {
 
                         if (controlValue.equals("null")) { //testNode was deleted
                             xpathToElement = testNodeDetail.getXpathLocation();
-                            String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
+                            //String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
                             //System.out.println("path:" + testNodeDetail.getValue());
 
                             Node node = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
@@ -227,19 +229,119 @@ public class Differ {
 
                         } else if (testValue.equals("null")) { //testNode is null so controlNode was created - copy from controlDoc to testDoc
                             xpathToElement = controlNodeDetail.getXpathLocation();
-                            String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/"));
-
+                            String xpathToParent = xpathToElement.substring(0, xpathToElement.lastIndexOf("/")); //use this only for xpathToGrandParent
+                            /*String xpathToGrandParent;
+                            if(xpathToParent.lastIndexOf("/")!=0) {
+                                xpathToGrandParent = xpathToParent.substring(0, xpathToParent.lastIndexOf("/"));
+                            } else {
+                                xpathToGrandParent = xpathToParent;
+                            } */                           
+                            //String realXpathToParent = "";
+                            
+                            //String nodeName = "";
+                            Node importNode;
+                            Element importElement;
+                            //Node testNodeParent;                            
+                            //String testNodeParentName = "";
+                            
                             Node controlNode = controlNodeDetail.getNode();
-                            Node importNode = testDoc.importNode(controlNode, false); //importedbut not placed yet
-                            Element importElement = (Element) importNode;
+                            Element controlElement = (Element) controlNode;
+                            String controlNodeName = controlElement.getAttribute("name");
+                            
+                            //Node controlNodeParent = (Node) controlXPath.evaluate(xpathToParent, controlDoc.getDocumentElement(), XPathConstants.NODE);
+                            //Element controlElementParent = (Element) controlNodeParent;
+                            //String controlNodeParentName = controlElementParent.getAttribute("name");
+                            //Node controlNode2 = (Node) controlXPath.evaluate(xpathToElement, controlDoc.getDocumentElement(), XPathConstants.NODE);
+                            Node testNodeParent = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
+
+                            //Node nextSibling; //in controlDocument
+                            //nextSibling = controlNode.getNextSibling();
+                            //while ((nextSibling.equals(null)) || (!nextSibling.getNodeName().equals("file") && !nextSibling.getNodeName().equals("directory"))) {
+                            //    nextSibling = nextSibling.getNextSibling();
+                            //}
+
+                            NodeList testSiblings; //in testDocument
+                            String testSiblingName = "";
+                            Node testNextsibling = null;
+                            NodeList nl = testNodeParent.getChildNodes();
+                            for (int i = 0; i < nl.getLength(); i++) {
+                                System.out.println("NS children: " + nl.item(i).getNodeName());
+                                Node n = nl.item(i);
+                                if (n.getNodeName().equals("file") || n.getNodeName().equals("directory")) {
+                                    NamedNodeMap nnm = n.getAttributes();
+                                    testSiblingName = nnm.getNamedItem("name").getNodeValue();
+                                    if (String.CASE_INSENSITIVE_ORDER.compare(controlNodeName, testSiblingName) < 0) {
+                                        testNextsibling = n;
+                                    }
+                                }
+                            }
+
+                            //Node testNodeParent = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
+                            
+                            importNode = testDoc.importNode(controlNode, false);
+                            importElement = (Element) importNode;
                             importElement.setAttribute("state", "created");
+                            //if(controlNode.getNextSibling() != null) {
+                            //    nextSibling = controlNode.getNextSibling();
+                                testNodeParent.insertBefore(importNode, testNextsibling);
+                            //} else {
+                            //    testNodeParent.appendChild(importNode);
+                            //}
+                            /*
+                            NodeList siblings = controlNodeParent.getChildNodes();
+                            for(int i = 0; i < siblings.getLength(); i++) {
+                                Node sibling = siblings.item(i);
+                                for(int j = 0; j < sibling.getL)
+                                if( String.CASE_INSENSITIVE_ORDER.compare(testValue, testValue) < 0 ) {
+                                    //zastav se, trefa
+                                }
+                            }*/
+                            
+                            /*
+                            Node testNodeGrandParent = (Node) testXPath.evaluate(xpathToGrandParent, testDoc.getDocumentElement(), XPathConstants.NODE);
+                            NodeList nodeList = testNodeGrandParent.getChildNodes(); //includes possible parent of node to append
+                            for(int i = 0; i < nodeList.getLength(); i++) {
+                                testNodeParent = nodeList.item(i);
+                                if(!testNodeParent.getNodeName().equals("directory")) {
+                                    continue;
+                                }
+                                NodeList nl = (NodeList) testNodeParent.getChildNodes(); //get name of directory
+                                for(int j = 0; j < nl.getLength(); j++) {
+                                    if(nl.item(j).getNodeName().equals("name")) {
+                                        testNodeParentName = nl.item(j).getNodeValue();
+                                        break;
+                                    }
+                                }                                
+                                if(testNodeParentName.equals(controlNodeParentName)) {
+                                    importNode = testDoc.importNode(controlNode, false);
+                                    importElement = (Element) importNode;
+                                    importElement.setAttribute("state", "created");
+                                    testNodeParent.appendChild(importNode);
+                                }
+                            }
+                            */
+                            
 
-                            Node testNode = (Node) testXPath.evaluate(xpathToParent, testDoc.getDocumentElement(), XPathConstants.NODE);
-                            testNode.appendChild(importNode);
-
-                            //Node appendedNode = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE);
-                            //elementToChange = (Element) appendedNode;
-                            //elementToChange.setAttribute("state", "created");
+                            //NodeList children = controlNode.getChildNodes();
+                            
+                            //Node importNode = testDoc.importNode(controlNode, false); //imported but not placed yet
+                            
+                            if (controlValue.equals("directory")) { //append children (files and directories) to imported node
+                                Node node = (Node) controlXPath.evaluate(xpathToElement, controlDoc.getDocumentElement(), XPathConstants.NODE);
+                                NodeList nodeList = node.getChildNodes();
+                                testNodeParent = (Node) testXPath.evaluate(xpathToElement, testDoc.getDocumentElement(), XPathConstants.NODE); //
+                                
+                                for (int i = 0; i < nodeList.getLength(); i++) {
+                                    controlNodeName = nodeList.item(i).getNodeName();
+                                    if (controlNodeName.equals("file") || controlNodeName.equals("directory")) {
+                                        importNode = testDoc.importNode(nodeList.item(i), false);
+                                        importElement = (Element) importNode;
+                                        importElement.setAttribute("state", "created");
+                                        
+                                        testNodeParent.appendChild(importNode);
+                                    }
+                                }
+                            }
                         }
                     }
                 } catch (XPathExpressionException ex) {
