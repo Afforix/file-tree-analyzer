@@ -19,12 +19,16 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -33,7 +37,7 @@ import org.xml.sax.SAXException;
 public class XMLFileManager {
 
     private final static Logger logger = Logger.getLogger(FileTreeAnalyzer.class.getName());
-    private Path analysesPath;    
+    private Path analysesPath;
 
     public XMLFileManager(String path) {
 
@@ -74,7 +78,7 @@ public class XMLFileManager {
             t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
             t.transform(new javax.xml.transform.dom.DOMSource(xmlDom), new javax.xml.transform.stream.StreamResult(file));
-           logger.log(Level.INFO, "File {0} created.", file.toPath().getFileName().toString());           
+            logger.log(Level.INFO, "File {0} created.", file.toPath().getFileName().toString());
             return file.toPath().getFileName().toString();
         } catch (TransformerException ex) {
             logger.log(Level.SEVERE, "Cannot save file.", ex);
@@ -126,16 +130,16 @@ public class XMLFileManager {
         }
 
         if (xmlFile == null) {
-           logger.log(Level.SEVERE, "File not found!");
+            logger.log(Level.SEVERE, "File not found!");
             return;
         }
 
         try {
             String name = xmlFile.toPath().getFileName().toString();
             xmlFile.delete();
-           logger.log(Level.INFO, "File {0} deleted.", name);
+            logger.log(Level.INFO, "File {0} deleted.", name);
         } catch (Exception ex) {
-          logger.log(Level.SEVERE, "Cannot delete file.", ex);
+            logger.log(Level.SEVERE, "Cannot delete file.", ex);
         }
 
     }
@@ -167,7 +171,7 @@ public class XMLFileManager {
             }
         }
 
-       logger.log(Level.INFO, "{0} analyses found.", xmlFiles.length);
+        logger.log(Level.INFO, "{0} analyses found.", xmlFiles.length);
 
         return xmlFilesNames;
     }
@@ -227,16 +231,50 @@ public class XMLFileManager {
             }
 
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            if(xmlFile!=null) {
+            if (xmlFile != null) {
                 xmlDoc = dBuilder.parse(xmlFile);
             } else {
-               logger.log(Level.SEVERE, "File does not exist.");
+                logger.log(Level.SEVERE, "File does not exist.");
             }
-            
+
         } catch (IOException | ParserConfigurationException | SAXException ex) {
-          logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
-            logger.log(Level.INFO, "open {0} ", fileName);
-            return xmlDoc;
-        }
+        logger.log(Level.INFO, "open {0} ", fileName);
+        return xmlDoc;
     }
+
+    /**
+     * Method for effective obtaining of attribute path from the given XML.
+     * 
+     * @param file file to obtain path from
+     * @return attribute path
+     */
+    public String getPathFromXML(String file) {
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser saxParser = factory.newSAXParser();
+
+            DefaultHandler handler = new DefaultHandler() {
+                @Override
+                public void startElement(String uri, String localName, String qName,
+                        Attributes attributes) throws SAXException {
+                    String path = attributes.getValue("path");
+                    //stop parsing by throwing exception
+                    throw new SAXException(path);
+                }
+            };
+                    
+            saxParser.parse(new File(analysesPath.toFile(), file), handler);
+        } catch (SAXException e) {
+            return e.getMessage();
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, "unknown file{0}", file);
+        } catch (ParserConfigurationException ex) {
+            logger.log(Level.SEVERE, "SAX configuration failed");
+        }
+        
+        //error occured
+        return null;
+    }
+}

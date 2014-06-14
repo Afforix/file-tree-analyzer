@@ -80,9 +80,9 @@ public class Utils {
     }
     
     public static ComboBoxItem FilenameToComboBoxItem(String file,XMLFileManager xmlFileManager){
-        Document doc = xmlFileManager.findXMLFile(file);
-        String path = doc.getDocumentElement().getAttribute("path");
-        
+//        Document doc = xmlFileManager.findXMLFile(file);
+//        String path = doc.getDocumentElement().getAttribute("path");
+        String path = xmlFileManager.getPathFromXML(file);
         return new ComboBoxItem(path, file);
     }
     
