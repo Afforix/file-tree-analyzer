@@ -36,7 +36,7 @@ public class DiffInfo extends FileInfo {
     protected Date newLastModifiedTime;
        
     /**
-     * Constructor without parameters
+     * Constructor without parameters.
      */
     public DiffInfo(){
         super();
@@ -55,7 +55,7 @@ public class DiffInfo extends FileInfo {
 
         ArrayList<RowInfo> list = new ArrayList<>();
 
-        list.add(new RowInfo("Name", name, "(diffed)" + name));
+        list.add(new RowInfo("Name", name, name));
         addToList(list, "State", state.toString(), null);
 
         if (!directory) {
@@ -114,7 +114,7 @@ public class DiffInfo extends FileInfo {
     }
     
     /**
-     * Adds child if isDirectory()
+     * Adds child if is directory.
      * @param child to be added to the children list
      */
     public void addChild(DiffInfo child) {
@@ -170,7 +170,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
-     * Use only if isDirectory
+     * Use only if is directory.
      * @return the newNumberOfFiles
      */
     public int getNewNumberOfFiles() {
@@ -178,7 +178,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
-     * Use only if isDirectory
+     * Use only if is directory.
      * @return the newNumberOfDirectories
      */
     public int getNewNumberOfDirectories() {
@@ -186,7 +186,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
-     * Use only if !isDirectory
+     * Use only if is not a directory.
      * @return the newSize
      */
     public Long getNewSize() {
@@ -236,7 +236,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
-     * Use only if isDirectory
+     * Use only if is directory.
      * @param newNumberOfFiles the newNumberOfFiles to set
      */
     public void setNewNumberOfFiles(int newNumberOfFiles) {
@@ -244,7 +244,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
-     * Use only if isDirectory
+     * Use only if is directory.
      * @param newNumberOfDirectories the newNumberOfDirectories to set
      */
     public void setNewNumberOfDirectories(int newNumberOfDirectories) {
@@ -252,7 +252,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
-     * Use only if !isDirectory
+     * Use only if is not a directory.
      * @param newSize the newSize to set
      */
     public void setNewSize(Long newSize) {

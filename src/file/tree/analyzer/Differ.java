@@ -136,7 +136,8 @@ public class Differ {
                         Node node = (Node) controlXPath.evaluate(xpathToParent, controlDoc.getDocumentElement(), XPathConstants.NODE);
                         elementToChange = (Element) node;
                         elementToChange.setAttribute("state", "modified");
-                        elementToChange.setAttribute("new" + attributeToChange.substring(0, 1).toUpperCase() + attributeToChange.substring(1), testValue);
+                        elementToChange.setAttribute("new" + attributeToChange.substring(0, 1).toUpperCase() + attributeToChange.substring(1), controlValue);
+                        elementToChange.setAttribute(attributeToChange, testValue);
 
                     } else if (createdOrDeleted) {
                         if (testValue.equals("null")) { //node was created - just mark it

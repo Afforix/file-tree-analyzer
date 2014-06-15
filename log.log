@@ -1,90 +1,146 @@
-Čer 14, 2014 11:28:19 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193715.xml 
-Čer 14, 2014 11:28:19 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:28:26 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T224219.xml 
-Čer 14, 2014 11:28:26 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193455.xml 
-Čer 14, 2014 11:28:26 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193647.xml 
-Čer 14, 2014 11:28:30 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T222839.xml 
-Čer 14, 2014 11:28:30 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193515.xml 
-Čer 14, 2014 11:28:30 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193715.xml 
-Čer 14, 2014 11:28:46 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193455.xml 
-Čer 14, 2014 11:28:56 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:29:04 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T224219.xml 
-Čer 14, 2014 11:29:04 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193455.xml 
-Čer 14, 2014 11:29:04 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193647.xml 
-Čer 14, 2014 11:29:12 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T222839.xml 
-Čer 14, 2014 11:29:12 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193515.xml 
-Čer 14, 2014 11:29:12 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193715.xml 
-Čer 14, 2014 11:29:12 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:29:17 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T224219.xml 
-Čer 14, 2014 11:29:17 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193455.xml 
-Čer 14, 2014 11:29:17 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193647.xml 
-Čer 14, 2014 11:29:21 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T222839.xml 
-Čer 14, 2014 11:29:21 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193515.xml 
-Čer 14, 2014 11:29:21 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193715.xml 
-Čer 14, 2014 11:31:18 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:31:18 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:31:28 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193515.xml 
-Čer 14, 2014 11:31:36 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:31:36 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:33:43 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:33:44 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:33:54 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:33:54 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 6 analyses found.
-Čer 14, 2014 11:35:47 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 13 analyses found.
-Čer 14, 2014 11:35:47 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 13 analyses found.
-Čer 14, 2014 11:36:04 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open bla1.xml 
-Čer 14, 2014 11:36:40 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 13 analyses found.
-Čer 14, 2014 11:36:40 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 13 analyses found.
-Čer 14, 2014 11:39:59 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 26 analyses found.
-Čer 14, 2014 11:40:00 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 26 analyses found.
-Čer 14, 2014 11:40:47 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 26 analyses found.
-Čer 14, 2014 11:40:47 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 26 analyses found.
-Čer 14, 2014 11:41:35 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193515.xml 
-Čer 14, 2014 11:41:44 DOP. file.tree.analyzer.XMLFileManager findXMLFile
-INFO: open 2014-06-13T193647.xml.xml 
-Čer 14, 2014 11:49:05 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 26 analyses found.
-Čer 14, 2014 11:49:06 DOP. file.tree.analyzer.XMLFileManager findAllXMLFiles
-INFO: 26 analyses found.
+Čer 14, 2014 7:34:52 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T193440.xml and 2014-06-14T193429.xml
+Čer 14, 2014 7:35:54 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 7:36:02 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 7:36:02 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 7:41:19 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 7:41:21 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 7:41:21 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 7:41:21 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T193440.xml and 2014-06-14T193429.xml
+Čer 14, 2014 7:49:51 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 4 analyses found.
+Čer 14, 2014 7:49:58 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 7:50:00 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 7:50:00 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 7:50:00 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T193440.xml and 2014-06-14T193429.xml
+Čer 14, 2014 7:50:25 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 4 analyses found.
+Čer 14, 2014 7:50:31 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 7:50:32 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 7:50:32 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 7:50:33 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T193440.xml and 2014-06-14T193429.xml
+Čer 14, 2014 8:18:22 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 4 analyses found.
+Čer 14, 2014 8:18:40 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 8:19:12 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 8:19:12 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 8:19:51 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 4 analyses found.
+Čer 14, 2014 8:19:55 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 8:19:56 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 8:19:56 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 8:19:56 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T193440.xml and 2014-06-14T193429.xml
+Čer 14, 2014 8:20:35 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 4 analyses found.
+Čer 14, 2014 8:20:39 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 8:20:40 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 8:20:40 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 8:20:40 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T193440.xml and 2014-06-14T193429.xml
+Čer 14, 2014 8:21:54 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 4 analyses found.
+Čer 14, 2014 8:21:58 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 8:21:59 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 8:21:59 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 8:21:59 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T193440.xml and 2014-06-14T193429.xml
+Čer 14, 2014 9:04:04 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 4 analyses found.
+Čer 14, 2014 9:04:16 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 9:04:17 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 14, 2014 9:04:17 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 14, 2014 9:04:17 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T193440.xml and 2014-06-14T193429.xml
+Čer 15, 2014 2:36:10 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 4 analyses found.
+Čer 15, 2014 2:36:16 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 15, 2014 2:36:19 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193440.xml 
+Čer 15, 2014 2:36:19 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-14T193429.xml 
+Čer 15, 2014 2:36:19 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-14T193440.xml and 2014-06-14T193429.xml
+Čer 15, 2014 2:51:31 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 4 analyses found.
+Čer 15, 2014 2:52:01 ODP. file.tree.analyzer.gui.MainController newAnalysis
+SEVERE: No selected directory!
+Čer 15, 2014 2:52:06 ODP. file.tree.analyzer.gui.MainController newAnalysis
+SEVERE: No selected directory!
+Čer 15, 2014 2:52:31 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 0 analyses found.
+Čer 15, 2014 2:52:42 ODP. file.tree.analyzer.XMLFileManager createXMLFile
+INFO: File 2014-06-15T145242.xml created.
+Čer 15, 2014 2:53:10 ODP. file.tree.analyzer.XMLFileManager createXMLFile
+INFO: File 2014-06-15T145310.xml created.
+Čer 15, 2014 2:53:23 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T145310.xml 
+Čer 15, 2014 2:53:23 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T145242.xml 
+Čer 15, 2014 2:53:23 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-15T145310.xml and 2014-06-15T145242.xml
+Čer 15, 2014 3:31:16 ODP. file.tree.analyzer.XMLFileManager createXMLFile
+INFO: File 2014-06-15T153113.xml created.
+Čer 15, 2014 3:40:07 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Čer 15, 2014 3:40:22 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T153113.xml 
+Čer 15, 2014 3:42:32 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Čer 15, 2014 3:42:36 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T145310.xml 
+Čer 15, 2014 3:42:40 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T145310.xml 
+Čer 15, 2014 3:42:40 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T145242.xml 
+Čer 15, 2014 3:42:42 ODP. file.tree.analyzer.Differ diffXMLs
+INFO: diffed 2014-06-15T145310.xml and 2014-06-15T145242.xml
+Čer 15, 2014 4:01:07 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T153113.xml 
+Čer 15, 2014 4:02:15 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Čer 15, 2014 4:02:33 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T153113.xml 
+Čer 15, 2014 4:58:22 ODP. file.tree.analyzer.XMLFileManager findAllXMLFiles
+INFO: 3 analyses found.
+Čer 15, 2014 4:58:33 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T145242.xml 
+Čer 15, 2014 4:58:55 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T153113.xml 
+Čer 15, 2014 5:43:37 ODP. file.tree.analyzer.XMLFileManager createXMLFile
+INFO: File 2014-06-15T174333.xml created.
+Čer 15, 2014 6:14:34 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T174333.xml 
+Čer 15, 2014 6:14:48 ODP. file.tree.analyzer.XMLFileManager findXMLFile
+INFO: open 2014-06-15T153113.xml 
