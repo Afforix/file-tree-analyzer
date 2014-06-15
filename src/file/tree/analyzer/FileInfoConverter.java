@@ -10,9 +10,7 @@ package file.tree.analyzer;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -23,7 +21,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- *
+ * Class for converting fileInfo to DOM and vice versa.
  * @author martina
  */
 public class FileInfoConverter {
@@ -63,6 +61,13 @@ public class FileInfoConverter {
         return doc;
     }
 
+    /**
+     * Used by fileInfoToDom to create DOM representation of Document
+     * 
+     * @param doc 
+     * @param parent
+     * @param fileInfo 
+     */
     private static void childrenToDom(Document doc, Node parent, FileInfo fileInfo) {
         //create new element that represents fileInfo and add all attributes
         
@@ -107,78 +112,12 @@ public class FileInfoConverter {
     }
 
     /**
-     * Takes object representing XML DOM and converts it to FileInfo.
-     *
-     * @param doc XML DOM
-     * @return FileInfo
-     *  
-     */
-    /*
-    public static FileInfo domToFileInfo(Document doc) {
-        if(doc == null) throw new IllegalArgumentException("doc is null");
-        
-        Element rootElement = doc.getDocumentElement();
-        FileInfo root = childrenToFileInfo(rootElement, "");
-
-        return root;
-    }
-    */
-
-    /**
-     * @deprecated
-     */
-    /*
-    private static FileInfo childrenToFileInfo(Element element, String path) {
-        //get all file info from element
-        
-        FileInfo item = new FileInfo();
-
-        item.setName(element.getAttribute("name"));
-        item.setAccessibility(Boolean.parseBoolean(element.getAttribute("accessible")));
-        item.setDirectory(element.getTagName().equals("directory"));
-        item.setPath(element.hasAttribute("path") ? element.getAttribute("path") : path + "/" + item.getName());
-
-        if (!item.isAccessible()) {
-            return item;//we are done here
-        }
-
-        if (item.isDirectory()) {
-            item.setNumberOfFiles(Integer.parseInt(element.getAttribute("numberOfFiles")));
-            item.setNumberOfDirectories(Integer.parseInt(element.getAttribute("numberOfDirectories")));
-
-            for (int i = 0; i < element.getChildNodes().getLength(); i++) {
-                Node node = element.getChildNodes().item(i);
-                if (node.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-                item.addChild(childrenToFileInfo((Element) node, item.getPath()));
-            }
-        } else {
-            item.setSize(Long.parseLong(element.getAttribute("size")));
-        }
-
-        item.setSymbolicLink(Boolean.parseBoolean(element.getAttribute("symbolicLink")));
-        //set date format for time attributes
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-        try {
-            item.setCreationTime(dateFormat.parse(element.getAttribute("creationTime")));
-            item.setLastAccessTime(dateFormat.parse(element.getAttribute("lastAccessTime")));
-            item.setLastModifiedTime(dateFormat.parse(element.getAttribute("lastModifiedTime")));
-        } catch (ParseException ex) {
-           logger.log(Level.SEVERE, null, ex);
-        }
-
-        return item;
-    }
-    */
-    
-    /**
      * Gets date from desired attribute or uses "older" attribute.
-     *
+     * Helping method for childrenToInfo
+     * 
      * @param parent element whose attribute should be tested
      * @param oldAttribute already existing Date (for example creationTime)
-     * @param newAttributeName name of Date to set (for example newCreationTime)
+     * @param newAttributeName name of Date to be set (for example newCreationTime)
      * @param dateFormat how should output look like
      * @return date
      */
@@ -201,28 +140,34 @@ public class FileInfoConverter {
     }
     
     /**
-     * Set newNumberOfFiles or newNumberOfDirectories 
+     * Helping method for childrenToInfo
+     * Sets newNumberOfFiles or newNumberOfDirectories 
+     * 
      * @param newAttributeValue string to parse value from
-     * @param state 
-     * @param oldAttributeValue
+     * @param oldAttributeValue return this if newAttributeValue is empty
      * @return int
      */
-    private static int setNewNumber(String newAttributeValue, ItemState state, int oldAttributeValue) {
+    private static int setNewNumber(String newAttributeValue, int oldAttributeValue) {
         int number;
         if (!newAttributeValue.isEmpty()) {
             number = Integer.parseInt(newAttributeValue);
-        /*} else if (state == ItemState.DELETED) {
-            number = 0; */
         } else {
             number = oldAttributeValue;
         }
         return number;
     }
     
-    private static boolean setNewBoolean(String newAttributevalue, boolean oldAttributeValue) {
+    /**
+     * Helping method for childrenToInfo
+     * 
+     * @param newAttributeValue If this is empty, oldAttributeValue is returned
+     * @param oldAttributeValue 
+     * @return setted boolean 
+     */
+    private static boolean setNewBoolean(String newAttributeValue, boolean oldAttributeValue) {
         boolean bool;
-        if (!newAttributevalue.isEmpty()) {
-                bool = Boolean.getBoolean(newAttributevalue);
+        if (!newAttributeValue.isEmpty()) {
+                bool = Boolean.getBoolean(newAttributeValue);
             } else {
                 bool = oldAttributeValue;
             }
@@ -232,10 +177,10 @@ public class FileInfoConverter {
     /**
      * Takes object representing XML DOM and converts it to FileInfo.
      *
-     * @param doc XML Dom
+     * @param doc XML DOM
      * @return FileInfo
+     * @see childrenToInfo
      */
-    //name changed from domToFileInfo2
     public static FileInfo domToFileInfo(Document doc) {
         if(doc == null) throw new IllegalArgumentException("doc is null");
 
@@ -248,8 +193,9 @@ public class FileInfoConverter {
     /**
      * Takes object representing XML DOM and converts it to DiffInfo.
      *
-     * @param doc XML Dom
-     * @return FileInfo with DiffInfo
+     * @param doc XML DOM
+     * @return FileInfo (with DiffInfo informations)
+     * @see childrenToInfo
      */
     public static DiffInfo domToDiffInfo(Document doc) {
         if(doc == null) throw new IllegalArgumentException("doc is null");
@@ -261,11 +207,11 @@ public class FileInfoConverter {
     }
 
     /**
-     *
+     * Used by both domToFileInfo and domToDiffInfo to process children to depth.
      * @param parent Element to be processed
-     * @param path To parent element
-     * @param isDiffInfo DiffInfo needs additional code
-     * @return Object. This can be casted back to FileInfo or DiffInfo
+     * @param path Path to parent Element
+     * @param isDiffInfo DiffInfo uses more code in this method
+     * @return FileInfo. This can be casted to DiffInfo
      */
     private static FileInfo childrenToInfo(Element parent, String path, boolean isDiffInfo) {
         String name = "";
@@ -365,9 +311,9 @@ public class FileInfoConverter {
                     }
                 } else { 
                     newString = parent.getAttribute("newNumberOfFiles");
-                    newNumberOfFiles = setNewNumber(newString, state, numberOfFiles);
+                    newNumberOfFiles = setNewNumber(newString, numberOfFiles);
                     newString = parent.getAttribute("newNumberOfDirectories");
-                    newNumberOfDirectories = setNewNumber(newString, state, numberOfDirectories);
+                    newNumberOfDirectories = setNewNumber(newString, numberOfDirectories);
                 }
 
                 newCreationTime = setDate(parent, creationTime, "newCreationTime", dateFormat);
@@ -407,13 +353,16 @@ public class FileInfoConverter {
                         Element child = (Element) parent.getChildNodes().item(i);
                         if (diffInfoRoot.getState() == ItemState.CREATED) { //mark children of deleted also as deleted
                             child.setAttribute("state", "created");
-                        } 
+                        } else if (diffInfoRoot.getState() == ItemState.DELETED) {
+                            child.setAttribute("state", "deleted");
+                        }
                         diffInfoRoot.addChild((DiffInfo) childrenToInfo(child, diffInfoRoot.getPath(), isDiffInfo));   
                     }
                 }
             }
             
             return (FileInfo) diffInfoRoot;
+            
         } else {
             fileInfoRoot = new FileInfo();
             fileInfoRoot.setAccessibility(isAccessible);

@@ -8,7 +8,6 @@ package file.tree.analyzer;
 import file.tree.analyzer.gui.RowInfo;
 import file.tree.analyzer.utils.Utils;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -17,6 +16,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 /**
+ * Entity class for storing extended information about file or directory. 
+ * In case of directory, all children are accessible using instance of this class.
+ * DiffInfo is used by Differ for storing differences between two documents.
  *
  * @author jindra
  */
@@ -32,28 +34,18 @@ public class DiffInfo extends FileInfo {
     protected Date newCreationTime;
     protected Date newLastAccessTime;
     protected Date newLastModifiedTime;
-
-    
-    public DiffInfo(String name, String path, boolean directory, boolean symbolicLink, boolean accessibility, Long size, Date creationTime, Date lastAccessTime, Date lastModifiedTime, List<FileInfo> children, int numberOfFiles, int numberofDirectories,
-            ItemState state, List<DiffInfo> diffChildren, boolean newSymbolicLink, boolean newAccessibility, int newNumberOfFiles, int newNumberOfDirectories, Long newSize, Date newCreationTime, Date newLastAccessTime, Date newLastModifiedTime) {
-        super(name, path, directory, symbolicLink, accessibility, size, creationTime, lastAccessTime, lastModifiedTime, children, numberOfFiles, numberofDirectories);
-        this.state = state;
-        this.newSymbolicLink = newSymbolicLink;
-        this.diffChildren = diffChildren;
-        this.newAccessibility = newAccessibility;
-        this.newNumberOfFiles = newNumberOfFiles;
-        this.newNumberOfDirectories = newNumberOfDirectories;
-        this.newSize = newSize;
-        this.newCreationTime = newCreationTime;
-        this.newLastAccessTime = newLastAccessTime;
-        this.newLastModifiedTime = newLastModifiedTime;
-    }
-    
-    
+       
+    /**
+     * Constructor without parameters
+     */
     public DiffInfo(){
         super();
     }
     
+    /**
+     * 
+     * @param file Path to file, which attributes are going to be stored 
+     */
     public DiffInfo(Path file) {
         super(file);
     }
@@ -64,11 +56,6 @@ public class DiffInfo extends FileInfo {
         ArrayList<RowInfo> list = new ArrayList<>();
 
         list.add(new RowInfo("Name", name, "(diffed)" + name));
-        /*if(state == ItemState.UNMODIFIED || state == ItemState.DELETED) {
-            addToList(list, "State", state.toString(), null);
-        } else {
-            addToList(list, "State", null, state.toString());
-        }*/
         addToList(list, "State", state.toString(), null);
 
         if (!directory) {
@@ -89,7 +76,7 @@ public class DiffInfo extends FileInfo {
     private void addToList(ArrayList<RowInfo> list, String key, Object value, Object newValue) {
         String val = "";
         String newVal = "";
-        
+
         if (!isAccessible() && !isNewlyAccessible()) {
             return;
         }
@@ -126,6 +113,10 @@ public class DiffInfo extends FileInfo {
         return "";
     }
     
+    /**
+     * Adds child if isDirectory()
+     * @param child to be added to the children list
+     */
     public void addChild(DiffInfo child) {
         if (isDirectory()) {
             if (diffChildren == null) {
@@ -137,6 +128,10 @@ public class DiffInfo extends FileInfo {
         }
     }
     
+    /**
+     * @throws IllegalStateException
+     * @return list of diffChildren of the directory
+     */
     public List<DiffInfo> getDiffChildren() {
         if (!isAccessible() && !isNewlyAccessible()) {
             throw new IllegalStateException("file is not accessible: " + getPath());
@@ -161,7 +156,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
-     * @return the newSymbolicLink
+     * @return new symbolic link
      */
     public boolean isNewlySymbolicLink() {
         return newSymbolicLink;
@@ -175,6 +170,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
+     * Use only if isDirectory
      * @return the newNumberOfFiles
      */
     public int getNewNumberOfFiles() {
@@ -182,6 +178,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
+     * Use only if isDirectory
      * @return the newNumberOfDirectories
      */
     public int getNewNumberOfDirectories() {
@@ -189,6 +186,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
+     * Use only if !isDirectory
      * @return the newSize
      */
     public Long getNewSize() {
@@ -238,6 +236,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
+     * Use only if isDirectory
      * @param newNumberOfFiles the newNumberOfFiles to set
      */
     public void setNewNumberOfFiles(int newNumberOfFiles) {
@@ -245,6 +244,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
+     * Use only if isDirectory
      * @param newNumberOfDirectories the newNumberOfDirectories to set
      */
     public void setNewNumberOfDirectories(int newNumberOfDirectories) {
@@ -252,6 +252,7 @@ public class DiffInfo extends FileInfo {
     }
 
     /**
+     * Use only if !isDirectory
      * @param newSize the newSize to set
      */
     public void setNewSize(Long newSize) {
