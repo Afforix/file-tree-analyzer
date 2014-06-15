@@ -39,6 +39,10 @@ public class XMLFileManager {
     private final static Logger logger = Logger.getLogger(FileTreeAnalyzer.class.getName());
     private Path analysesPath;
 
+    /**
+     *
+     * @param path path of the directory with analyses
+     */
     public XMLFileManager(String path) {
 
         analysesPath = Paths.get(path);
@@ -192,8 +196,7 @@ public class XMLFileManager {
     }
 
     /**
-     * Returns XML DOM loaded from XML file. added by Jindra because deferred
-     * DOM was causing troubles in Differ
+     * Returns XML DOM loaded from XML file.
      *
      * @param fileName name of the xml file
      * @param turnOffDefferedDom true to disable deffered version of DOM
