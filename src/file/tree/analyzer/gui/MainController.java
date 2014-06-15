@@ -351,8 +351,7 @@ public class MainController {
     }
 
     private void diff(String first, String second) throws IOException {
-
-        System.out.println("Diff " + first + " " + second); // log
+        
         fullDiffCheckBox.setDisable(false);
         DiffInfo info = Differ.diffXMLs("./saved_analyses", first, second);
         loadFile(info, true);
@@ -380,16 +379,17 @@ public class MainController {
             List<T> items) {
         ComboBoxItem selectOpen = openComboBox.getSelectionModel().getSelectedItem();
         List<T> filteredItems = new ArrayList<>();
-
         if (selectOpen != null) {
-            filter = filter.getName(filter.getNameCount() - 1);
+            
+            int count = filter.getNameCount() - 1;
+            filter = (count  < 0) ? filter.getRoot() : filter.getName(count);            
             for (T item : items) {
                 Path path = Paths.get(((ComboBoxItem) item).getPath());
                 if (path.endsWith(filter) && !selectOpen.equals(item)) {
                     filteredItems.add(item);
-                } else {
+                } /*else {
                     filteredItems.add(item);
-                }
+                }*/
             }
         }
         comboBox.setItems(FXCollections.observableArrayList(filteredItems));
