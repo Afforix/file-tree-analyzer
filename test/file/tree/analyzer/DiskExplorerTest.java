@@ -17,8 +17,6 @@ import org.junit.Test;
  * @author martina
  */
 public class DiskExplorerTest {
-    
-//    private boolean testSymLink;
 
     @Before
     public void setUp() throws Exception {

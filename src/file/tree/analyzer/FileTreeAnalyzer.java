@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package file.tree.analyzer;
 
 import java.io.IOException;
@@ -49,19 +45,6 @@ public class FileTreeAnalyzer extends Application {
             logger.log(Level.SEVERE,ex.getMessage());
             throw ex;
         }
-
-        //FOR TESTING ONLY
-//        System.out.println("Contents of the parent directory:");
-//        FileInfo directory = null;
-//        try {
-//            directory = DiskExplorer.getFileTree("..");
-//            directory.print();
-//            System.out.println("DONE");
-//        } catch (IOException e) {
-//            System.err.println("Analysis failed.");
-//            e.printStackTrace();
-//        }                 
-        //END TESTING
     }
 
     private static void initLogger() {

@@ -20,7 +20,6 @@ import org.w3c.dom.Element;
  * @author martina
  */
 public class FileInfoConverterTest {
-//    private boolean testSymLink;
     
     @Before
     public void setUp() throws Exception {
@@ -122,9 +121,10 @@ public class FileInfoConverterTest {
 
     /**
      * Test of domToFileInfo method, of class FileInfoConverter.
+     * @throws java.lang.Exception
      */
     @Test
-    public void testDomToFileInfo() throws Exception{
+    public void testDomToFileInfo() throws Exception {
         System.out.println("domToFileInfo test");
         XMLFileManager manager = new XMLFileManager("./test/file/tree/analyzer");
         Document doc = manager.findXMLFile("testXMLDocument.xml");

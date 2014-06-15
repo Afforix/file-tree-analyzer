@@ -288,8 +288,7 @@ public class FileInfo implements Comparable<FileInfo> {
     }
 
     /**
-     * Prints whole directory tree. Mainly for testing purposes, can be removed
-     * in the final release.
+     * Prints whole directory tree.
      */
     public void print() {
         print(0);
