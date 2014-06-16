@@ -36,22 +36,16 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
-import javafx.util.Pair;
 
 public class MainController {
 
@@ -319,7 +313,7 @@ public class MainController {
                                     treeAlreadyLoaded = true;
                                     openComboBox.getSelectionModel().select(oldItem);
                                     String oldFile = oldItem.getFile();
-                                    diff(file, oldFile);
+                                    diff(oldFile,file);
                                     xmlFileManager.deleteXMLFile(file);
                                     openComboBox.getItems().remove(displayString);
                                     diffComboBox.setDisable(true);
@@ -387,9 +381,7 @@ public class MainController {
                 Path path = Paths.get(((ComboBoxItem) item).getPath());
                 if (path.endsWith(filter) && !selectOpen.equals(item)) {
                     filteredItems.add(item);
-                } /*else {
-                    filteredItems.add(item);
-                }*/
+                }
             }
         }
         comboBox.setItems(FXCollections.observableArrayList(filteredItems));

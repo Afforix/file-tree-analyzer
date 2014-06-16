@@ -1,23 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package file.tree.analyzer.gui;
 
 import file.tree.analyzer.DiffInfo;
 import file.tree.analyzer.FileInfo;
 import file.tree.analyzer.ItemState;
-import file.tree.analyzer.utils.Utils;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 /**
  *
