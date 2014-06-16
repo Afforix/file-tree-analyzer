@@ -12,7 +12,7 @@
     <import file="nbproject/build-impl.xml"/>
     
     <target name="-post-jar">
-  <jar jarfile="downloads/Combined-dist.jar">
+  <jar jarfile="downloads/FileTreeAnalyzer.jar">
     <zipfileset src="${dist.jar}" excludes="META-INF/*" />
     <zipfileset src="lib/xmlunit-1.5.jar" excludes="META-INF/*" />    
     <manifest>
