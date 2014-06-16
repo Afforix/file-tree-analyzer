@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article>
+  <articleinfo>
+    <title>Závěrečná zpráva</title>
+
+    <author>
+      <firstname>Matěj</firstname>
+
+      <surname>Plch</surname>
+
+      <affiliation>
+        <orgname>Masarykova Univerzita, Fakulta informatiky</orgname>
+      </affiliation>
+    </author>
+
+    <pubdate>15.6.2014</pubdate>
+  </articleinfo>
+
+  <section>
+    <title>Počáteční organizace týmu</title>
+
+    <para>Na první schůzi týmu jsme jsme se nejprve domluvili, jaký budeme
+    používat verzovací systém. Vybrali jsme si Git, zejména kvůli hostování
+    projektu na službě GitHub. Ke komunikaci mezi členy týmu byla vytvořena
+    diskuzní místnost na webu gitter.im, který poskytuje propojení s
+    repozitářem na GitHubu. Následně jsme začali přemýšlet o návrhu našeho
+    programu, který musel analyzovat data na disku, uložit je, a zobrazit
+    porovnání dvou analýz. Jako vedoucí týmu jsem byl vybrán já, vytvořil jsem
+    tedy na githubu v sekci Issues položky pro jednotlivé části programu, kde
+    se každý člen týmu přiřadil k různým problémům dle svých
+    preferencí.</para>
+  </section>
+
+  <section>
+    <title>Analýza dat na disku</title>
+
+    <para>Jak svůj hlavní úkol jsem si vybral získání stromové struktury dat z
+    disku, která reprezentuje obsah určitého adresáře. Procházení adresářů
+    jsem realizoval pomocí metody Files.walkFileTree(), které se předá
+    počáteční cesta a objekt implementující rozhraní FileVisitor. Toto
+    rozhraní obsahuje metody, které se volají při různých událostech při čtení
+    dat, konkrétně při nalezení souboru, před vstupem do složky, po výstupu ze
+    složky a při selhání čtení souboru/složky. Na základě volání těchto jsem
+    implementoval rekurzivní budování stromové struktury adresáře.</para>
+
+    <para>Takto získaná data jsem měl dále za úkol prezentovat ostatním částem
+    aplikace, takže jsem ve spolupráci s týmovými kolegy navrhnul třídu, která
+    umožňuje pohodlnou práci s daty.</para>
+  </section>
+
+  <section>
+    <title>Unit testy</title>
+
+    <para>Dalším z mých úkolů bylo vytvoření unit testů. S tím mi velmi
+    pomohla Martina, která naprogramovala vytvoření testovacího adresáře, a
+    také sama napsala testy pro několik tříd. V testech se testuje, zda se
+    správně načte stromová struktura adresáře z disku, zda jsou tato data
+    správně převedena do prezentovatelné formy, jestli se data správně
+    převedou a uloží jako XML, a také se testuje správa již uložených XML
+    dokumentů.</para>
+  </section>
+
+  <section>
+    <title>Optimalizace</title>
+
+    <para>Všiml jsem si, že se náš program pomalu spouštěl, a za pomoci
+    profileru jsem hledal příčinu. Zpomalení bylo způsobeno parsováním
+    uložených analýz, aby se vyčetlo, k jakým adresářům analýzy patří. K
+    vyčtení jednoho atributu z XML ale nebylo potřeba parsovat celý dokument,
+    takže jsem atribut s cestou nechal načíst pomocí parseru SAX, kdy jsem z
+    prvního elementu přečetl atribut path a pak jsem přerušil parsování. Díky
+    této optimalizaci již start programu není nijak zpomalen přítomnými
+    analýzami.</para>
+  </section>
+
+  <section>
+    <title>Závěrečné problémy</title>
+
+    <para>Porovnání dvou analýz disku implementoval Jindra za pomoci knihovny
+    XMLUnit, narazil ovšem na nečekaně velké problémy při zaznamenávání
+    rozdílů. Rozdíly se zaznamenávají tak, že se připíší do již existujícího
+    DOM stromu, ze kterého se poté data vyčtou pro prezentaci výsledku v GUI.
+    Velkým problémem bylo ale zaznamenat, že byl smazán nějaký soubor či
+    složka, protože knihovna XMLUnit poskytla pouze XPath výraz, kde soubor
+    chyběl, ale tuto informaci nešlo do výsledného XML zaznamenat pomocí
+    tohoto XPathu, protože v druhém dokumentu často nevedl na to stejné místo.
+    Nabídl jsem se, že Jindrovi pomůžu tento problém řešit, a společně jsme
+    vymýšleli, co s tím. Na řešení nakonec přišel Jindra sám, muselo se v
+    jednom stromě zjistit jména všech předchůdců, a podle těchto jmen hledat
+    cestu ve druhém stromě.</para>
+  </section>
+
+  <section>
+    <title>Zhodnocení projektu</title>
+
+    <para>Jednalo se o největší týmový projekt, na jakém jsem se zatím
+    podílel. Povedlo se nám vytvořit funkční aplikaci, ale to nebyl hlavní cíl
+    tohoto projektu, vyzkoušeli jsme si práci s nástroji pro zpracování XML,
+    naučili jsme se používat Git a vyzkoušeli jsme si, jak probíhá práce ve
+    větším týmu. Tento projekt byl pro mě velkým přínosem a získané znalosti a
+    zkušenosti jistě v budoucnu využiji.</para>
+  </section>
+</article>
