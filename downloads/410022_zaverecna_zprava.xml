@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<article>
+  <articleinfo>
+    <title>Zaverecna zpráva k projektu analýza disku pro předmět PB138</title>
+
+    <author>
+      <firstname>Filipo</firstname>
+      <surname>Křepinský</surname>
+      <affiliation>
+	<address><email>suomiy@gmail.com</email></address>
+      </affiliation>
+    </author>
+ </articleinfo>
+
+  <section>
+    <title>Zavěrečná zpráva</title>
+
+    <para>Měl jsem na starost primárně grafické rozhraní projektu, které běží na JavaFX 8 jež je součástí Javy 8. Grafické rozhraní bylo navrženo a nakonfigurováno v JavaFXBuilder 2.0. který to poté transformuje do fxml souboru. V tomto souboru musí být určený controller což je název Java třídy s kterým bude toto okno spárováno. Příslušné definované proměné a handlery  jsou v dané třídě spárovány pomocí fxml notace. 
+Kromě okna hlavní aplikace jsou tam ještě další dvě okna s dalšími dvěma controlery. V hlavní aplikaci je tlačítko na utvoření nové analýzy jež zavolá systémový file chooser a zavolá dané metody pro novou analýzu a uloží ji definované složky. Jelikož je toto časové náročné tak se pustí analýza jako task(DiskExplorerTask.java). Uložené analýzy v této složce se zobrazují v Open Comboboxu. Při načtení analýzy je zobrazen strom pomocí TreeView. Dále je možnost diffnout analýzu která se zobrazují profiltrované v DiffTo comboboxu. Třída FileInfoTreeItem která rozšiřuje TreeItem  má přetížené metody tak aby se daný strom načítal líně. Na TreeView je přidaný listener který je svázaný s TableView, jež zobrazuje dané atributy vybraného souboru(nebo I diffnutého) v TreeView. Pro tabulku a strom jsou dále nadefinované custom cell factory aby se zobrazovali dobře barvy pro zpřehledenění difu. Pro zobrazení ikonek ve stromu se požívá systémové volání a zejména na linuxech to nefunguje stoprocentně(ikonky podle typu souboru). Dále pomocí checkboxu lze nastavit zobrazení diffu bez nezměněných souborů.</para>
+
+   
+  </section>
+</article>
+
+
+
+
+
