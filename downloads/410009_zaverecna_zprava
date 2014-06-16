@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<article>
+  <articleinfo>
+    <title>Závěrečná zpráva k projektu File Tree Analyzer z předmětu PB138</title>
+
+    <author>
+      <firstname>Jindřich</firstname>
+      <surname>Ryšavý</surname>
+      <affiliation>
+	<address><email>rysavy.jindrich@seznam.cz</email></address>
+      </affiliation>
+    </author>
+ </articleinfo>
+
+  <section>
+    <title>Zavěrečná zpráva</title>
+
+    <para>
+    Mým úkolem bylo nastudování knihovny XMLUnit (http://xmlunit.sourceforge.net/) a její aplikace na zadaný problém porovnání obsahů dvou XML souborů a uložení rozdílů pro další zpracování pomocí třídy Differ.</para>
+    <para>
+    XMLUnit je rozšířením pro JUnit, mimo jiné umí najít rozdíly mezi dvěma částmi zadaných XML. Nastavil jsem ho tak, aby nacházel rozdíly pouze mezi uzly se stejným jménem a atributem name na stejné úrovni stromu.
+    </para>
+    <para>
+    Vstupní XML pro Differ obsahují uzly typu directory a file s atributy popisujícími jejich vlastnosti. Differ jeden z dokumentů zkopíruje do třetího, do kterého zapisuje rozdíly (aby neměnil přímo vstupní dokument). Nastat mohou čtyři situace: žádná změna, změna atributu "a" (pak se vytvoří atribut newA), vytvoření uzlu (pouze se změní atribut state na created) nebo smazání uzlu.
+    </para>
+    Při smazání uzlu jsem narazil na problém s importem smazaného uzlu a jeho potomků na správné místo v novém dokumentu, protože Xpath lokace v obou dokumentech se lišily kvůli nově vytvořeným uzlům. Vyřešil jsem to vytvořením cesty pomocí jmen nadřazených složek ve starém dokumentu a následným nalezením těchto jmen v novém.  
+    <para>
+    Dále jsem se zabýval převodem výsledného dokumentu na DiffInfo.
+    </para>
+    
+  </section>
+</article>
+
+
+
+
+
