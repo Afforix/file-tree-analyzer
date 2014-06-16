@@ -10,6 +10,17 @@
 <project name="file-tree-analyzer" default="default" basedir=".">
     <description>Builds, tests, and runs the project file-tree-analyzer.</description>
     <import file="nbproject/build-impl.xml"/>
+    
+    <target name="-post-jar">
+  <jar jarfile="downloads/Combined-dist.jar">
+    <zipfileset src="${dist.jar}" excludes="META-INF/*" />
+    <zipfileset src="lib/xmlunit-1.5.jar" excludes="META-INF/*" />    
+    <manifest>
+        <attribute name="Main-Class" value="file.tree.analyzer.FileTreeAnalyzer"/>
+    </manifest>
+  </jar>
+</target>
+
     <!--
 
     There exist several targets which are by default empty and which can be 
